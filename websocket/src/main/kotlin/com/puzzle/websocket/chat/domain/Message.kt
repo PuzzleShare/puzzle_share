@@ -5,8 +5,15 @@ sealed class Message(
     open val userName: String,
 )
 
+data class InGameMessage(
+    val gameId: Long,
+    val team: String,
+    override val userName: String,
+    override val message: String,
+) : Message(message, userName)
+
 data class InRoomMessage(
-    val roomId: Long,
+    val roomId: String,
     val roomName: String,
     override val userName: String,
     override val message: String,
