@@ -11,9 +11,9 @@ import jakarta.persistence.Table
 class Users(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var user_id: Long = 0,
-    var user_name: String,
+    var userId: Long = 0,
+    var userName: String,
     var email: String,
-    var social_type: String,
-    var user_image: String,
+    var socialType: String,
+    var userImage: String,
 ) : BaseEntity()
