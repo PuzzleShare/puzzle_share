@@ -8,12 +8,16 @@ spring:
     password: 1111
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    defer-datasource-initialization: true
-    hibernate.ddl-auto: create
+    defer-datasource-initialization: false
+    hibernate.ddl-auto: validate
     show-sql: true
     properties:
       hibernate.format_sql: true
       hibernate.default_batch_fetch_size: 100
   sql.init.mode: always
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
 
 kotlin.code.style: official
