@@ -3,3 +3,7 @@ server:
 spring:
   application:
     name: websocket
+
+kotlin:
+  code:
+    style: official

@@ -2,7 +2,7 @@ package com.puzzle.websocket.chat.domain
 
 sealed class Message(
     open val message: String,
-    open val userName: String
+    open val userName: String,
 )
 
 data class InRoomMessage(

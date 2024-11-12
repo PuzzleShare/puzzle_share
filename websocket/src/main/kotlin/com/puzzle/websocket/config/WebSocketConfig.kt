@@ -8,7 +8,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-class WebSocketConfig : WebSocketMessageBrokerConfigurer{
+class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
         registry.setApplicationDestinationPrefixes("/pub")
         registry.enableSimpleBroker("/topic")
@@ -16,7 +16,8 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer{
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        registry.addEndpoint("/ws")
+        registry
+            .addEndpoint("/ws")
 //            .setAllowedOrigins("*")
             .withSockJS()
         super.registerStompEndpoints(registry)
