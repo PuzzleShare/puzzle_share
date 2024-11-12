@@ -6,21 +6,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class TestControllerTest
+class TestControllerTest(
     @Autowired
-    constructor(
-        val mockMvc: MockMvc,
-    ) {
-        @Test
-        fun `GET success should return Hello World!`() {
-            mockMvc
-                .get("/api/v1/test/success")
-                .andExpect {
-                    status { isOk() }
-                    content { string("Hello World!") }
-                }
-        }
+    private val mockMvc: MockMvc,
+) {
+    @Test
+    fun `GET success should return Hello World!`() {
+        mockMvc
+            .perform(get("/api/v1/test/success"))
+            .andExpect {
+                it.response.contentAsString.equals("Hello World!")
+            }
     }
+}
