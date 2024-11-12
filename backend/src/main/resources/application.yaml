@@ -2,12 +2,11 @@ spring:
   swagger-ui:
     enabled: true
   datasource:
-    url: jdbc:mysql://localhost:3306/puzzle
+    url: jdbc:mysql://localhost:3306/puzzle?useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: wjddlsdn5
+    password: 1111
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-#    defer-datasource-initialization: true
     defer-datasource-initialization: false
     hibernate.ddl-auto: none
     show-sql: true
