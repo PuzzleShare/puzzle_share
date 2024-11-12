@@ -7,13 +7,13 @@
         "NODE_ENV": "production"
       },
       "ports": {
-        "80": "HTTP"
+        "8080": "HTTP"
       }
     }
   },
   "publicEndpoint": {
     "containerName": "app",
-    "containerPort": 80,
+    "containerPort": 8080,
     "healthCheck": {
       "healthyThreshold": 2,
       "unhealthyThreshold": 2,
