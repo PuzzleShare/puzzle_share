@@ -43,7 +43,9 @@ allOpen {
     annotation("jakarta.persistence.MappedSuperclass")
     annotation("jakarta.persistence.Embeddable")
 }
-
+tasks.named("processResources") {
+    dependsOn("copyGitSubmodule")
+}
 tasks.withType<Test> {
     useJUnitPlatform()
 }
