@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatTest</title>
+    <style>
+        #chat_ul{
+            width:300px;
+            height:500px;
+            overflow: auto;
+        }
+        #chat_ul li {
+            background: lightblue;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<ul id="chat_ul"></ul>
+<textarea id="message"></textarea>
+<button id="send" onclick="sendMessage()">보내기</button>
+</body>
+<script>
+    const sockJs = new SockJS("/ws/chat");
+    const stomp = Stomp.over(sockJs);
+    let stompClient = null;
+
+    function connect() {
+        const socket = new SockJS('/ws');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log('Connected: ' + frame);
+
+            // 수신 메시지 구독
+
+            stompClient.subscribe("/topic/chat/main", message => {
+                const ul = document.getElementById('chat_ul')
+                const li = document.createElement('li')
+                const json = JSON.parse(message.body)
+                li.textContent = `${json.userName} : ${json.message}`
+                ul.appendChild(li)
+                const textarea = document.getElementById("message")
+                textarea.value = ''
+            })
+        });
+    }
+
+    function sendMessage() {
+        const message = document.getElementById("message")
+        const value = message.value.trim()
+        if (!value) return
+        const json = {
+            userName:"mymy",
+            message:message.value
+        }
+        stompClient.send('/pub/chat/main', {}, JSON.stringify(json))
+    }
+
+    document.getElementById('message').addEventListener('keydown', e => {
+        if(e.isComposing) return
+        if(e.code === 'Enter'){
+            console.log('enter send')
+            sendMessage()
+        }
+    })
+
+
+    connect();
+</script>
+</html>
