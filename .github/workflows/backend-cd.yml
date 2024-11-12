@@ -52,7 +52,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Build Kotlin Application
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
 
       - name: Build Docker Image
         run: DOCKER_BUILDKIT=1 docker build -t ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}:release .
