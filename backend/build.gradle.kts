@@ -47,3 +47,9 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.register<Copy>("copyGitSubmodule") {
+    from(file("./config"))
+    include("*.yml")
+    into(file("./src/main/resources"))
+}
