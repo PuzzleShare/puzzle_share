@@ -3,7 +3,6 @@ spring:
     group:
       local: "local"
       dev: "dev, datasource"
-      prod: "production, datasource"
-    active: local
+    active: dev
 
 
