@@ -4,7 +4,9 @@ plugins {
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("plugin.jpa") version "1.9.25"
+    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
 }
+// build.gradle.kts
 
 group = "com.puzzle"
 version = "0.0.1-SNAPSHOT"
@@ -43,7 +45,15 @@ allOpen {
     annotation("jakarta.persistence.MappedSuperclass")
     annotation("jakarta.persistence.Embeddable")
 }
-
+tasks.named("processResources") {
+    dependsOn("copyGitSubmodule")
+}
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.register<Copy>("copyGitSubmodule") {
+    from(file("./secret"))
+    include("*.yml")
+    into(file("./src/main/resources"))
 }
