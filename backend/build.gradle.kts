@@ -46,7 +46,15 @@ allOpen {
     annotation("jakarta.persistence.MappedSuperclass")
     annotation("jakarta.persistence.Embeddable")
 }
-
+tasks.named("processResources") {
+    dependsOn("copyGitSubmodule")
+}
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.register<Copy>("copyGitSubmodule") {
+    from(file("./secret"))
+    include("*.yml")
+    into(file("./src/main/resources"))
 }
