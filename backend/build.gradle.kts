@@ -49,7 +49,7 @@ tasks.withType<Test> {
 }
 
 tasks.register<Copy>("copyGitSubmodule") {
-    from(file("./config"))
+    from(file("./secret"))
     include("*.yml")
     into(file("./src/main/resources"))
 }
