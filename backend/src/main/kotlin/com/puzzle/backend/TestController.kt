@@ -12,4 +12,5 @@ class TestController {
 
     @GetMapping("/error")
     fun error(): String = throw RuntimeException("test")
+
 }
