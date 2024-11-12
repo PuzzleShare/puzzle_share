@@ -1,6 +1,7 @@
 spring:
-  swagger-ui:
-    enabled: true
+  config:
+    activate:
+      on-profile: "local"
   datasource:
     url: jdbc:mysql://localhost:3306/puzzle?useSSL=false&allowPublicKeyRetrieval=true
     username: root
