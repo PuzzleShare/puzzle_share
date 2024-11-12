@@ -8,5 +8,4 @@ class BackendApplication
 
 fun main(args: Array<String>) {
     runApplication<BackendApplication>(*args)
-
 }
