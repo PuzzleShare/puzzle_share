@@ -2,17 +2,21 @@ spring:
   swagger-ui:
     enabled: true
   datasource:
-    url: jdbc:mysql://localhost:3306/puzzle?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/puzzle
     username: root
-    password: 1111
+    password: wjddlsdn5
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    defer-datasource-initialization: true
-    hibernate.ddl-auto: create
+#    defer-datasource-initialization: true
+    defer-datasource-initialization: false
+    hibernate.ddl-auto: none
     show-sql: true
     properties:
       hibernate.format_sql: true
       hibernate.default_batch_fetch_size: 100
   sql.init.mode: always
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
 
 kotlin.code.style: official
