@@ -24,5 +24,5 @@ class Users(
     var socialType: String,
     var userImage: String,
 ) : BaseEntity(){
-    fun toUserDataResponse():UserDataResponse = UserDataResponse(userName, userImage, email)
+    fun toUserDataResponse():UserDataResponse = UserDataResponse(userName, userImage, email, socialType)
 }

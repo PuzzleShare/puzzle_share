@@ -4,4 +4,5 @@ data class UserDataResponse(
     val userName: String,
     val image: String,
     val email: String,
+    val provider: String,
 )

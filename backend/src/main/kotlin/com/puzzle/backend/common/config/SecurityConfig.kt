@@ -1,5 +1,6 @@
 package com.puzzle.backend.common.config
 
+import com.puzzle.backend.common.oauth.handler.CustomLogoutSuccessHandler
 import com.puzzle.backend.common.oauth.handler.OAuth2AuthenticationFailureHandler
 import com.puzzle.backend.common.oauth.handler.OAuth2AuthenticationSuccessHandler
 import com.puzzle.backend.common.oauth.service.CustomOAuth2UserService
@@ -16,7 +17,8 @@ import org.springframework.security.web.SecurityFilterChain
 class SecurityConfig (
     private val jwtProvider: JwtProvider,
     private val customOAuth2UserService: CustomOAuth2UserService,
-    private val corsConfig: CorsConfig
+    private val corsConfig: CorsConfig,
+    private val customLogoutSuccessHandler: CustomLogoutSuccessHandler,
 ){
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -33,6 +35,10 @@ class SecurityConfig (
                 it.userInfoEndpoint { it.userService(customOAuth2UserService::loadUser) }
                 it.successHandler(OAuth2AuthenticationSuccessHandler(jwtProvider))
                 it.failureHandler(OAuth2AuthenticationFailureHandler())
+            }.logout {
+                it.logoutUrl("/api/user/logout")
+                it.logoutSuccessHandler(customLogoutSuccessHandler)
+                it.deleteCookies("JSESSIONID")
             }
 
         return http.build() // 설정 완료 후 SecurityFilterChain 반환
