@@ -4,5 +4,3 @@ spring:
       local: "local, keys, oauth"
       dev: "dev, datasource, keys, oauth"
     active: dev
-
-

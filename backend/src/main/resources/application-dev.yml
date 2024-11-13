@@ -3,12 +3,13 @@ spring:
     activate:
       on-profile: "dev"
   jpa:
-    hibernate:
-      ddl-auto: update
+    defer-datasource-initialization: false
+    hibernate.ddl-auto: validate
     properties:
-      default_batch_fetch_size: 1000
-      hibernate:
-        format_sql: false
-        show_sql: false
+      hibernate.default_batch_fetch_size: 100
   flyway:
     enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
