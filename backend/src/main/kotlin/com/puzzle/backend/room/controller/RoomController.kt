@@ -17,12 +17,11 @@ class RoomController(
     private val roomService: RoomService,
 ) {
     // 방 생성 API
-    @PostMapping("/create")
+    @PostMapping("/")
     fun createRoom(
         @RequestParam name: String,
-        @RequestParam maxPlayers: Int,
     ): ResponseEntity<Room> {
-        val newRoom = roomService.createRoom(name, maxPlayers)
+        val newRoom = roomService.createRoom(name)
         return ResponseEntity.ok(newRoom)
     }
 

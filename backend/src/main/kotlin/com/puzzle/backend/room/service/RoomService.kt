@@ -10,10 +10,7 @@ class RoomService(
     private val redisService: RedisService,
 ) {
     // 방 생성
-    fun createRoom(
-        name: String,
-        maxPlayers: Int,
-    ): Room {
+    fun createRoom(name: String): Room {
         // 고유한 방 ID 생성
         val roomId = UUID.randomUUID().toString()
         // Room 객체 생성

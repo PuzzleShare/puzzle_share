@@ -9,17 +9,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     defer-datasource-initialization: false
-    hibernate.ddl-auto: create
+    hibernate.ddl-auto: validate
     show-sql: true
     properties:
       hibernate.format_sql: true
       hibernate.default_batch_fetch_size: 100
   sql.init.mode: always
   flyway:
-    enabled: false
-#    enabled: true
-#    baseline-on-migrate: true
-#    baseline-version: 0
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
   data:
     redis:
       host: localhost
