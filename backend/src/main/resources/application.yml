@@ -4,5 +4,3 @@ spring:
       local: "local"
       dev: "dev, datasource"
     active: dev
-
-
