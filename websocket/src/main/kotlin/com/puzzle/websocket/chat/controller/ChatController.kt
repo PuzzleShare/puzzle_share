@@ -17,6 +17,7 @@ class ChatController(
 ) {
     @MessageMapping("/chat/main")
     fun mainChat(mainChatMessage: MainChatMessage) {
+        print("dd")
         mainChatService.send(mainChatMessage)
     }
 
