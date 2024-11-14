@@ -27,7 +27,10 @@ class JwtProvider(
 
     fun validateToken(token: String): Boolean {
         return try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
+            Jwts.parserBuilder()
+                .setSigningKey(Keys.hmacShaKeyFor(secretKey.toByteArray()))
+                .build()
+                .parseClaimsJws(token)
             true
         } catch (e: Exception) {
             false

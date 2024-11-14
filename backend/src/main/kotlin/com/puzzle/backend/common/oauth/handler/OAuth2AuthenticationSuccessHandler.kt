@@ -1,11 +1,8 @@
 package com.puzzle.backend.common.oauth.handler
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.puzzle.backend.common.BaseResponse
 import com.puzzle.backend.common.oauth.enums.SocialType
-import com.puzzle.backend.common.oauth.repository.UsersRepository
 import com.puzzle.backend.common.oauth.service.JwtProvider
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication
