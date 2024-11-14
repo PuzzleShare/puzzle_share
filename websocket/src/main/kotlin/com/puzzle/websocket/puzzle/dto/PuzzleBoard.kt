@@ -1,5 +1,8 @@
 package com.puzzle.websocket.puzzle.dto
 
+import com.puzzle.websocket.puzzle.dto.Picture
+import com.puzzle.websocket.puzzle.dto.Piece
+
 const val TOP = 0
 const val RIGHT = 1
 const val BOTTOM = 2
@@ -17,7 +20,6 @@ class PuzzleBoard {
     var bundles: MutableList<MutableSet<Piece>> = mutableListOf()
     var isCorrected: Array<BooleanArray> = arrayOf()
     var correctedCount: Int = 0
-
     var visited: Array<BooleanArray> = arrayOf()
 
     fun init(p: Picture): Array<Array<Array<Piece?>>> {
@@ -28,18 +30,15 @@ class PuzzleBoard {
         val levelSize = mapOf(1 to 500, 2 to 600, 3 to 800)
         val originHeight = p.length
         val originWidth = p.width
-        val imgWidth =
-            if (originHeight >= originWidth) {
-                (levelSize[3]!! * originWidth / originHeight / 100) * 100
-            } else {
-                levelSize[3]!!
-            }
-        val imgHeight =
-            if (originHeight >= originWidth) {
-                levelSize[3]!!
-            } else {
-                (levelSize[3]!! * originHeight / originWidth / 100) * 100
-            }
+        val imgWidth = if (originHeight >= originWidth)
+            (levelSize[3]!! * originWidth / originHeight / 100) * 100
+        else
+            levelSize[3]!!
+        val imgHeight = if (originHeight >= originWidth)
+            levelSize[3]!!
+        else
+            (levelSize[3]!! * originHeight / originWidth / 100) * 100
+
 
         widthCnt = (imgWidth / pieceSize.toDouble()).toInt()
         lengthCnt = (imgHeight / pieceSize.toDouble()).toInt()
@@ -72,55 +71,53 @@ class PuzzleBoard {
 
                 when {
                     // 상단 변
-                    i == 0 ->
-                        when {
-                            // 좌상단 꼭짓점
-                            j == 0 -> {
-                                type[TOP] = 0
-                                type[LEFT] = 0
-                                type[RIGHT] = random(2)
-                                type[BOTTOM] = random(2)
-                            }
-                            // 우상단 꼭짓점
-                            j == widthCnt - 1 -> {
-                                type[TOP] = 0
-                                type[RIGHT] = 0
-                                type[BOTTOM] = random(2)
-                                type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
-                            }
-                            // 그 외 상단 변
-                            else -> {
-                                type[TOP] = 0
-                                type[RIGHT] = random(2)
-                                type[BOTTOM] = random(2)
-                                type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
-                            }
+                    i == 0 -> when {
+                        // 좌상단 꼭짓점
+                        j == 0 -> {
+                            type[TOP] = 0
+                            type[LEFT] = 0
+                            type[RIGHT] = random(2)
+                            type[BOTTOM] = random(2)
                         }
+                        // 우상단 꼭짓점
+                        j == widthCnt - 1 -> {
+                            type[TOP] = 0
+                            type[RIGHT] = 0
+                            type[BOTTOM] = random(2)
+                            type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
+                        }
+                        // 그 외 상단 변
+                        else -> {
+                            type[TOP] = 0
+                            type[RIGHT] = random(2)
+                            type[BOTTOM] = random(2)
+                            type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
+                        }
+                    }
                     // 하단 변
-                    i == lengthCnt - 1 ->
-                        when {
-                            // 좌하단 꼭짓점
-                            j == 0 -> {
-                                type[TOP] = if (board[0][i - 1][j]?.type?.get(BOTTOM) == 2) 1 else 2
-                                type[RIGHT] = random(2)
-                                type[BOTTOM] = 0
-                                type[LEFT] = 0
-                            }
-                            // 우하단 꼭짓점
-                            j == widthCnt - 1 -> {
-                                type[TOP] = if (board[0][i - 1][j]?.type?.get(BOTTOM) == 2) 1 else 2
-                                type[RIGHT] = 0
-                                type[BOTTOM] = 0
-                                type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
-                            }
-                            // 그 외 하단 변
-                            else -> {
-                                type[TOP] = if (board[0][i - 1][j]?.type?.get(BOTTOM) == 2) 1 else 2
-                                type[RIGHT] = random(2)
-                                type[BOTTOM] = 0
-                                type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
-                            }
+                    i == lengthCnt - 1 -> when {
+                        // 좌하단 꼭짓점
+                        j == 0 -> {
+                            type[TOP] = if (board[0][i - 1][j]?.type?.get(BOTTOM) == 2) 1 else 2
+                            type[RIGHT] = random(2)
+                            type[BOTTOM] = 0
+                            type[LEFT] = 0
                         }
+                        // 우하단 꼭짓점
+                        j == widthCnt - 1 -> {
+                            type[TOP] = if (board[0][i - 1][j]?.type?.get(BOTTOM) == 2) 1 else 2
+                            type[RIGHT] = 0
+                            type[BOTTOM] = 0
+                            type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
+                        }
+                        // 그 외 하단 변
+                        else -> {
+                            type[TOP] = if (board[0][i - 1][j]?.type?.get(BOTTOM) == 2) 1 else 2
+                            type[RIGHT] = random(2)
+                            type[BOTTOM] = 0
+                            type[LEFT] = if (board[0][i][j - 1]?.type?.get(RIGHT) == 2) 1 else 2
+                        }
+                    }
                     // 좌측 변
                     j == 0 -> {
                         type[TOP] = if (board[0][i - 1][j]?.type?.get(BOTTOM) == 2) 1 else 2
@@ -225,6 +222,7 @@ class PuzzleBoard {
     private val dx = intArrayOf(1, -1, 0, 0)
     private val dy = intArrayOf(0, 0, -1, 1)
 
+
     fun dfsForSearch(
         r: Int,
         c: Int,
@@ -246,7 +244,7 @@ class PuzzleBoard {
         return cnt
     }
 
-    // 분해된 조각을 플레이어 보드에 다시 배치
+
     private fun extracted(
         r: Int,
         c: Int,
@@ -353,7 +351,7 @@ class PuzzleBoard {
         }
     }
 
-    // 랜덤 숫자 생성 메서드
+
     fun random(range: Int): Int = (Math.random() * range).toInt() + 1
 
     // 최대공약수 계산 메서드
