@@ -7,7 +7,11 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 
 class OAuth2AuthenticationFailureHandler : AuthenticationFailureHandler {
 
-    override fun onAuthenticationFailure(request: HttpServletRequest, response: HttpServletResponse, exception: AuthenticationException) {
+    override fun onAuthenticationFailure(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        exception: AuthenticationException
+    ) {
         response.contentType = "application/json"
         response.status = HttpServletResponse.SC_UNAUTHORIZED
         val jsonResponse = """{"error": "Authentication failed", "message": "${exception.message}"}"""

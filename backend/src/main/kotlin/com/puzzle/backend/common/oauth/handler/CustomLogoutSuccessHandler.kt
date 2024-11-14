@@ -1,7 +1,6 @@
 package com.puzzle.backend.common.oauth.handler
 
 import com.puzzle.backend.common.oauth.enums.SocialType
-import com.puzzle.backend.common.oauth.repository.UsersRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -13,11 +12,11 @@ import org.springframework.stereotype.Component
 @Component
 class CustomLogoutSuccessHandler(
     @Value("\${oauth.credentials.google.logout-url}")
-    private val googleLogourUrl : String,
+    private val googleLogourUrl: String,
     @Value("\${oauth.credentials.kakao.logout-url}")
-    private val kakaoLogourUrl : String,
+    private val kakaoLogourUrl: String,
     @Value("\${oauth.credentials.naver.logout-url}")
-    private val naverLogourUrl : String,
+    private val naverLogourUrl: String,
 ) : LogoutSuccessHandler {
 
     override fun onLogoutSuccess(
@@ -26,7 +25,7 @@ class CustomLogoutSuccessHandler(
         authentication: Authentication?
     ) {
         // 요청에서 OAuth 제공자 정보를 가져옵니다 (예: "google", "kakao", "naver")
-        val url = when (request.getParameter("provider")){
+        val url = when (request.getParameter("provider")) {
             SocialType.GOOGLE.name -> googleLogourUrl
             SocialType.KAKAO.name -> kakaoLogourUrl
             SocialType.NAVER.name -> naverLogourUrl

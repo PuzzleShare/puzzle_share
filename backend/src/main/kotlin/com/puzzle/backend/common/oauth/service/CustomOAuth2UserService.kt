@@ -12,20 +12,20 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class CustomOAuth2UserService (
+class CustomOAuth2UserService(
     private val usersRepository: UsersRepository
-): DefaultOAuth2UserService(){
+) : DefaultOAuth2UserService() {
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val oAuth2User = super.loadUser(userRequest)
         val type = SocialType.valueOf(userRequest.clientRegistration.registrationId.uppercase())
         return try {
             processUser(oAuth2User, type)
-        }catch (e : IllegalArgumentException){
+        } catch (e: IllegalArgumentException) {
             throw OAuth2AuthenticationException("Unsupported provider")
         }
     }
 
-    private fun processUser(oAuth2User: OAuth2User, type: SocialType): OAuth2User{
+    private fun processUser(oAuth2User: OAuth2User, type: SocialType): OAuth2User {
         val attr = type.convert(oAuth2User.attributes)
 
         when (val user = usersRepository.findBySocialTypeAndEmail(type.name, attr.email)) {
@@ -39,6 +39,7 @@ class CustomOAuth2UserService (
                 )
                 usersRepository.save(newUser)
             }
+
             else -> {
                 user.userImage = attr.image
                 user.userName = attr.userName

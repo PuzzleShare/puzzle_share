@@ -11,8 +11,10 @@ import jakarta.persistence.Index
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "users",
-    indexes = [Index(name = "idx_users_email", columnList = "socialType, email")])
+@Table(
+    name = "users",
+    indexes = [Index(name = "idx_users_email", columnList = "socialType, email")]
+)
 class Users(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +25,6 @@ class Users(
     @Column(updatable = false)
     var socialType: String,
     var userImage: String,
-) : BaseEntity(){
-    fun toUserDataResponse():UserDataResponse = UserDataResponse(userName, userImage, email, socialType)
+) : BaseEntity() {
+    fun toUserDataResponse(): UserDataResponse = UserDataResponse(userName, userImage, email, socialType)
 }

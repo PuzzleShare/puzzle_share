@@ -14,12 +14,12 @@ import org.springframework.security.web.SecurityFilterChain
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig (
+class SecurityConfig(
     private val jwtProvider: JwtProvider,
     private val customOAuth2UserService: CustomOAuth2UserService,
     private val corsConfig: CorsConfig,
     private val customLogoutSuccessHandler: CustomLogoutSuccessHandler,
-){
+) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http

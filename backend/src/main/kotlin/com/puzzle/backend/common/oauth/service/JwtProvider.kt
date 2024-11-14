@@ -7,13 +7,11 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.Date
 
-
-
 @Service
-class JwtProvider (
+class JwtProvider(
     @Value("\${jwt.secret-key}")
-    private val secretKey:String,
-){
+    private val secretKey: String,
+) {
 
     fun createToken(userId: String): String {
         val claims = Jwts.claims().setSubject(userId)
