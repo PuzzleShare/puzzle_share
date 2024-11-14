@@ -3,6 +3,11 @@ package com.puzzle.websocket.puzzle.dto
 import com.puzzle.websocket.puzzle.dto.Picture
 import com.puzzle.websocket.puzzle.dto.Piece
 
+const val TOP = 0
+const val RIGHT = 1
+const val BOTTOM = 2
+const val LEFT = 3
+
 class PuzzleBoard {
     var picture: Picture? = null
     var idxToCoordinate: HashMap<Int, IntArray> = HashMap()
@@ -15,16 +20,7 @@ class PuzzleBoard {
     var bundles: MutableList<MutableSet<Piece>> = mutableListOf()
     var isCorrected: Array<BooleanArray> = arrayOf()
     var correctedCount: Int = 0
-
-    // 랜덤 타입 적용에 쓰일 인덱스 상수
-    val TOP = 0
-    val RIGHT = 1
-    val BOTTOM = 2
-    val LEFT = 3
-
     var visited: Array<BooleanArray> = arrayOf()
-
-
 
     fun init(p: Picture): Array<Array<Array<Piece?>>> {
         picture = p
@@ -42,6 +38,7 @@ class PuzzleBoard {
             levelSize[3]!!
         else
             (levelSize[3]!! * originHeight / originWidth / 100) * 100
+
 
         widthCnt = (imgWidth / pieceSize.toDouble()).toInt()
         lengthCnt = (imgHeight / pieceSize.toDouble()).toInt()
@@ -224,7 +221,12 @@ class PuzzleBoard {
     // DFS 탐색 메서드
     private val dx = intArrayOf(1, -1, 0, 0)
     private val dy = intArrayOf(0, 0, -1, 1)
-    fun dfsForSearch(r: Int, c: Int): Int {
+
+
+    fun dfsForSearch(
+        r: Int,
+        c: Int,
+    ): Int {
         var cnt = 1
 
         for (i in 0 until 4) {
@@ -242,8 +244,11 @@ class PuzzleBoard {
         return cnt
     }
 
-    // 분해된 조각을 플레이어 보드에 다시 배치
-    private fun extracted(r: Int, c: Int) {
+
+    private fun extracted(
+        r: Int,
+        c: Int,
+    ) {
         for (i in 0 until lengthCnt) {
             for (j in 0 until widthCnt) {
                 if (board[1][i][j] == null) {
@@ -289,8 +294,6 @@ class PuzzleBoard {
         addPiece(pieceList)
         return comboPieces
     }
-
-
 
     // 퍼즐 보드 상태 출력 메서드
     fun print() {
@@ -348,15 +351,14 @@ class PuzzleBoard {
         }
     }
 
-    // 랜덤 숫자 생성 메서드
-    fun random(range: Int): Int {
-        return (Math.random() * range).toInt() + 1
-    }
+
+    fun random(range: Int): Int = (Math.random() * range).toInt() + 1
 
     // 최대공약수 계산 메서드
     companion object {
-        fun GCD(a: Int, b: Int): Int {
-            return if (b == 0) a else GCD(b, a % b)
-        }
+        fun gcd(
+            a: Int,
+            b: Int,
+        ): Int = if (b == 0) a else gcd(b, a % b)
     }
 }

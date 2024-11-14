@@ -6,5 +6,5 @@ data class Piece(
     var correctBottomIndex: Int = -1,
     var correctLeftIndex: Int = -1,
     var correctRightIndex: Int = -1,
-    var type: IntArray = IntArray(4) { 0 }
+    var type: IntArray = IntArray(4) { 0 },
 )
