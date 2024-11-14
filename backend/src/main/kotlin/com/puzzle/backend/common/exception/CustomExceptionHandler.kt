@@ -1,6 +1,7 @@
 package com.puzzle.backend.common.exception
 
 import com.puzzle.backend.common.BaseResponse
+import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.backend.common.status.ResultCode
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,6 +21,12 @@ class CustomExceptionHandler {
             val errorMessage = error.defaultMessage
             errors[fieldName] = errorMessage ?: "Not Exception Message"
         }
+        return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
+    }
+
+    @ExceptionHandler(RoomFullException::class)
+    protected fun roomFullException(ex: RoomFullException): ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mapOf("빈 자리 없음" to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
     }
 
