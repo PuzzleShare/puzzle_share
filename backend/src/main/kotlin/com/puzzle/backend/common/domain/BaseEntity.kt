@@ -1,4 +1,4 @@
-package com.puzzle.backend.domain
+package com.puzzle.backend.common.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners

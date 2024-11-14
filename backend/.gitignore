@@ -40,5 +40,5 @@ out/
 .kotlin
 
 ### Git Submodule
-src/main/resources/application-key.yml
+src/main/resources/application-keys.yml
 src/main/resources/application-datasource.yml

@@ -33,17 +33,17 @@ class RedisService(
     fun find(key: String): Any? = valueOperations.get(key)
 
     // 데이터 삭제
-    fun delete(key: String): Boolean = redisTemplate.delete(key) ?: false
+    fun delete(key: String): Boolean = redisTemplate.delete(key)
 
     // 키 존재 여부 확인
-    fun exists(key: String): Boolean = redisTemplate.hasKey(key) ?: false
+    fun exists(key: String): Boolean = redisTemplate.hasKey(key)
 
     // 데이터 만료 시간 설정
     fun setExpiration(
         key: String,
         timeout: Long,
         timeUnit: TimeUnit,
-    ): Boolean = redisTemplate.expire(key, timeout, timeUnit) ?: false
+    ): Boolean = redisTemplate.expire(key, timeout, timeUnit)
 
     // 데이터의 남은 TTL(Time-To-Live) 확인
     fun getTTL(
