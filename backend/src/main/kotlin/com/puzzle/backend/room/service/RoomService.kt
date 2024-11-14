@@ -10,6 +10,9 @@ import com.puzzle.backend.room.dto.response.RoomListResponse
 import com.puzzle.backend.room.dto.response.WaitingRoomResponse
 import com.puzzle.backend.room.repository.PlayerRepository
 import com.puzzle.backend.room.repository.RoomRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 @Service
@@ -30,10 +33,17 @@ class RoomService(
         return response
     }
 
-    fun getRoomList(): List<RoomListResponse> {
+    fun getRoomList(pageable: Pageable): Page<RoomListResponse> {
         val roomList = roomRepository.findAll().toList()
-        val response = roomList.map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
-        return response
+        val start = pageable.pageNumber * pageable.pageSize
+        val end = minOf(start + pageable.pageSize, roomList.size)
+
+        val pagedRooms =
+            roomList
+                .subList(start, end)
+                .map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
+
+        return PageImpl(pagedRooms, pageable, roomList.size.toLong())
     }
 
     fun findById(roomId: String): Room = roomRepository.findById(roomId).orElseThrow()
