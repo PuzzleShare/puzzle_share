@@ -5,6 +5,6 @@ import com.puzzle.backend.common.oauth.dto.response.LoginSuccessResponse
 import jakarta.servlet.http.HttpServletRequest
 
 interface UsersService {
-    fun getUserInfo(request: HttpServletRequest):LoginSuccessResponse
-    fun logout(request: HttpServletRequest):BaseResponse<String>
+    fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse
+    fun logout(request: HttpServletRequest): BaseResponse<String>
 }
