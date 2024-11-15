@@ -3,6 +3,7 @@ package com.puzzle.backend.common.exception
 import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.backend.common.status.ResultCode
 import com.puzzle.websocket.common.BaseResponse
+import com.puzzle.websocket.common.exception.custom.NoneMasterException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError
@@ -27,6 +28,12 @@ class CustomExceptionHandler {
     @ExceptionHandler(RoomFullException::class)
     protected fun roomFullException(ex: RoomFullException): ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf("빈 자리 없음" to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
+    }
+    
+    @ExceptionHandler(NoneMasterException::class)
+    protected fun noneMasterException(ex: NoneMasterException): ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mapOf("방장 권한임" to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
     }
 

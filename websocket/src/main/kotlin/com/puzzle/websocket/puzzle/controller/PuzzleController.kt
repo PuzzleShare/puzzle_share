@@ -7,12 +7,12 @@ import org.springframework.stereotype.Controller
 class PuzzleController(
     private val puzzleService: PuzzleService,
 ) {
-    fun gameStart()  {
+    fun gameStart() {
     }
 
-    fun movePiece()  {
+    fun movePiece() {
     }
 
-    fun matchPiece()  {
+    fun matchPiece() {
     }
 }

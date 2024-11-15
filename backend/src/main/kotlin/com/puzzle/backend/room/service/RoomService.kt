@@ -54,36 +54,6 @@ class RoomService(
         return response
     }
 
-    fun entranceRoom(roomId: String): RoomIdResponse {
-        val userId = 2L // TODO: 현재 사용자
-        val room = findById(roomId)
-        val playerCount = room.bluePlayers.count() + room.redPlayers.count()
-        if (playerCount >= room.maxPlayers) {
-            throw RoomFullException("방이 가득 찼습니다.")
-        }
-        if (room.redPlayers.count() <= room.bluePlayers.count()) {
-            room.redPlayers.add(userId)
-        } else {
-            room.bluePlayers.add(userId)
-        }
-        roomRepository.save(room)
-
-        val player = Player(userId, RoomRole.USER, room.roomId)
-        playerRepository.save(player)
-
-        val response = RoomIdResponse(room.roomId)
-        return response
-    }
-
-    fun exitRoom(roomId: String) {
-        val userId = 2L // TODO: 현재 사용자
-        val room = findById(roomId)
-        room.redPlayers.remove(userId)
-        room.bluePlayers.remove(userId)
-        roomRepository.save(room)
-        playerRepository.deleteById(userId)
-    }
-
     fun deleteRoom(roomId: String) {
         roomRepository.deleteById(roomId)
     }

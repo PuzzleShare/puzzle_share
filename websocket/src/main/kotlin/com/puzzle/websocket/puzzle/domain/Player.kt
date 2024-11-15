@@ -8,6 +8,10 @@ import org.springframework.data.redis.core.RedisHash
 data class Player(
     @Id
     val playerId: Long,
-    val role: PuzzleRoomRole,
+    var role: PuzzleRoomRole,
     val roomId: String,
-)
+) {
+    fun updateRoomRole(role: PuzzleRoomRole) {
+        this.role = role
+    }
+}
