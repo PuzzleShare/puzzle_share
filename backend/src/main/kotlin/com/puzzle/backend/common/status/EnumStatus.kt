@@ -8,3 +8,8 @@ enum class ResultCode(
     SUCCESS("정상 처리되었습니다."),
     ERROR("에러가 발생했습니다."),
 }
+
+enum class RoomRole {
+    ROOM_MASTER,
+    USER,
+}
