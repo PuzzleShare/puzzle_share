@@ -30,7 +30,7 @@ class CustomExceptionHandler {
         val errors = mapOf("빈 자리 없음" to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
     }
-    
+
     @ExceptionHandler(NoneMasterException::class)
     protected fun noneMasterException(ex: NoneMasterException): ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf("방장 권한임" to (ex.message ?: "Not Exception Message"))
