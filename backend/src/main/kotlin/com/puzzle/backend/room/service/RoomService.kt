@@ -1,6 +1,5 @@
 package com.puzzle.backend.room.service
 
-import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.backend.common.status.RoomRole
 import com.puzzle.backend.room.domain.Player
 import com.puzzle.backend.room.domain.Room
