@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>방 목록</title>
+    <style>
+        /* 기본 스타일 */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            background-color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 20%;
+            background-color: #f8f8f8;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .room-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            overflow-y: auto;
+            width: 60%;
+        }
+
+        .room-card {
+            width: 45%;
+            background-color: #9fd3ff;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .room-info {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .user-list {
+            width: 20%;
+            background-color: #f8f8f8;
+            padding: 20px;
+        }
+
+        .user {
+            background-color: #e3e3e3;
+            border-radius: 5px;
+            margin: 5px 0;
+            padding: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 사이드바 (방 생성, 빠른 시작 등) -->
+    <div class="sidebar">
+        <button onclick="createRoom()">방 만들기</button>
+        <button onclick="quickStart()">빠른 시작</button>
+        <button onclick="settings()">설정</button>
+    </div>
+
+    <!-- 방 목록 -->
+    <div class="room-list" id="room-list">
+        <div class="room-card" onclick="enterRoom('room1')">
+            <img src="이미지경로" alt="방 이미지" width="100" height="100">
+            <div class="room-info">
+                <h3>OOO 대기방</h3>
+                <p>아이템전</p>
+                <p>500피스</p>
+                <p>4/4</p>
+            </div>
+        </div>
+        <!-- 추가 방 카드들 -->
+    </div>
+
+    <!-- 사용자 목록 -->
+    <div class="user-list">
+        <div class="user">문어</div>
+        <div class="user">민재민재</div>
+        <div class="user">진상</div>
+        <div class="user">고찬</div>
+        <div class="user">이누야사</div>
+    </div>
+</div>
+
+<script>
+    // WebSocket 설정
+    const sockJs = new SockJS("/ws");
+    const stompClient = Stomp.over(sockJs);
+
+    stompClient.connect({}, function(frame) {
+        console.log("Connected: " + frame);
+    });
+
+    function enterRoom(roomId) {
+        stompClient.send(`/app/room/${roomId}/enter`, {}, JSON.stringify({ roomId: roomId }));
+    }
+
+    function createRoom() {
+        console.log("방 만들기 클릭됨");
+        // 방 생성 로직 필요
+    }
+
+    function quickStart() {
+        console.log("빠른 시작 클릭됨");
+        // 빠른 시작 로직 필요
+    }
+
+    function settings() {
+        console.log("설정 클릭됨");
+        // 설정 로직 필요
+    }
+</script>
+
+</body>
+</html>

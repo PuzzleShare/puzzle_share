@@ -1,9 +1,9 @@
 package com.puzzle.websocket.puzzle.service
 
 interface PuzzleRoomService {
-    fun enterRoom()
+    fun enterRoom(roomId: String)
 
-    fun leaveRoom()
+    fun leaveRoom(roomId: String)
 
     fun moveTeam()
 

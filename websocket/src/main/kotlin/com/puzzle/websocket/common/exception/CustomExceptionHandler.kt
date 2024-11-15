@@ -1,5 +1,8 @@
 package com.puzzle.backend.common.exception
 
+import com.puzzle.backend.common.exception.custom.RoomFullException
+import com.puzzle.backend.common.status.ResultCode
+import com.puzzle.websocket.common.BaseResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError

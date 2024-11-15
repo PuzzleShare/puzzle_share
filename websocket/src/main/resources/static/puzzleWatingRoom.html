@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>대기방</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            display: flex;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .chat-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #chat_ul {
+            width: 300px;
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            list-style-type: none;
+            margin: 0;
+        }
+
+        #chat_ul li {
+            background: lightblue;
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        #message {
+            width: 300px;
+            margin-top: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- 기존 팀 및 게임 시작 섹션을 포함하는 코드 -->
+
+    <div class="chat-container">
+        <ul id="chat_ul"></ul>
+        <textarea id="message" placeholder="메시지를 입력하세요"></textarea>
+        <button id="send" onclick="sendMessage()">보내기</button>
+    </div>
+</div>
+
+<script>
+    let stompClient = null;
+
+    function connect() {
+        const socket = new SockJS("/ws");
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log("Connected: " + frame);
+
+            // 특정 방의 채팅 구독
+            const roomId = "exampleRoomId"; // 실제 방 ID로 대체 필요
+            stompClient.subscribe(`/topic/chat/room/${roomId}`, message => {
+                const ul = document.getElementById('chat_ul');
+                const li = document.createElement('li');
+                const json = JSON.parse(message.body);
+                li.textContent = `${json.userName} : ${json.message}`;
+                ul.appendChild(li);
+
+                // 스크롤을 맨 아래로 이동
+                ul.scrollTop = ul.scrollHeight;
+
+                // 메시지 입력란 비우기
+                document.getElementById("message").value = '';
+            });
+        });
+    }
+
+    function sendMessage() {
+        const messageInput = document.getElementById("message");
+        const messageText = messageInput.value.trim();
+        if (!messageText) return;
+
+        const json = {
+            userName: "현재 사용자", // 실제 사용자 이름으로 대체
+            message: messageText
+        };
+
+        // 특정 방의 채팅으로 메시지 전송
+        const roomId = "exampleRoomId"; // 실제 방 ID로 대체 필요
+        stompClient.send(`/pub/chat/room/${roomId}`, {}, JSON.stringify(json));
+    }
+
+    document.getElementById('message').addEventListener('keydown', e => {
+        if (e.isComposing) return;
+        if (e.code === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    connect();
+</script>
+
+</body>
+</html>
