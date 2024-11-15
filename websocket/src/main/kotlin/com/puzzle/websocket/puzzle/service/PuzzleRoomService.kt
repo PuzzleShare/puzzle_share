@@ -1,11 +1,13 @@
 package com.puzzle.websocket.puzzle.service
 
+import com.puzzle.websocket.puzzle.dto.request.RoomIdRequest
+
 interface PuzzleRoomService {
-    fun enterRoom(roomId: String)
+    fun enterRoom(roomId: RoomIdRequest)
 
-    fun leaveRoom(roomId: String)
+    fun leaveRoom(roomId: RoomIdRequest)
 
-    fun moveTeam()
+    fun moveTeam(roomId: RoomIdRequest)
 
-    fun gameStart()
+    fun gameStart(roomId: RoomIdRequest)
 }

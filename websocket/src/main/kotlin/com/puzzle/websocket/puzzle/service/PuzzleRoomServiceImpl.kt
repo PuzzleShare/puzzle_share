@@ -4,6 +4,7 @@ import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.backend.common.status.PuzzleRoomRole
 import com.puzzle.websocket.puzzle.domain.Player
 import com.puzzle.websocket.puzzle.domain.PuzzleRoom
+import com.puzzle.websocket.puzzle.dto.request.RoomIdRequest
 import com.puzzle.websocket.puzzle.repository.PlayerRepository
 import com.puzzle.websocket.puzzle.repository.PuzzleRoomRepository
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -16,11 +17,12 @@ class PuzzleRoomServiceImpl(
     private val messagingTemplate: SimpMessagingTemplate,
 ) : PuzzleRoomService {
 
-    fun findById(roomId: String): PuzzleRoom = puzzleRoomRepository.findById(roomId).orElseThrow()
+    fun findById(roomId: String): PuzzleRoom = puzzleRoomRepository.findById(roomId)
+        .orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
 
-    override fun enterRoom(roomId: String) {
-        val userId = 2L // 현재 사용자 ID (예시)
-        val room = findById(roomId)
+    override fun enterRoom(roomId: RoomIdRequest) {
+        val userId = 1L // 현재 사용자 ID (예시)
+        val room = findById(roomId.roomId)
         val playerCount = room.redPlayers.size + room.bluePlayers.size
 
         if (playerCount >= room.maxPlayers) {
@@ -38,12 +40,12 @@ class PuzzleRoomServiceImpl(
 
         // 입장 이벤트 WebSocket 전송
         val entranceMessage = "User $userId has entered the room."
-        messagingTemplate.convertAndSend("/topic/room/$roomId/enter", entranceMessage)
+        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "enter", "message" to entranceMessage))
     }
 
-    override fun leaveRoom(roomId: String) {
-        val userId = 2L // TODO: 현재 사용자
-        val room = findById(roomId)
+    override fun leaveRoom(roomId: RoomIdRequest) {
+        val userId = 1L // 현재 사용자 ID (예시)
+        val room = findById(roomId.roomId)
 
         room.redPlayers.remove(userId)
         room.bluePlayers.remove(userId)
@@ -53,15 +55,13 @@ class PuzzleRoomServiceImpl(
 
         // 퇴장 이벤트 WebSocket 전송
         val leaveMessage = "User $userId has left the room."
-        messagingTemplate.convertAndSend("/topic/room/$roomId/leave", leaveMessage)
+        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "exit", "message" to leaveMessage))
     }
 
-    override fun moveTeam() {
-        val userId = 2L // 현재 사용자 ID (예시)
-        val roomId = "exampleRoomId" // 예시
-        val room = findById(roomId)
+    override fun moveTeam(roomId: RoomIdRequest) {
+        val userId = 1L // 현재 사용자 ID (예시)
+        val room = findById(roomId.roomId)
 
-        // 현재 팀에서 제거하고 다른 팀으로 이동
         if (room.redPlayers.contains(userId)) {
             room.redPlayers.remove(userId)
             room.bluePlayers.add(userId)
@@ -74,14 +74,11 @@ class PuzzleRoomServiceImpl(
 
         // 팀 변경 알림 WebSocket 전송
         val switchMessage = "User $userId switched teams."
-        messagingTemplate.convertAndSend("/topic/room/$roomId/switch", switchMessage)
+        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "switch", "message" to switchMessage))
     }
 
-    override fun gameStart() {
-        val roomId = "exampleRoomId" // 예시
+    override fun gameStart(roomId: RoomIdRequest) {
         val gameStartMessage = "The game has started!"
-
-        // 게임 시작 알림 WebSocket 전송
-        messagingTemplate.convertAndSend("/topic/room/$roomId/start", gameStartMessage)
+        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "start", "message" to gameStartMessage))
     }
 }

@@ -4,6 +4,7 @@ import com.puzzle.backend.room.domain.Room
 import java.io.Serializable
 
 data class WaitingRoomResponse(
+    val roomId: String,
     val roomName: String, // 방 이름
     val gameMode: String,
     val puzzlePiece: Int,
@@ -18,6 +19,7 @@ data class WaitingRoomResponse(
             nowPlayers: Int,
         ): WaitingRoomResponse =
             WaitingRoomResponse(
+                room.roomId,
                 room.roomName,
                 room.gameMode,
                 room.puzzlePiece,

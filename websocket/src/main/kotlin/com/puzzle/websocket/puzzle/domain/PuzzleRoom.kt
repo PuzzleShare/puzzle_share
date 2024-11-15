@@ -3,7 +3,7 @@ package com.puzzle.websocket.puzzle.domain
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 
-@RedisHash(value = "PuzzleRoom", timeToLive = 86400)
+@RedisHash(value = "Room", timeToLive = 86400)
 class PuzzleRoom(
     @Id
     val roomId: String, // 방 ID
