@@ -25,3 +25,9 @@ spring:
       port: 6379
 
 kotlin.code.style: official
+login:
+  base-url: http://localhost:8080
+  redirect-url: http://localhost:5173/login/redirect
+#logging:
+#  level:
+#    root: debug
