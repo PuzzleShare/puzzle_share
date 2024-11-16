@@ -15,5 +15,5 @@ spring:
       port: 6379
 
 login:
-  base-url:
-  redirect-url:
+  base-url: https://container-service-1.9sjrmz3hsgdvw.ap-northeast-2.cs.amazonlightsail.com
+  redirect-url: http://localhost:5173/login/redirect
