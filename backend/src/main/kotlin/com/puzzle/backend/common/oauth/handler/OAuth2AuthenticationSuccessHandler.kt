@@ -1,9 +1,10 @@
 package com.puzzle.backend.common.oauth.handler
 
+import com.puzzle.backend.common.oauth.domain.UserCache
 import com.puzzle.backend.common.oauth.enums.SocialType
+import com.puzzle.backend.common.oauth.repository.UserCacheRepository
 import com.puzzle.backend.common.oauth.repository.UsersRepository
 import com.puzzle.backend.common.oauth.service.JwtProvider
-import com.puzzle.backend.room.service.RedisService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -18,7 +19,7 @@ class OAuth2AuthenticationSuccessHandler(
     private val usersRepository: UsersRepository,
     @Value("\${login.redirect-url}")
     private val redirectUrl: String,
-    private val redisService: RedisService
+    private val userCacheRepository: UserCacheRepository
 ) : AuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
@@ -32,7 +33,8 @@ class OAuth2AuthenticationSuccessHandler(
 
         val accessToken = jwtProvider.createToken(user, 3_600_000)
         val refreshToken = jwtProvider.createToken(user, 24 * 60 * 60 * 1000)
-        redisService.save("user${user.userId}", refreshToken)
+        val userCache = UserCache(user.userId, refreshToken)
+        userCacheRepository.save(userCache)
 
         response.contentType = "application/json"
         response.characterEncoding = "UTF-8"
