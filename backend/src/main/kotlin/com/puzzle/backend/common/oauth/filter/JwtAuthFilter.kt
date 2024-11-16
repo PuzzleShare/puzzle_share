@@ -18,12 +18,14 @@ class JwtAuthFilter(
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         request as HttpServletRequest
         val header = request.getHeader("Authorization")
-        val token = header.removePrefix("Bearer ")
-        if (jwtProvider.validateToken(token)) {
-            val userId = jwtProvider.getUid(token)
-            val auth = UsernamePasswordAuthenticationToken(userId, "", emptyList())
-            auth.details = WebAuthenticationDetailsSource().buildDetails(request)
-            SecurityContextHolder.getContext().authentication = auth
+        if (header != null) {
+            val token = header.removePrefix("Bearer ")
+            if (jwtProvider.validateToken(token)) {
+                val userId = jwtProvider.getUid(token)
+                val auth = UsernamePasswordAuthenticationToken(userId, "", emptyList())
+                auth.details = WebAuthenticationDetailsSource().buildDetails(request)
+                SecurityContextHolder.getContext().authentication = auth
+            }
         }
 
         chain.doFilter(request, response)

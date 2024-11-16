@@ -32,7 +32,11 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) } // 세션을 사용하지 않도록 설정 (JWT로 인증하기 때문)
             .authorizeHttpRequests {
                 // 요청 URL별 권한 설정
-                it.requestMatchers("/login/oauth2/code/**", "/oauth2/authorization/**").permitAll()
+                it.requestMatchers(
+                    "/login/oauth2/code/**",
+                    "/oauth2/authorization/**",
+                    "/api/v1/test/**"
+                ).permitAll()
                     .anyRequest().authenticated() // 나머지 모든 요청은 인증 확인
             }
             .oauth2Login {
