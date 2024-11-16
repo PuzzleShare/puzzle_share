@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Puzzle Share - 방 목록</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            background-color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: row;
+            padding: 20px;
+        }
+
+        /* Sidebar 스타일 */
+        .sidebar {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar button {
+            width: 100%;
+            padding: 15px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .sidebar button:hover {
+            background-color: #ff8c00;
+        }
+
+        /* 방 목록 스타일 */
+        .room-list {
+            width: 60%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .room-card {
+            width: 45%;
+            background-color: #9fd3ff;
+            padding: 10px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .room-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            margin-right: 10px;
+        }
+
+        .room-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .room-info h3 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        .room-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* 사용자 목록 스타일 */
+        .user-list {
+            width: 20%;
+            padding: 10px;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-list h4 {
+            font-size: 18px;
+            color: #333;
+            margin: 0;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            background-color: #e3e3e3;
+            border-radius: 5px;
+            gap: 10px;
+        }
+
+        .user img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <button onclick="alert('방 목록 갱신')">방 목록 갱신</button>
+    </div>
+
+    <!-- 방 목록 (더미 데이터로 작성) -->
+    <div class="room-list">
+        <div class="room-card" onclick="enterRoom('5f5455bd-0839-4fdf-80fe-7c084853314f')">
+            <img src="https://via.placeholder.com/80" alt="방 이미지">
+            <div class="room-info">
+                <h3>OOO 대기방 1</h3>
+                <p>게임 모드: 아이템전</p>
+                <p>퍼즐 조각: 500 피스</p>
+                <p>인원: 4/4</p>
+            </div>
+        </div>
+        <div class="room-card" onclick="enterRoom('5f5455bd-0839-4fdf-80fe-7c084853314f')">
+            <img src="https://via.placeholder.com/80" alt="방 이미지">
+            <div class="room-info">
+                <h3>OOO 대기방 2</h3>
+                <p>게임 모드: 일반전</p>
+                <p>퍼즐 조각: 300 피스</p>
+                <p>인원: 3/4</p>
+            </div>
+        </div>
+        <div class="room-card" onclick="enterRoom('d7d795c8-5eda-4584-b1a8-34d313f85c44')">
+            <img src="https://via.placeholder.com/80" alt="방 이미지">
+            <div class="room-info">
+                <h3>OOO 대기방 3</h3>
+                <p>게임 모드: 협력전</p>
+                <p>퍼즐 조각: 200 피스</p>
+                <p>인원: 2/4</p>
+            </div>
+        </div>
+        <!-- 추가적인 더미 데이터 방 카드 -->
+    </div>
+
+    <!-- 사용자 목록 -->
+    <div class="user-list">
+        <h4>유저 목록</h4>
+        <div class="user">
+            <img src="https://via.placeholder.com/30" alt="사용자 이미지">
+            <span>문어</span>
+        </div>
+        <div class="user">
+            <img src="https://via.placeholder.com/30" alt="사용자 이미지">
+            <span>민재민재</span>
+        </div>
+        <div class="user">
+            <img src="https://via.placeholder.com/30" alt="사용자 이미지">
+            <span>진상</span>
+        </div>
+        <div class="user">
+            <img src="https://via.placeholder.com/30" alt="사용자 이미지">
+            <span>고찬</span>
+        </div>
+        <div class="user">
+            <img src="https://via.placeholder.com/30" alt="사용자 이미지">
+            <span>이누야사</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 특정 방으로 입장
+    function enterRoom(roomId) {
+        window.location.href = `/puzzleWaitingRoom.html?roomId=${roomId}`;
+    }
+</script>
+
+</body>
+</html>

@@ -31,11 +31,6 @@ class RoomController(
         return ResponseEntity.ok(newRoom)
     }
 
-    // 방 리스트 조회
-    //    fun getRoomList(): ResponseEntity<List<RoomListResponse>> {
-//        val response = roomService.getRoomList()
-//        return ResponseEntity.ok(response)
-//    }
     @GetMapping("")
     fun getRoomList(
         @RequestParam(defaultValue = "0") page: Int,
@@ -45,15 +40,6 @@ class RoomController(
         return ResponseEntity.ok(rooms)
     }
 
-    // 방 입장
-    @PostMapping("/{roomId}")
-    fun entranceRoom(
-        @PathVariable roomId: String,
-    ): ResponseEntity<RoomIdResponse> {
-        val response = roomService.entranceRoom(roomId)
-        return ResponseEntity.ok(response)
-    }
-
     // 방 정보 조회
     @GetMapping("/{roomId}")
     fun getRoom(
@@ -61,14 +47,5 @@ class RoomController(
     ): ResponseEntity<WaitingRoomResponse> {
         val room = roomService.getRoom(roomId)
         return ResponseEntity.ok(room)
-    }
-
-    // 방 나가기
-    @PostMapping("/{roomId}/exit")
-    fun exitRoom(
-        @PathVariable roomId: String,
-    ): ResponseEntity<String> {
-        roomService.exitRoom(roomId)
-        return ResponseEntity.ok("방 나가기 성공")
     }
 }

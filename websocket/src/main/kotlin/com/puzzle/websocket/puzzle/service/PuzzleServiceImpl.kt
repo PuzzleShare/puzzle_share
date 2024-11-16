@@ -1,7 +1,9 @@
 package com.puzzle.websocket.puzzle.service
 
 import org.springframework.messaging.simp.SimpMessagingTemplate
+import org.springframework.stereotype.Service
 
+@Service
 class PuzzleServiceImpl(
     private val template: SimpMessagingTemplate,
 ) : PuzzleService {

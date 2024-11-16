@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>대기방</title>
+    <style>
+        /* 기존 스타일 유지 */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 20px;
+            gap: 20px;
+        }
+        /* 사이드바 스타일 */
+        .sidebar {
+            width: 20%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .sidebar button {
+            padding: 10px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .sidebar button:hover {
+            background-color: #ff8c00;
+        }
+        /* 팀 영역 스타일 */
+        .team-container {
+            display: flex;
+            width: 50%;
+            gap: 20px;
+            justify-content: space-around;
+        }
+        .team {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 45%;
+            padding: 15px;
+        }
+        .team h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+        .team .player {
+            background-color: #e3e3e3;
+            border-radius: 5px;
+            padding: 5px;
+            margin-top: 5px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .player img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+        /* 방 정보 스타일 */
+        .room-info {
+            width: 30%;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .room-info img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        .room-info h3 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+        }
+        .room-info p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #555;
+        }
+        .room-info button {
+            padding: 10px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .room-info button:hover {
+            background-color: #ff8c00;
+        }
+        /* 채팅 영역 스타일 */
+        .chat-container {
+            width: 90%;
+            margin-top: 20px;
+        }
+        #chat_ul {
+            width: 100%;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            list-style-type: none;
+            background-color: #ffffff;
+            margin: 0;
+        }
+        #chat_ul li {
+            background: lightblue;
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        #message {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #send {
+            margin-top: 5px;
+            padding: 10px;
+            background-color: #ffa500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #send:hover {
+            background-color: #ff8c00;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- 사이드바 -->
+    <div class="sidebar">
+        <button onclick="exitRoom()">나가기</button>
+        <button onclick="switchTeam()">이동</button>
+        <button>설정</button>
+        <button>초대</button>
+    </div>
+
+    <!-- 팀 영역 -->
+    <div class="team-container">
+        <div class="team" style="background-color: #b0d4ff;">
+            <h2>파란팀</h2>
+            <div class="player"><img src="https://via.placeholder.com/30" alt="Player Image"> 이누야사</div>
+            <div class="player"><img src="https://via.placeholder.com/30" alt="Player Image"> 진상</div>
+            <div class="player">비어 있음</div>
+            <div class="player">비어 있음</div>
+        </div>
+
+        <div class="team" style="background-color: #ffb0b0;">
+            <h2>빨간팀</h2>
+            <div class="player"><img src="https://via.placeholder.com/30" alt="Player Image"> 문어</div>
+            <div class="player"><img src="https://via.placeholder.com/30" alt="Player Image"> 고찬</div>
+            <div class="player">비어 있음</div>
+            <div class="player">비어 있음</div>
+        </div>
+    </div>
+
+    <!-- 방 정보 -->
+    <div class="room-info">
+        <img src="https://via.placeholder.com/300x200" alt="방 이미지">
+        <h3>너만 오면 고</h3>
+        <p>아이템전</p>
+        <p>100 피스</p>
+        <p>4/4</p>
+        <button onclick="startGame()">시작</button>
+        <button onclick="enterRoom()">입장</button>
+    </div>
+</div>
+
+<!-- 채팅 영역 -->
+<div class="chat-container">
+    <ul id="chat_ul"></ul>
+    <textarea id="message" placeholder="메시지를 입력하세요"></textarea>
+    <button id="send" onclick="sendMessage()">보내기</button>
+</div>
+
+<script>
+    let stompClient = null;
+    const roomId = "7bb69e12-d4e7-47f4-bbe6-fec2358160a0"; // 실제 roomId 값으로 교체 필요
+
+    // WebSocket 연결 및 구독
+    function connect() {
+        const socket = new SockJS("/ws");
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function (frame) {
+            console.log("Connected: " + frame);
+
+            // 방 이벤트 구독
+            stompClient.subscribe(`/topic/room/${roomId}`, function (message) {
+                const data = JSON.parse(message.body);
+                handleRoomEvent(data);
+            });
+        });
+    }
+
+    // 방 이벤트 처리 함수
+    function handleRoomEvent(data) {
+        switch (data.event) {
+            case "enter":
+                console.log("방 입장:", data.message);
+                break;
+            case "exit":
+                console.log("방 나가기:", data.message);
+                break;
+            case "switch":
+                console.log("팀 변경:", data.message);
+                break;
+            case "start":
+                console.log("게임 시작:", data.message);
+                break;
+            default:
+                console.log("알 수 없는 이벤트:", data);
+        }
+    }
+
+    // 방 입장
+    function enterRoom() {
+        stompClient.send(`/pub/room/${roomId}/enter`, {}, JSON.stringify({ roomId }));
+    }
+
+    // 방 나가기
+    function exitRoom() {
+        stompClient.send(`/pub/room/${roomId}/exit`, {}, JSON.stringify({ roomId }));
+    }
+
+    // 팀 변경
+    function switchTeam() {
+        stompClient.send(`/pub/room/${roomId}/switch`, {}, JSON.stringify({ roomId }));
+    }
+
+    // 게임 시작
+    function startGame() {
+        stompClient.send(`/pub/room/${roomId}/start`, {}, JSON.stringify({ roomId }));
+    }
+
+    // 채팅 메시지 보내기
+    function sendMessage() {
+        const message = document.getElementById("message").value;
+        if (!message.trim()) return;
+        const ul = document.getElementById("chat_ul");
+        const li = document.createElement("li");
+        li.textContent = `나: ${message}`;
+        ul.appendChild(li);
+        document.getElementById("message").value = ""; // 입력 필드 초기화
+    }
+
+    // WebSocket 연결 초기화
+    connect();
+</script>
+
+</body>
+</html>
