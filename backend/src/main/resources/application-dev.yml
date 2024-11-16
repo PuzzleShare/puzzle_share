@@ -13,3 +13,7 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+login:
+  base-url:
+  redirect-url:
