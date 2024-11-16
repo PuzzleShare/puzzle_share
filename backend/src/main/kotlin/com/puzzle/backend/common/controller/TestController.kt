@@ -1,4 +1,4 @@
-package com.puzzle.backend
+package com.puzzle.backend.common.controller
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping

@@ -1,4 +1,4 @@
-package com.puzzle.websocket.config
+package com.puzzle.websocket.common.config
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.simp.config.MessageBrokerRegistry
@@ -18,7 +18,7 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
         registry
             .addEndpoint("/ws")
-//            .setAllowedOrigins("*")
+            .setAllowedOriginPatterns("*")
             .withSockJS()
         super.registerStompEndpoints(registry)
     }

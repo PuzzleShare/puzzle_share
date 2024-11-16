@@ -10,9 +10,23 @@ import org.springframework.stereotype.Controller
 class ChatController(
     @Qualifier("mainChatService")
     private val mainChatService: ChatService,
+    @Qualifier("inRoomChatService")
+    private val inRoomChatService: ChatService,
+    @Qualifier("inGameChatService")
+    private val inGameChatService: ChatService,
 ) {
     @MessageMapping("/chat/main")
     fun mainChat(mainChatMessage: MainChatMessage) {
         mainChatService.send(mainChatMessage)
+    }
+
+    @MessageMapping("/chat/room")
+    fun inRoomChat(mainChatMessage: MainChatMessage) {
+        inRoomChatService.send(mainChatMessage)
+    }
+
+    @MessageMapping("/chat/game")
+    fun inGameChat(mainChatMessage: MainChatMessage) {
+        inGameChatService.send(mainChatMessage)
     }
 }
