@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/user")
 class UsersController(
     private val usersService: UsersService,
-) {
+) : UsersControllerSpec {
     @GetMapping("/info")
-    fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse = usersService.getUserInfo(request)
+    override fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse = usersService.getUserInfo(request)
 
     @GetMapping("/logout")
-    fun logout(request: HttpServletRequest): BaseResponse<String> = usersService.logout(request)
+    override fun logout(request: HttpServletRequest): BaseResponse<String> = usersService.logout(request)
 }
