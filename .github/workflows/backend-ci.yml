@@ -55,6 +55,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          SPRING_PROFILES_ACTIVE: dev
 
       - name: Write Test Report
         uses: EnricoMi/publish-unit-test-result-action@v2
