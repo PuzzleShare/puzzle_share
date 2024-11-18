@@ -7,5 +7,5 @@ import org.springframework.data.redis.core.RedisHash
 class UserCache(
     @Id
     val userId: Long,
-    val refreshToken: String
+    val refreshToken: String,
 )

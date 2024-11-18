@@ -14,7 +14,7 @@ enum class SocialType(
                 email = it["email"] as String,
                 provider = "GOOGLE",
             )
-        }
+        },
     ),
     KAKAO(
         Function {
@@ -24,7 +24,7 @@ enum class SocialType(
                 email = (it["kakao_account"] as Map<*, *>)["email"] as String,
                 provider = "KAKAO",
             )
-        }
+        },
     ),
     NAVER(
         Function {
@@ -34,8 +34,9 @@ enum class SocialType(
                 email = (it["response"] as Map<*, *>)["email"] as String,
                 provider = "NAVER",
             )
-        }
-    );
+        },
+    ),
+    ;
 
     fun convert(attributes: Map<String, Any>): UserDataResponse = function.apply(attributes)
 }

@@ -18,11 +18,10 @@ class CustomLogoutSuccessHandler(
     @Value("\${oauth.credentials.naver.logout-url}")
     private val naverLogourUrl: String,
 ) : LogoutSuccessHandler {
-
     override fun onLogoutSuccess(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        authentication: Authentication?
+        authentication: Authentication?,
     ) {
         // 요청에서 OAuth 제공자 정보를 가져옵니다 (예: "google", "kakao", "naver")
         val url = when (request.getParameter("provider")) {

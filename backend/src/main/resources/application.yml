@@ -1,6 +1,6 @@
 spring:
   profiles:
     group:
-      local: "local, keys, oauth, localredis"
-      dev: "dev, datasource, keys, oauth"
-    active: dev
+      local: "local, keys, oauth, localredis,docs"
+      dev: "dev, datasource, keys, oauth,docs"
+    active: local

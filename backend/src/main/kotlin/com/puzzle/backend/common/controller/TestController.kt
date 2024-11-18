@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/test")
-class TestController {
+class TestController : TestControllerSpec {
     @GetMapping("/success")
-    fun success(): String = "Hello World!"
-
-    @GetMapping("/error")
-    fun error(): String = throw RuntimeException("test")
+    override fun success(name: String): String = "Hello $name"
 }

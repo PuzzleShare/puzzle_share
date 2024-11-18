@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/rooms")
 class RoomController(
     private val roomService: RoomService,
-) {
+) : RoomControllerSpec {
     // 방 생성
     @PostMapping("")
-    fun createRoom(
+    override fun createRoom(
         @RequestBody request: CreateRoomRequest,
     ): ResponseEntity<RoomIdResponse> {
         val newRoom = roomService.createRoom(request)
@@ -32,7 +32,7 @@ class RoomController(
     }
 
     @GetMapping("")
-    fun getRoomList(
+    override fun getRoomList(
         @RequestParam(defaultValue = "0") page: Int,
     ): ResponseEntity<Page<RoomListResponse>> {
         val pageable: Pageable = PageRequest.of(page, 10)
@@ -42,7 +42,7 @@ class RoomController(
 
     // 방 정보 조회
     @GetMapping("/{roomId}")
-    fun getRoom(
+    override fun getRoom(
         @PathVariable roomId: String,
     ): ResponseEntity<WaitingRoomResponse> {
         val room = roomService.getRoom(roomId)
