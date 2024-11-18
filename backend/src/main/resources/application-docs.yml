@@ -1,0 +1,10 @@
+springdoc:
+  swagger-ui:
+    enabled: true
+
+---
+# Test와 Stable 환경에서는 Swagger UI를 비활성화합니다.
+spring.config.activate.on-profile: prod
+springdoc:
+  swagger-ui:
+    enabled: false

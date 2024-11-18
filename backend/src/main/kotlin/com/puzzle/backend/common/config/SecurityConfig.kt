@@ -34,9 +34,7 @@ class SecurityConfig(
                 // 요청 URL별 권한 설정
                 it
                     .requestMatchers(
-                        "/login/oauth2/code/**",
-                        "/oauth2/authorization/**",
-                        "/api/v1/test/**",
+                        *PERMITTED_URL_PATTERNS,
                     ).permitAll()
                     .anyRequest()
                     .authenticated() // 나머지 모든 요청은 인증 확인
@@ -49,3 +47,13 @@ class SecurityConfig(
         return http.build() // 설정 완료 후 SecurityFilterChain 반환
     }
 }
+
+private val PERMITTED_URL_PATTERNS =
+    arrayOf(
+        "/login/oauth2/code/**",
+        "/oauth2/authorization/**",
+        "/api/v1/test/success",
+        "/api/v1/test/error",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+    )
