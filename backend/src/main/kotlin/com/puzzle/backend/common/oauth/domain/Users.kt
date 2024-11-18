@@ -13,7 +13,7 @@ import jakarta.persistence.Table
 @Entity
 @Table(
     name = "users",
-    indexes = [Index(name = "idx_users_email", columnList = "socialType, email")]
+    indexes = [Index(name = "idx_users_email", columnList = "socialType, email")],
 )
 class Users(
     @Id

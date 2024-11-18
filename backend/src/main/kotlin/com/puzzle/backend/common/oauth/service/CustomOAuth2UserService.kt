@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional
 class CustomOAuth2UserService(
-    private val usersRepository: UsersRepository
+    private val usersRepository: UsersRepository,
 ) : DefaultOAuth2UserService() {
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val oAuth2User = super.loadUser(userRequest)
@@ -25,7 +25,10 @@ class CustomOAuth2UserService(
         }
     }
 
-    private fun processUser(oAuth2User: OAuth2User, type: SocialType): OAuth2User {
+    private fun processUser(
+        oAuth2User: OAuth2User,
+        type: SocialType,
+    ): OAuth2User {
         val attr = type.convert(oAuth2User.attributes)
 
         when (val user = usersRepository.findBySocialTypeAndEmail(type.name, attr.email)) {
@@ -35,7 +38,7 @@ class CustomOAuth2UserService(
                     userImage = attr.image,
                     email = attr.email,
                     userId = 0,
-                    socialType = type.name
+                    socialType = type.name,
                 )
                 usersRepository.save(newUser)
             }

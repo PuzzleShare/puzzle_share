@@ -5,7 +5,7 @@ import java.io.Serializable
 import java.util.UUID
 
 data class CreateRoomRequest(
-    val roomName: String, // 방 이름
+    val roomName: String,
     val gameMode: String,
     val puzzleImage: String,
     val puzzlePiece: Int,
