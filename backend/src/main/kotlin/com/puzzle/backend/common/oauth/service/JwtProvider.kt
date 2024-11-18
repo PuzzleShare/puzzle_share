@@ -87,7 +87,9 @@ class JwtProvider(
         accessCookie.maxAge = HOUR.toInt()
         response.addCookie(accessCookie)
 
-        val refreshCookie = Cookie("refresh", refreshToken)
-        response.addHeader("Set-Cookie", "${refreshCookie.name}=${refreshCookie.value}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=$DAY")
+        response.addHeader(
+            "Set-Cookie",
+            "refresh=$refreshToken; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=$DAY",
+        )
     }
 }

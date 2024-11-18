@@ -47,8 +47,7 @@ class UsersServiceImpl(
             email = user.email,
             image = user.userImage,
             provider = user.socialType,
-            token = jwtProvider.createToken(user, HOUR * 1000)
+            token = jwtProvider.createToken(user, HOUR * 1000),
         )
-
     }
 }

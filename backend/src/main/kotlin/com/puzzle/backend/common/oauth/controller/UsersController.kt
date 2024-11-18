@@ -5,7 +5,6 @@ import com.puzzle.backend.common.oauth.dto.response.LoginSuccessResponse
 import com.puzzle.backend.common.oauth.dto.response.RefreshDataResponse
 import com.puzzle.backend.common.oauth.service.UsersService
 import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
