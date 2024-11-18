@@ -1,3 +1,4 @@
 [submodule "backend/secret"]
 	path = backend/secret
 	url = https://github.com/PuzzleShare/secret.git
+	branch = main

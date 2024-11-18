@@ -23,7 +23,7 @@ spring:
 kotlin.code.style: official
 login:
   base-url: http://localhost:8080
-  redirect-url: http://localhost:5173/login/redirect
+  redirect-url: http://localhost:3000/login/redirect
 #logging:
 #  level:
 #    root: debug

@@ -18,4 +18,7 @@ class UsersController(
 
     @GetMapping("/logout")
     override fun logout(request: HttpServletRequest): BaseResponse<String> = usersService.logout(request)
+
+    @GetMapping("/refresh")
+    fun refeshToken(): Boolean = true
 }
