@@ -1,9 +1,17 @@
 package com.puzzle.backend.common.oauth.service
 
+import com.puzzle.backend.common.oauth.domain.UserCache
 import com.puzzle.backend.common.oauth.domain.Users
+import com.puzzle.backend.common.oauth.handler.DAY
+import com.puzzle.backend.common.oauth.handler.HOUR
+import com.puzzle.backend.common.oauth.repository.UserCacheRepository
+import com.puzzle.backend.common.oauth.repository.UsersRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -12,6 +20,8 @@ import java.util.Date
 class JwtProvider(
     @Value("\${jwt.secret-key}")
     private val secretKey: String,
+    private val userCacheRepository: UserCacheRepository,
+    private val usersRepository: UsersRepository,
 ) {
     private val signKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
 
@@ -44,5 +54,33 @@ class JwtProvider(
             .setSigningKey(signKey)
             .build()
             .parseClaimsJws(token).body.subject
+    }
+
+    fun refesh(request: HttpServletRequest, response: HttpServletResponse): Boolean {
+        return try {
+            val refreshCookie = request.cookies?.find { it.name == "refresh" }!!
+            val userId = getUid(refreshCookie.value)
+            val cache = userCacheRepository.findById(userId.toLong()).orElseThrow()
+            val user = usersRepository.findById(userId.toLong()).orElseThrow()
+            val newRefreshToken = createToken(user, DAY * 1000)
+            userCacheRepository.save(UserCache(userId = cache.userId, refreshToken = newRefreshToken))
+            setCookie(createToken(user, HOUR * 1000), newRefreshToken, response)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun setCookie(accessToken: String, refreshToken: String, response: HttpServletResponse) {
+        val accessCookie = Cookie("jwt", accessToken)
+        accessCookie.path = "/"
+        accessCookie.maxAge = HOUR.toInt()
+        response.addCookie(accessCookie)
+
+        val refreshCookie = Cookie("refresh", refreshToken)
+        refreshCookie.path = "/"
+        refreshCookie.maxAge = DAY.toInt()
+        refreshCookie.isHttpOnly = true
+        response.addCookie(refreshCookie)
     }
 }

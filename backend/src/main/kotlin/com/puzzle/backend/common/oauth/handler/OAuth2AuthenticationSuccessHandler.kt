@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
 
+const val HOUR = 3_600L
+const val DAY = 24 * 60 * 60L
 @Component
 class OAuth2AuthenticationSuccessHandler(
     private val jwtProvider: JwtProvider,
@@ -31,8 +33,8 @@ class OAuth2AuthenticationSuccessHandler(
         val dto = SocialType.valueOf(type).convert(oAuth2User.attributes)
         val user = usersRepository.findBySocialTypeAndEmail(dto.provider, dto.email)!!
 
-        val accessToken = jwtProvider.createToken(user, 3_600_000)
-        val refreshToken = jwtProvider.createToken(user, 24 * 60 * 60 * 1000)
+        val accessToken = jwtProvider.createToken(user, HOUR * 1000)
+        val refreshToken = jwtProvider.createToken(user, DAY * 1000)
         val userCache = UserCache(user.userId, refreshToken)
         userCacheRepository.save(userCache)
 
@@ -40,6 +42,8 @@ class OAuth2AuthenticationSuccessHandler(
         response.characterEncoding = "UTF-8"
         response.status = HttpServletResponse.SC_OK
         response.addHeader("Authorization", "Bearer $accessToken")
+
+        jwtProvider.setCookie(accessToken, refreshToken, response)
 
         response.sendRedirect("$redirectUrl?token=$accessToken")
     }

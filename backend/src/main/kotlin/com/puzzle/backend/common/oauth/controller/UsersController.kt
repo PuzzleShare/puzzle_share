@@ -15,6 +15,10 @@ class UsersController(
 ) {
     @GetMapping("/info")
     fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse = usersService.getUserInfo(request)
+
     @GetMapping("/logout")
     fun logout(request: HttpServletRequest): BaseResponse<String> = usersService.logout(request)
+
+    @GetMapping("/refresh")
+    fun refeshToken(): Boolean = true
 }

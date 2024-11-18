@@ -15,8 +15,8 @@ class UsersServiceImpl(
     private val userCacheRepository: UserCacheRepository
 ) : UsersService {
     override fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse {
-        val token = request.getHeader("Authorization").removePrefix("Bearer ")
-        val userId = jwtProvider.getUid(token)
+        val cookie = request.cookies?.find { it.name == "refresh" }
+        val userId = jwtProvider.getUid(cookie?.value)
         val user = usersRepository.findById(userId.toLong()).orElseThrow()
         return LoginSuccessResponse.of(user)
     }

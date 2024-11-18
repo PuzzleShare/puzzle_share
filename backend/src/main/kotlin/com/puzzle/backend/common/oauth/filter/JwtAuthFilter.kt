@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
@@ -13,21 +14,30 @@ import org.springframework.web.filter.GenericFilterBean
 
 @Component
 class JwtAuthFilter(
-    private val jwtProvider: JwtProvider
+    private val jwtProvider: JwtProvider,
 ) : GenericFilterBean() {
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         request as HttpServletRequest
+        response as HttpServletResponse
+
         val header = request.getHeader("Authorization")
         if (header != null) {
             val token = header.removePrefix("Bearer ")
             if (jwtProvider.validateToken(token)) {
-                val userId = jwtProvider.getUid(token)
-                val auth = UsernamePasswordAuthenticationToken(userId, "", emptyList())
-                auth.details = WebAuthenticationDetailsSource().buildDetails(request)
-                SecurityContextHolder.getContext().authentication = auth
+                setAuth(token, request)
+            } else if (jwtProvider.refesh(request, response)) {
+                val refreshCookie = request.cookies?.find { it.name == "refresh" }!!
+                setAuth(refreshCookie.value, request)
             }
         }
 
         chain.doFilter(request, response)
+    }
+
+    private fun setAuth(token: String, request: HttpServletRequest) {
+        val userId = jwtProvider.getUid(token)
+        val auth = UsernamePasswordAuthenticationToken(userId, "", emptyList())
+        auth.details = WebAuthenticationDetailsSource().buildDetails(request)
+        SecurityContextHolder.getContext().authentication = auth
     }
 }
