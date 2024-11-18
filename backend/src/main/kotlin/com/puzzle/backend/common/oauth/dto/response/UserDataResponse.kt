@@ -18,13 +18,14 @@ data class LoginSuccessResponse(
     val provider: String,
 ) {
     companion object {
-        fun of(users: Users): LoginSuccessResponse = LoginSuccessResponse(
-            userId = users.userId,
-            userName = users.userName,
-            image = users.userImage,
-            email = users.email,
-            provider = users.socialType
-        )
+        fun of(users: Users): LoginSuccessResponse =
+            LoginSuccessResponse(
+                userId = users.userId,
+                userName = users.userName,
+                image = users.userImage,
+                email = users.email,
+                provider = users.socialType,
+            )
     }
 
     fun toJson(): String = ObjectMapper().writeValueAsString(this)

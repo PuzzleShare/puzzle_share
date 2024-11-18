@@ -1,10 +1,12 @@
+import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     id("org.springframework.boot") version "3.3.5"
     id("io.spring.dependency-management") version "1.1.6"
     kotlin("plugin.jpa") version "1.9.25"
-    id("org.jlleitschuh.gradle.ktlint") version "11.0.0"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
 }
 // build.gradle.kts
 
@@ -20,7 +22,11 @@ java {
 repositories {
     mavenCentral()
 }
-
+ktlint {
+    reporters {
+        reporter(ReporterType.JSON)
+    }
+}
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

@@ -21,7 +21,7 @@ class SecurityConfig(
     private val corsConfig: CorsConfig,
     private val customLogoutSuccessHandler: CustomLogoutSuccessHandler,
     private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
-    private val oAuth2AuthenticationFailureHandler: OAuth2AuthenticationFailureHandler
+    private val oAuth2AuthenticationFailureHandler: OAuth2AuthenticationFailureHandler,
 ) {
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
@@ -32,19 +32,19 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) } // 세션을 사용하지 않도록 설정 (JWT로 인증하기 때문)
             .authorizeHttpRequests {
                 // 요청 URL별 권한 설정
-                it.requestMatchers(
-                    "/login/oauth2/code/**",
-                    "/oauth2/authorization/**",
-                    "/api/v1/test/**"
-                ).permitAll()
-                    .anyRequest().authenticated() // 나머지 모든 요청은 인증 확인
-            }
-            .oauth2Login {
+                it
+                    .requestMatchers(
+                        "/login/oauth2/code/**",
+                        "/oauth2/authorization/**",
+                        "/api/v1/test/**",
+                    ).permitAll()
+                    .anyRequest()
+                    .authenticated() // 나머지 모든 요청은 인증 확인
+            }.oauth2Login {
                 it.userInfoEndpoint { it.userService(customOAuth2UserService::loadUser) }
                 it.successHandler(oAuth2AuthenticationSuccessHandler)
                 it.failureHandler(oAuth2AuthenticationFailureHandler)
-            }
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
+            }.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build() // 설정 완료 후 SecurityFilterChain 반환
     }

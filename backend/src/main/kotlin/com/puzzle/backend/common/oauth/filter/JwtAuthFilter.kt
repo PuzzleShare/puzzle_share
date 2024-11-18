@@ -13,9 +13,13 @@ import org.springframework.web.filter.GenericFilterBean
 
 @Component
 class JwtAuthFilter(
-    private val jwtProvider: JwtProvider
+    private val jwtProvider: JwtProvider,
 ) : GenericFilterBean() {
-    override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    override fun doFilter(
+        request: ServletRequest,
+        response: ServletResponse,
+        chain: FilterChain,
+    ) {
         request as HttpServletRequest
         val header = request.getHeader("Authorization")
         if (header != null) {
