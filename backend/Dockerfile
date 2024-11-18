@@ -19,4 +19,4 @@ COPY --from=build-stage ${DEPENDENCY}/BOOT-INF/lib ./app/lib
 COPY --from=build-stage ${DEPENDENCY}/META-INF ./app/META-INF
 COPY --from=build-stage ${DEPENDENCY}/BOOT-INF/classes ./app/
 
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.puzzle.backend.BackendApplicationKt"]
+ENTRYPOINT ["java","-Duser.timezone=Asia/Seoul","-cp","app:app/lib/*","com.puzzle.backend.BackendApplicationKt"]
