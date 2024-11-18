@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 class UsersServiceImpl(
     private val usersRepository: UsersRepository,
     private val jwtProvider: JwtProvider,
-    private val userCacheRepository: UserCacheRepository
+    private val userCacheRepository: UserCacheRepository,
 ) : UsersService {
     override fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse {
         val cookie = request.cookies?.find { it.name == "refresh" }

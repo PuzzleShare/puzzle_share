@@ -25,7 +25,10 @@ class JwtProvider(
 ) {
     private val signKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
 
-    fun createToken(user: Users, time: Long): String {
+    fun createToken(
+        user: Users,
+        time: Long,
+    ): String {
         val claims = Jwts.claims().setSubject(user.userId.toString())
         val now = Date()
         val expiryDate = Date(now.time + time) // 1시간 만료

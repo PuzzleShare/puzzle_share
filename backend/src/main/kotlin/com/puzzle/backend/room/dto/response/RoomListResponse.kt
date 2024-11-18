@@ -5,11 +5,14 @@ import java.io.Serializable
 
 class RoomListResponse(
     val roomId: String,
-    val roomName: String, // 방 이름
+    // 방 이름
+    val roomName: String,
     val gameMode: String,
     val puzzlePiece: Int,
-    val maxPlayers: Int, // 최대 참가자 수
-    val nowPlayers: Int, // 현재 참가자 수
+    // 최대 참가자 수
+    val maxPlayers: Int,
+    // 현재 참가자 수
+    val nowPlayers: Int,
 ) : Serializable {
     companion object {
         fun toResponse(

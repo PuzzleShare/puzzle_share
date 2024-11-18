@@ -16,7 +16,11 @@ import org.springframework.web.filter.GenericFilterBean
 class JwtAuthFilter(
     private val jwtProvider: JwtProvider,
 ) : GenericFilterBean() {
-    override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
+    override fun doFilter(
+        request: ServletRequest,
+        response: ServletResponse,
+        chain: FilterChain,
+    ) {
         request as HttpServletRequest
         response as HttpServletResponse
 

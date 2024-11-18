@@ -21,12 +21,12 @@ class OAuth2AuthenticationSuccessHandler(
     private val usersRepository: UsersRepository,
     @Value("\${login.redirect-url}")
     private val redirectUrl: String,
-    private val userCacheRepository: UserCacheRepository
+    private val userCacheRepository: UserCacheRepository,
 ) : AuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        authentication: Authentication
+        authentication: Authentication,
     ) {
         val oAuth2User = authentication.principal as OAuth2User
         val type = request.requestURI.substring(request.requestURI.lastIndexOf("/") + 1).uppercase()
