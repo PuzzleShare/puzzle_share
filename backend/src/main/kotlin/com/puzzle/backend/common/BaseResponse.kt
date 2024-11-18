@@ -1,6 +1,5 @@
 package com.puzzle.backend.common
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.puzzle.backend.common.status.ResultCode
 
 data class BaseResponse<T>(
@@ -10,6 +9,4 @@ data class BaseResponse<T>(
     val data: T? = null,
     // 처리 메세지
     val message: String = ResultCode.SUCCESS.msg,
-) {
-    fun toJson() = ObjectMapper().writeValueAsString(this)
-}
+)

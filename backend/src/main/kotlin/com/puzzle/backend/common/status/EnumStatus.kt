@@ -12,4 +12,5 @@ enum class ResultCode(
 enum class RoomRole {
     ROOM_MASTER,
     USER,
+    ADMIN,
 }
