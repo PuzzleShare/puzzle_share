@@ -11,7 +11,8 @@ const val FRONT = "https://puzzle-frontend-five.vercel.app"
 @Configuration
 class CorsConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**")
+        registry
+            .addMapping("/**")
             .allowedOrigins(LOCAL_FRONT, LOCAL_BACK, FRONT)
             .allowedMethods("GET", "POST", "PUT", "DELETE")
             .allowedHeaders("*")
