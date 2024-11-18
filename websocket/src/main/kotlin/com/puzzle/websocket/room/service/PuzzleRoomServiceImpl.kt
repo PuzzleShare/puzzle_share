@@ -1,12 +1,12 @@
-package com.puzzle.websocket.puzzle.service
+package com.puzzle.websocket.room.service
 
 import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.backend.common.status.PuzzleRoomRole
-import com.puzzle.websocket.puzzle.domain.Player
-import com.puzzle.websocket.puzzle.domain.PuzzleRoom
-import com.puzzle.websocket.puzzle.dto.request.RoomIdRequest
-import com.puzzle.websocket.puzzle.repository.PlayerRepository
-import com.puzzle.websocket.puzzle.repository.PuzzleRoomRepository
+import com.puzzle.websocket.room.domain.Player
+import com.puzzle.websocket.room.domain.PuzzleRoom
+import com.puzzle.websocket.room.dto.request.RoomIdRequest
+import com.puzzle.websocket.room.repository.PlayerRepository
+import com.puzzle.websocket.room.repository.PuzzleRoomRepository
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 
@@ -22,6 +22,8 @@ class PuzzleRoomServiceImpl(
 
     override fun enterRoom(roomId: RoomIdRequest) {
         val userId = 2L // 현재 사용자 ID (예시)
+        println("들어와ㅕ어")
+        roomId.roomId="50c45eb6-7c00-4a3a-ab99-26842b419ed4"
         val room = findById(roomId.roomId)
         val playerCount = room.redPlayers.size + room.bluePlayers.size
 
@@ -40,7 +42,9 @@ class PuzzleRoomServiceImpl(
 
         // 입장 이벤트 WebSocket 전송
         val entranceMessage = "User $userId has entered the room."
-        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "enter", "message" to entranceMessage))
+
+        println(entranceMessage)
+        messagingTemplate.convertAndSend("/topic/room",entranceMessage)
     }
 
     override fun leaveRoom(roomId: RoomIdRequest) {

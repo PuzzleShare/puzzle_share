@@ -1,6 +1,6 @@
-package com.puzzle.websocket.puzzle.service
+package com.puzzle.websocket.room.service
 
-import com.puzzle.websocket.puzzle.dto.request.RoomIdRequest
+import com.puzzle.websocket.room.dto.request.RoomIdRequest
 
 interface PuzzleRoomService {
     fun enterRoom(roomId: RoomIdRequest)

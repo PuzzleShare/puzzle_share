@@ -1,4 +1,4 @@
-package com.puzzle.websocket.puzzle.domain
+package com.puzzle.websocket.room.domain
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
