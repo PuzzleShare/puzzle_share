@@ -38,7 +38,10 @@ class JwtAuthFilter(
         chain.doFilter(request, response)
     }
 
-    private fun setAuth(token: String, request: HttpServletRequest) {
+    private fun setAuth(
+        token: String,
+        request: HttpServletRequest,
+    ) {
         val userId = jwtProvider.getUid(token)
         val auth = UsernamePasswordAuthenticationToken(userId, "", emptyList())
         auth.details = WebAuthenticationDetailsSource().buildDetails(request)

@@ -59,7 +59,10 @@ class JwtProvider(
             .parseClaimsJws(token).body.subject
     }
 
-    fun refesh(request: HttpServletRequest, response: HttpServletResponse): Boolean {
+    fun refesh(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): Boolean {
         return try {
             val refreshCookie = request.cookies?.find { it.name == "refresh" }!!
             val userId = getUid(refreshCookie.value)
@@ -74,7 +77,11 @@ class JwtProvider(
         }
     }
 
-    fun setCookie(accessToken: String, refreshToken: String, response: HttpServletResponse) {
+    fun setCookie(
+        accessToken: String,
+        refreshToken: String,
+        response: HttpServletResponse,
+    ) {
         val accessCookie = Cookie("jwt", accessToken)
         accessCookie.path = "/"
         accessCookie.maxAge = HOUR.toInt()

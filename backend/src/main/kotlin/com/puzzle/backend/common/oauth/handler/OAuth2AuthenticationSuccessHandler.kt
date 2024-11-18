@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 
 const val HOUR = 3_600L
 const val DAY = 24 * 60 * 60L
+
 @Component
 class OAuth2AuthenticationSuccessHandler(
     private val jwtProvider: JwtProvider,
