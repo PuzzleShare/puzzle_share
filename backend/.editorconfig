@@ -14,5 +14,3 @@ ktlint_standard_package-name = disabled
 ktlint_standard_string-template-indent = disabled
 ktlint_standard_multiline-expression-wrapping = disabled
 ktlint_standard_discouraged-comment-location = warn
-# New rules to address multiline expression issues
-ktlint_standard_multiline-expression-wrapping-ignore = true

@@ -1,4 +1,4 @@
-package com.puzzle.websocket.puzzle.service
+package com.puzzle.websocket.room.service
 
 interface PuzzleService {
     fun matchPiece()

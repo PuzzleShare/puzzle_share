@@ -1,4 +1,4 @@
-package com.puzzle.websocket.puzzle.repository
+package com.puzzle.websocket.room.repository
 
 import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import org.springframework.data.repository.CrudRepository

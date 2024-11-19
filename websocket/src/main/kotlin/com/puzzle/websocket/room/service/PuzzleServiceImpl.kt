@@ -1,4 +1,4 @@
-package com.puzzle.websocket.puzzle.service
+package com.puzzle.websocket.room.service
 
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service

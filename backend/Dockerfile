@@ -8,7 +8,7 @@ COPY gradlew settings.gradle.kts build.gradle.kts /workspace/app/
 
 #RUN --mount=type=cache,target=/root/.gradle ./gradlew clean build -x test
 # Build cache import/export 기능을 활용하기 위한 코드
-RUN --mount=type=cache,target=/root/.gradle ls -alh /root/.gradle; ./gradlew assemble; ls -alh /root/.gradle
+RUN --mount=type=cache,target=/root/.gradle ls -alh /root/.gradle; ./gradlew clean build -x test; ls -alh /root/.gradle
 RUN mkdir -p build/dependencies && (cd build/dependencies; jar -xf ../libs/backend-0.0.1-SNAPSHOT.jar)
 
 FROM openjdk:21-slim
