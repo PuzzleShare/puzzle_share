@@ -1,6 +1,7 @@
 package com.puzzle.websocket.puzzle.service
 
 import com.puzzle.backend.common.exception.custom.RoomFullException
+import com.puzzle.websocket.game.service.GameService
 import com.puzzle.websocket.common.exception.custom.NoneMasterException
 import com.puzzle.websocket.puzzle.domain.PuzzleRoom
 import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service
 class PuzzleRoomServiceImpl(
     private val puzzleRoomRepository: PuzzleRoomRepository,
     private val messagingTemplate: SimpMessagingTemplate,
+    private val gameService: GameService,
 ) : PuzzleRoomService {
 
     fun findById(roomId: String): PuzzleRoom = puzzleRoomRepository.findById(roomId)
@@ -36,7 +38,9 @@ class PuzzleRoomServiceImpl(
 
         puzzleRoomRepository.save(room)
 
+
         messagingTemplate.convertAndSend("/topic/room/$roomId", room)
+
     }
 
     override fun leaveRoom(roomId: String, playerRequest: PlayerRequest) {
@@ -76,10 +80,14 @@ class PuzzleRoomServiceImpl(
 
     override fun gameStart(roomId: String, playerRequest: PlayerRequest) {
         val room = findById(roomId)
-        if (playerRequest.playerId != room.master) {
-            throw NoneMasterException()
-        }
+        var game = gameService.createGame(room)
+        game = gameService.startGame(game.gameId)!!
+        println("gameStart")
+        println(game.toString())
+        messagingTemplate.convertAndSend(
+            "/topic/room/$roomId",
+            game,
+        )
 
-        messagingTemplate.convertAndSend("/topic/room/$roomId", room)
     }
 }

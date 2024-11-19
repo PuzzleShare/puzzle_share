@@ -1,19 +1,20 @@
 package com.puzzle.websocket.game.service
 
 import com.google.gson.Gson
-import com.puzzle.websocket.game.domain.*
-
+import com.puzzle.websocket.game.domain.Game
+import com.puzzle.websocket.game.domain.PieceDto
+import com.puzzle.websocket.game.domain.PuzzleBoard
+import com.puzzle.websocket.game.domain.ResponseMessage
+import com.puzzle.websocket.game.domain.SharePuzzle
+import com.puzzle.websocket.room.domain.PuzzleRoom
 import org.springframework.stereotype.Service
-import java.util.*
+import java.util.Date
 
 @Service
-class GameService(
-
-) {
-
-    val gameRooms: MutableMap<String, Game> = Collections.synchronizedMap(HashMap())
+class GameService {
+    val gameRooms: MutableMap<String, Game> = mutableMapOf()
     val gson: Gson = Gson()
-    val sessionToGame: MutableMap<String, String> = Collections.synchronizedMap(HashMap())
+    val sessionToGame: MutableMap<String, String> = mutableMapOf()
 
     // 협동 게임방 불러오기
     fun findAllCooperationRoom(): List<Game> {
@@ -29,14 +30,15 @@ class GameService(
         return result
     }
 
-    fun findById(roomId: String): Game? {
-        return gameRooms[roomId]
-    }
+    fun findById(roomId: String): Game? = gameRooms[roomId]
 
     // 채팅방 생성
-    fun createRoom(room: Room): Game {
+    fun createGame(room: PuzzleRoom): Game {
         val game = Game.create(room)
         gameRooms[game.gameId] = game
+        println(game.gameId)
+        print(game.toString())
+        print(gameRooms[game.gameId])
         return game
     }
 
@@ -47,7 +49,11 @@ class GameService(
     // 게임 시작
     fun startGame(roomId: String): Game? {
         val game = findById(roomId)
-        game?.start()
+        println("startGame")
+        print(game.toString())
+        if (game != null) {
+            game.start()
+        }
         return game
     }
 
@@ -57,8 +63,8 @@ class GameService(
         val sender = sharePuzzle.sender
         var message = sharePuzzle.message
         val targets = sharePuzzle.targets
-        val position_x = sharePuzzle.position_x
-        val position_y = sharePuzzle.position_y
+        val x = sharePuzzle.position_x
+        val y = sharePuzzle.position_y
 
         val res = ResponseMessage()
         val game = findById(roomId) ?: return res.apply { message = "팀 없는데?" }
@@ -183,8 +189,9 @@ class GameService(
         return res
     }
 
-    private fun calculateProgress(puzzle: PuzzleBoard): Double {
-        return (puzzle.correctedCount.toDouble() /
-                (puzzle.widthCnt.toDouble() * puzzle.lengthCnt.toDouble()) * 100)
-    }
+    private fun calculateProgress(puzzle: PuzzleBoard): Double =
+        (
+            puzzle.correctedCount.toDouble() /
+                (puzzle.widthCnt.toDouble() * puzzle.lengthCnt.toDouble()) * 100
+        )
 }
