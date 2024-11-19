@@ -15,7 +15,7 @@ class PuzzleRoom(
     val maxPlayers: Int, // 최대 참가자 수
     val redPlayers: MutableList<PlayerRequest> = mutableListOf(), // 현재 참가자 목록
     val bluePlayers: MutableList<PlayerRequest> = mutableListOf(), // 현재 참가자 목록
-    var master: Long
+    var master: Long,
 ) {
     fun updateMaster(newMaster: Long) {
         this.master = newMaster

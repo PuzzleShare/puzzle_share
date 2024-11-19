@@ -1,21 +1,16 @@
 package com.puzzle.websocket.game.controller
 
-import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
 import com.puzzle.websocket.game.domain.User
 import com.puzzle.websocket.game.service.GameService
-
 import org.springframework.context.event.EventListener
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessageSendingOperations
-import org.springframework.messaging.simp.stomp.StompCommand
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import org.springframework.web.socket.messaging.SessionConnectEvent
-import org.springframework.web.socket.messaging.SessionDisconnectEvent
-import java.util.*
+import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 
 @Controller
@@ -79,6 +74,17 @@ class GameController(
 //        sendingOperations.convertAndSend("/topic/game/room/$gameId", game)
 //    }
 
+    @MessageMapping("/{roomId}/game/enter")
+    @Throws(Exception::class)
+    fun enterGame(
+        @DestinationVariable roomId: String,
+    ) {
+        sendingOperations.convertAndSend(
+            "/topic/game/room/$roomId/init",
+            gameService.findById(roomId)!!,
+        )
+    }
+
     @MessageMapping("/game/puzzle")
     @Throws(Exception::class)
     fun puzzle(sharePuzzle: SharePuzzle) {
@@ -89,47 +95,48 @@ class GameController(
             return
         }
 
-        val res = gameService.playGame(sharePuzzle).apply {
-            redProgressPercent = game.redPuzzle!!.correctedCount.toDouble() /
+        val res =
+            gameService.playGame(sharePuzzle).apply {
+                redProgressPercent = game.redPuzzle!!.correctedCount.toDouble() /
                     (game.redPuzzle!!.lengthCnt * game.redPuzzle!!.widthCnt) * 100
-            blueProgressPercent = game.bluePuzzle!!.correctedCount.toDouble() /
+                blueProgressPercent = game.bluePuzzle!!.correctedCount.toDouble() /
                     (game.bluePuzzle!!.lengthCnt * game.bluePuzzle!!.widthCnt) * 100
-            isFinished = game.isFinished
-            redBundles = game.redPuzzle!!.bundles
-            if (game.gameType == "BATTLE") {
-                blueBundles = game.bluePuzzle!!.bundles
+                isFinished = game.isFinished
+                redBundles = game.redPuzzle!!.bundles
+                if (game.gameType == "BATTLE") {
+                    blueBundles = game.bluePuzzle!!.bundles
+                }
             }
-        }
 
         // 해당 방의 모든 사용자에게 게임 상태 전송
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
     }
 
     // 서버 타이머 제공
-    @Scheduled(fixedRate = 1000)
-    @Throws(Exception::class)
-    fun sendServerTime() {
-        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
-        for (game in allRooms.reversed()) {
-            if (game!!.isStarted) {
-                var time = game.getTime()
-                if (game.gameType == "BATTLE") {
-                    time = BATTLE_TIMER - time
-                }
-                if (time >= 0) {
-                    val timer = mapOf("time" to time)
-                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
-                } else {
-
-
-                        val res = ResponseMessage()
-                        res.isFinished = true
-
-                        Thread.sleep(20)
-                        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-
-                }
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 1000)
+//    @Throws(Exception::class)
+//    fun sendServerTime() {
+//        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
+//        for (game in allRooms.reversed()) {
+//            if (game!!.isStarted) {
+//                var time = game.getTime()
+//                if (game.gameType == "BATTLE") {
+//                    time = BATTLE_TIMER - time
+//                }
+//                if (time >= 0) {
+//                    val timer = mapOf("time" to time)
+//                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
+//                } else {
+//
+//
+//                        val res = ResponseMessage()
+//                        res.isFinished = true
+//
+//                        Thread.sleep(20)
+//                        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+//
+//                }
+//            }
+//        }
+//    }
 }

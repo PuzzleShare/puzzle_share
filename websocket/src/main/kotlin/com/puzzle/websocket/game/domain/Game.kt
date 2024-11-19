@@ -1,6 +1,7 @@
 package com.puzzle.websocket.game.domain
 
 import com.puzzle.websocket.room.domain.PuzzleRoom
+import com.puzzle.websocket.room.dto.request.PlayerRequest
 import java.util.*
 
 data class Game(
@@ -10,8 +11,8 @@ data class Game(
     var gameType: String = "",
     var admin: User? = null,
     var picture: Picture? = null,
-    var redTeam: Team = Team(mutableListOf()),
-    var blueTeam: Team = Team(mutableListOf()),
+    var redTeam: MutableList<PlayerRequest> = mutableListOf(),
+    var blueTeam: MutableList<PlayerRequest> = mutableListOf(),
     var players: MutableList<User> = mutableListOf(),
     var redPuzzle: PuzzleBoard? = null,
     var bluePuzzle: PuzzleBoard? = null,
@@ -26,32 +27,32 @@ data class Game(
         a: User?,
         b: User?,
     ) {
-        when {
-            a != null && redTeam.isIn(a) && b != null && blueTeam.isIn(b) -> {
-                redTeam.deletePlayer(a)
-                blueTeam.addPlayer(a)
-                blueTeam.deletePlayer(b)
-                redTeam.addPlayer(b)
-            }
-            a == null && b != null -> {
-                if (redTeam.isIn(b)) {
-                    redTeam.deletePlayer(b)
-                    blueTeam.addPlayer(b)
-                } else if (blueTeam.isIn(b)) {
-                    blueTeam.deletePlayer(b)
-                    redTeam.addPlayer(b)
-                }
-            }
-            b == null && a != null -> {
-                if (redTeam.isIn(a)) {
-                    redTeam.deletePlayer(a)
-                    blueTeam.addPlayer(a)
-                } else if (blueTeam.isIn(a)) {
-                    blueTeam.deletePlayer(a)
-                    redTeam.addPlayer(a)
-                }
-            }
-        }
+//        when {
+//            a != null && redTeam.isIn(a) && b != null && blueTeam.isIn(b) -> {
+//                redTeam.deletePlayer(a)
+//                blueTeam.addPlayer(a)
+//                blueTeam.deletePlayer(b)
+//                redTeam.addPlayer(b)
+//            }
+//            a == null && b != null -> {
+//                if (redTeam.isIn(b)) {
+//                    redTeam.deletePlayer(b)
+//                    blueTeam.addPlayer(b)
+//                } else if (blueTeam.isIn(b)) {
+//                    blueTeam.deletePlayer(b)
+//                    redTeam.addPlayer(b)
+//                }
+//            }
+//            b == null && a != null -> {
+//                if (redTeam.isIn(a)) {
+//                    redTeam.deletePlayer(a)
+//                    blueTeam.addPlayer(a)
+//                } else if (blueTeam.isIn(a)) {
+//                    blueTeam.deletePlayer(a)
+//                    redTeam.addPlayer(a)
+//                }
+//            }
+//        }
     }
 
     fun exitPlayer(sessionId: String) {
@@ -65,11 +66,11 @@ data class Game(
                 }
             }
 
-            if (redTeam.players.contains(it)) {
-                redTeam.deletePlayer(it)
-            } else {
-                blueTeam.deletePlayer(it)
-            }
+//            if (redTeam.players.contains(it)) {
+//                redTeam.deletePlayer(it)
+//            } else {
+//                blueTeam.deletePlayer(it)
+//            }
             sessionToUser.remove(sessionId)
         }
     }
@@ -78,36 +79,37 @@ data class Game(
         user: User,
         sessionId: String,
     ): Boolean {
-        if (sessionToUser.isEmpty()) {
-            admin = user
-        }
-        sessionToUser[sessionId] = user
-
-        return if (gameType == "BATTLE") {
-            if (redTeam.players.contains(user) || blueTeam.players.contains(user)) {
-                true
-            } else if (redTeam.players.size < roomSize / 2) {
-                redTeam.addPlayer(user)
-                true
-            } else if (blueTeam.players.size < roomSize / 2) {
-                blueTeam.addPlayer(user)
-                true
-            } else {
-                false
-            }
-        } else {
-            if (redTeam.players.contains(user)) {
-                true
-            } else if (redTeam.players.size < roomSize) {
-                redTeam.addPlayer(user)
-                true
-            } else {
-                false
-            }
-        }
+        return true
+//        if (sessionToUser.isEmpty()) {
+//            admin = user
+//        }
+//        sessionToUser[sessionId] = user
+//
+//        return if (gameType == "BATTLE") {
+//            if (redTeam.players.contains(user) || blueTeam.players.contains(user)) {
+//                true
+//            } else if (redTeam.players.size < roomSize / 2) {
+//                redTeam.addPlayer(user)
+//                true
+//            } else if (blueTeam.players.size < roomSize / 2) {
+//                blueTeam.addPlayer(user)
+//                true
+//            } else {
+//                false
+//            }
+//        } else {
+//            if (redTeam.players.contains(user)) {
+//                true
+//            } else if (redTeam.players.size < roomSize) {
+//                redTeam.addPlayer(user)
+//                true
+//            } else {
+//                false
+//            }
+//        }
     }
 
-    fun isEmpty(): Boolean = (redTeam.players.size + blueTeam.players.size) == 0
+//    fun isEmpty(): Boolean = (redTeam.players.size + blueTeam.players.size) == 0
 
     fun start() {
 //        if (isStarted) return
@@ -118,8 +120,8 @@ data class Game(
         bluePuzzle?.init(picture!!, gameType)
         players =
             mutableListOf<User>().apply {
-                addAll(redTeam.players)
-                addAll(blueTeam.players)
+//                addAll(redTeam.players)
+//                addAll(blueTeam.players)
             }
         startTime = Date()
         isStarted = true
@@ -152,14 +154,15 @@ data class Game(
                 )
 
             if (gameType == "BATTLE") {
-                game.redTeam = Team(mutableListOf())
-                game.blueTeam = Team(mutableListOf())
+                game.redTeam = room.redPlayers
+
+                game.blueTeam = room.bluePlayers
                 game.picture = Picture.create()
                 game.startTime = Date()
                 println("$name 배틀 방 생성 / id = $uuid")
             } else if (gameType == "COOPERATION") {
-                game.redTeam = Team(mutableListOf())
-                game.blueTeam = Team(mutableListOf())
+                game.redTeam = room.redPlayers
+                game.blueTeam = room.bluePlayers
                 game.picture = Picture.create()
                 game.startTime = Date()
                 println("$name 협동 방 생성 / id = $uuid")

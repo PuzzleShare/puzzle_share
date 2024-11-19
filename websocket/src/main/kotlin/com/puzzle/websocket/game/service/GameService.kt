@@ -75,16 +75,14 @@ class GameService {
         val yourColor: String
 
         res.senderId = sender
-        if (game.redTeam.isIn(sender)) {
+        if (game.redTeam.map { it.playerId }.contains(sender.toLong())) {
             ourPuzzle = game.redPuzzle!!
             ourColor = "RED"
             yourPuzzle = game.bluePuzzle!!
-            yourColor = "BLUE"
-        } else if (game.blueTeam.isIn(sender)) {
+        } else if (game.blueTeam.map { it.playerId }.contains(sender.toLong())) {
             ourPuzzle = game.bluePuzzle!!
             ourColor = "BLUE"
             yourPuzzle = game.redPuzzle!!
-            yourColor = "RED"
         } else {
             res.message = "팀 없는데?"
             return res
