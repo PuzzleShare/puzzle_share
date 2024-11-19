@@ -2,8 +2,8 @@ package com.puzzle.websocket.puzzle.service
 
 import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.websocket.common.exception.custom.NoneMasterException
-import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import com.puzzle.websocket.puzzle.domain.PuzzleRoom
+import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import com.puzzle.websocket.puzzle.repository.PuzzleRoomRepository
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
@@ -19,6 +19,9 @@ class PuzzleRoomServiceImpl(
 
     override fun enterRoom(roomId: String, playerRequest: PlayerRequest) {
         val room = findById(roomId)
+        if (room.bluePlayers.contains(playerRequest) || room.redPlayers.contains(playerRequest)) {
+            return
+        }
         val playerCount = room.redPlayers.size + room.bluePlayers.size
 
         if (playerCount >= room.maxPlayers) {
@@ -33,10 +36,7 @@ class PuzzleRoomServiceImpl(
 
         puzzleRoomRepository.save(room)
 
-        // 입장 이벤트 WebSocket 전송
-        val entranceMessage = "User ${playerRequest.playerId} has entered the room."
-        print(entranceMessage)
-        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "enter", "message" to entranceMessage, "player" to playerRequest))
+        messagingTemplate.convertAndSend("/topic/room/$roomId", room)
     }
 
     override fun leaveRoom(roomId: String, playerRequest: PlayerRequest) {
@@ -55,10 +55,7 @@ class PuzzleRoomServiceImpl(
 
         puzzleRoomRepository.save(room)
 
-        // 퇴장 이벤트 WebSocket 전송
-        val leaveMessage = "User ${playerRequest.playerId} has left the room."
-        print(leaveMessage)
-        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "exit", "message" to leaveMessage, "player" to playerRequest))
+        messagingTemplate.convertAndSend("/topic/room/$roomId", room)
     }
 
     override fun moveTeam(roomId: String, playerRequest: PlayerRequest) {
@@ -74,10 +71,7 @@ class PuzzleRoomServiceImpl(
 
         puzzleRoomRepository.save(room)
 
-        // 팀 변경 알림 WebSocket 전송
-        val switchMessage = "User ${playerRequest.playerId} switched teams."
-        print(switchMessage)
-        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "switch", "message" to switchMessage, "player" to playerRequest))
+        messagingTemplate.convertAndSend("/topic/room/$roomId", room)
     }
 
     override fun gameStart(roomId: String, playerRequest: PlayerRequest) {
@@ -86,8 +80,6 @@ class PuzzleRoomServiceImpl(
             throw NoneMasterException()
         }
 
-        val gameStartMessage = "The game has started!"
-        print(gameStartMessage)
-        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "start", "message" to gameStartMessage, "player" to playerRequest))
+        messagingTemplate.convertAndSend("/topic/room/$roomId", room)
     }
 }
