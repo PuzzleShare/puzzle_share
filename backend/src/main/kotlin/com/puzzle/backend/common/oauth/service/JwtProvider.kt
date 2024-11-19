@@ -9,7 +9,6 @@ import com.puzzle.backend.common.oauth.repository.UsersRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
-import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -82,10 +81,10 @@ class JwtProvider(
         refreshToken: String,
         response: HttpServletResponse,
     ) {
-        val accessCookie = Cookie("jwt", accessToken)
-        accessCookie.path = "/"
-        accessCookie.maxAge = HOUR.toInt()
-        response.addCookie(accessCookie)
+        response.addHeader(
+            "Set-Cookie",
+            "jwt=$accessToken; Path=/; SameSite=None; Max-Age=$HOUR",
+        )
 
         response.addHeader(
             "Set-Cookie",
