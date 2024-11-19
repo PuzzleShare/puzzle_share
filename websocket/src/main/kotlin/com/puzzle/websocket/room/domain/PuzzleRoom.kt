@@ -1,4 +1,4 @@
-package com.puzzle.websocket.puzzle.domain
+package com.puzzle.websocket.room.domain
 
 import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import org.springframework.data.annotation.Id

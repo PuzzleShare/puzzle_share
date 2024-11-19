@@ -1,21 +1,19 @@
-package com.puzzle.websocket.puzzle.controller
+package com.puzzle.websocket.room.controller
 
 import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
-import com.puzzle.websocket.puzzle.dto.request.RoomIdRequest
-import com.puzzle.websocket.puzzle.service.PuzzleRoomService
+import com.puzzle.websocket.room.service.PuzzleRoomService
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
 
 @Controller
 class PuzzleRoomController(
-    private val puzzleRoomService: PuzzleRoomService
+    private val puzzleRoomService: PuzzleRoomService,
 ) {
-
     @MessageMapping("/room/{roomId}/enter")
     fun entranceRoom(
         @DestinationVariable("roomId") roomId: String,
-        playerRequest: PlayerRequest
+        playerRequest: PlayerRequest,
     ) {
         puzzleRoomService.enterRoom(roomId, playerRequest)
     }
@@ -23,7 +21,7 @@ class PuzzleRoomController(
     @MessageMapping("/room/{roomId}/exit")
     fun exitRoom(
         @DestinationVariable("roomId") roomId: String,
-        playerRequest: PlayerRequest
+        playerRequest: PlayerRequest,
     ) {
         puzzleRoomService.leaveRoom(roomId, playerRequest)
     }
@@ -31,7 +29,7 @@ class PuzzleRoomController(
     @MessageMapping("/room/{roomId}/switch")
     fun switchTeam(
         @DestinationVariable("roomId") roomId: String,
-        playerRequest: PlayerRequest
+        playerRequest: PlayerRequest,
     ) {
         puzzleRoomService.moveTeam(roomId, playerRequest)
     }
@@ -39,7 +37,7 @@ class PuzzleRoomController(
     @MessageMapping("/room/{roomId}/start")
     fun startGame(
         @DestinationVariable("roomId") roomId: String,
-        playerRequest: PlayerRequest
+        playerRequest: PlayerRequest,
     ) {
         puzzleRoomService.gameStart(roomId, playerRequest)
     }

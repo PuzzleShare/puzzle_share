@@ -1,6 +1,6 @@
-package com.puzzle.websocket.puzzle.repository
+package com.puzzle.websocket.room.repository
 
-import com.puzzle.websocket.puzzle.domain.PuzzleRoom
+import com.puzzle.websocket.room.domain.PuzzleRoom
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 

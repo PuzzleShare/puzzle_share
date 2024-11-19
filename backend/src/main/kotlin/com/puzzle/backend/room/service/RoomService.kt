@@ -18,7 +18,7 @@ class RoomService(
 ) {
     fun createRoom(request: CreateRoomRequest): RoomIdResponse {
         val room = request.toRoom(request.playerId)
-        val player = PlayerRequest(request.playerId, request.playerImage, request.playerName)
+        val player = PlayerRequest(request.playerId, request.playerImage!!, request.playerName!!)
 
         room.bluePlayers.add(player)
         room.updateMaster(player.playerId)
