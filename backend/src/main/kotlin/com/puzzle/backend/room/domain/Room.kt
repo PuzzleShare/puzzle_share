@@ -19,7 +19,7 @@ data class Room(
     val redPlayers: MutableList<PlayerRequest> = mutableListOf(),
     // 현재 참가자 목록
     val bluePlayers: MutableList<PlayerRequest> = mutableListOf(),
-    var master: Long
+    var master: Long,
 ) {
     fun updateMaster(newMaster: Long) {
         this.master = newMaster

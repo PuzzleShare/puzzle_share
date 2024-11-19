@@ -1,8 +1,8 @@
 package com.puzzle.backend.room.service
 
-import com.puzzle.backend.room.dto.request.PlayerRequest
 import com.puzzle.backend.room.domain.Room
 import com.puzzle.backend.room.dto.request.CreateRoomRequest
+import com.puzzle.backend.room.dto.request.PlayerRequest
 import com.puzzle.backend.room.dto.response.RoomIdResponse
 import com.puzzle.backend.room.dto.response.RoomListResponse
 import com.puzzle.backend.room.dto.response.WaitingRoomResponse

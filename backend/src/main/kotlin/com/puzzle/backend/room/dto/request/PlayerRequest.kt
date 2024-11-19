@@ -5,5 +5,5 @@ import java.io.Serializable
 data class PlayerRequest(
     val playerId: Long,
     val playerImage: String,
-    val playerName: String
+    val playerName: String,
 ) : Serializable
