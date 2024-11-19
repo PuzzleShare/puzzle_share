@@ -6,6 +6,7 @@ import com.puzzle.websocket.game.domain.User
 import com.puzzle.websocket.game.service.GameService
 
 import org.springframework.context.event.EventListener
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.messaging.simp.stomp.StompCommand
@@ -79,6 +80,14 @@ class GameController(
 //        sendingOperations.convertAndSend("/topic/game/room/$gameId", game)
 //    }
 
+    @MessageMapping("/{roomId}/game/enter")
+    @Throws(Exception::class)
+    fun enterGame(@DestinationVariable roomId: String) {
+        sendingOperations.convertAndSend(
+            "/topic/game/room/${roomId}/init",
+            gameService.findById(roomId)!!)
+    }
+
     @MessageMapping("/game/puzzle")
     @Throws(Exception::class)
     fun puzzle(sharePuzzle: SharePuzzle) {
@@ -106,30 +115,30 @@ class GameController(
     }
 
     // 서버 타이머 제공
-    @Scheduled(fixedRate = 1000)
-    @Throws(Exception::class)
-    fun sendServerTime() {
-        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
-        for (game in allRooms.reversed()) {
-            if (game!!.isStarted) {
-                var time = game.getTime()
-                if (game.gameType == "BATTLE") {
-                    time = BATTLE_TIMER - time
-                }
-                if (time >= 0) {
-                    val timer = mapOf("time" to time)
-                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
-                } else {
-
-
-                        val res = ResponseMessage()
-                        res.isFinished = true
-
-                        Thread.sleep(20)
-                        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-
-                }
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 1000)
+//    @Throws(Exception::class)
+//    fun sendServerTime() {
+//        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
+//        for (game in allRooms.reversed()) {
+//            if (game!!.isStarted) {
+//                var time = game.getTime()
+//                if (game.gameType == "BATTLE") {
+//                    time = BATTLE_TIMER - time
+//                }
+//                if (time >= 0) {
+//                    val timer = mapOf("time" to time)
+//                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
+//                } else {
+//
+//
+//                        val res = ResponseMessage()
+//                        res.isFinished = true
+//
+//                        Thread.sleep(20)
+//                        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+//
+//                }
+//            }
+//        }
+//    }
 }
