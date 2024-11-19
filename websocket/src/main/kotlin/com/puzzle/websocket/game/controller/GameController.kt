@@ -1,22 +1,16 @@
 package com.puzzle.websocket.game.controller
 
-import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
 import com.puzzle.websocket.game.domain.User
 import com.puzzle.websocket.game.service.GameService
-
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessageSendingOperations
-import org.springframework.messaging.simp.stomp.StompCommand
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import org.springframework.web.socket.messaging.SessionConnectEvent
-import org.springframework.web.socket.messaging.SessionDisconnectEvent
-import java.util.*
+import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 
 @Controller
@@ -82,10 +76,13 @@ class GameController(
 
     @MessageMapping("/{roomId}/game/enter")
     @Throws(Exception::class)
-    fun enterGame(@DestinationVariable roomId: String) {
+    fun enterGame(
+        @DestinationVariable roomId: String,
+    ) {
         sendingOperations.convertAndSend(
-            "/topic/game/room/${roomId}/init",
-            gameService.findById(roomId)!!)
+            "/topic/game/room/$roomId/init",
+            gameService.findById(roomId)!!,
+        )
     }
 
     @MessageMapping("/game/puzzle")
@@ -98,17 +95,18 @@ class GameController(
             return
         }
 
-        val res = gameService.playGame(sharePuzzle).apply {
-            redProgressPercent = game.redPuzzle!!.correctedCount.toDouble() /
+        val res =
+            gameService.playGame(sharePuzzle).apply {
+                redProgressPercent = game.redPuzzle!!.correctedCount.toDouble() /
                     (game.redPuzzle!!.lengthCnt * game.redPuzzle!!.widthCnt) * 100
-            blueProgressPercent = game.bluePuzzle!!.correctedCount.toDouble() /
+                blueProgressPercent = game.bluePuzzle!!.correctedCount.toDouble() /
                     (game.bluePuzzle!!.lengthCnt * game.bluePuzzle!!.widthCnt) * 100
-            isFinished = game.isFinished
-            redBundles = game.redPuzzle!!.bundles
-            if (game.gameType == "BATTLE") {
-                blueBundles = game.bluePuzzle!!.bundles
+                isFinished = game.isFinished
+                redBundles = game.redPuzzle!!.bundles
+                if (game.gameType == "BATTLE") {
+                    blueBundles = game.bluePuzzle!!.bundles
+                }
             }
-        }
 
         // 해당 방의 모든 사용자에게 게임 상태 전송
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
