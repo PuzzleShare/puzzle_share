@@ -1,5 +1,6 @@
 package com.puzzle.websocket.game.domain
 
+import com.puzzle.websocket.room.domain.PuzzleRoom
 import java.util.*
 
 data class Game(
@@ -14,15 +15,17 @@ data class Game(
     var players: MutableList<User> = mutableListOf(),
     var redPuzzle: PuzzleBoard? = null,
     var bluePuzzle: PuzzleBoard? = null,
-
     var startTime: Date? = null,
     var finishTime: Date? = null,
     var isStarted: Boolean = false,
     var sessionToUser: MutableMap<String, User> = mutableMapOf(),
     var isFinished: Boolean = false,
-    var isSaved: Boolean = false
-){
-    fun changeTeam(a: User?, b: User?) {
+    var isSaved: Boolean = false,
+) {
+    fun changeTeam(
+        a: User?,
+        b: User?,
+    ) {
         when {
             a != null && redTeam.isIn(a) && b != null && blueTeam.isIn(b) -> {
                 redTeam.deletePlayer(a)
@@ -71,7 +74,10 @@ data class Game(
         }
     }
 
-    fun enterPlayer(user: User, sessionId: String): Boolean {
+    fun enterPlayer(
+        user: User,
+        sessionId: String,
+    ): Boolean {
         if (sessionToUser.isEmpty()) {
             admin = user
         }
@@ -101,21 +107,20 @@ data class Game(
         }
     }
 
-    fun isEmpty(): Boolean {
-        return (redTeam.players.size + blueTeam.players.size) == 0
-    }
+    fun isEmpty(): Boolean = (redTeam.players.size + blueTeam.players.size) == 0
 
     fun start() {
-        if (isStarted) return
+//        if (isStarted) return
 
         redPuzzle = PuzzleBoard()
         bluePuzzle = PuzzleBoard()
         redPuzzle?.init(picture!!, gameType)
         bluePuzzle?.init(picture!!, gameType)
-        players = mutableListOf<User>().apply {
-            addAll(redTeam.players)
-            addAll(blueTeam.players)
-        }
+        players =
+            mutableListOf<User>().apply {
+                addAll(redTeam.players)
+                addAll(blueTeam.players)
+            }
         startTime = Date()
         isStarted = true
         println("------------------게임 시작-------------------")
@@ -131,20 +136,20 @@ data class Game(
     }
 
     companion object {
-        @JvmStatic
-        fun create(room: Room): Game {
-            val name = room.name
-            val roomSize = room.roomSize
-            val gameType = room.gameType
+        fun create(room: PuzzleRoom): Game {
+            val name = room.roomName
+            val roomSize = room.maxPlayers
+            val gameType = "BATTLE"
             val uuid = UUID.randomUUID().toString()
 
-            val game = Game(
-                gameId = uuid,
-                gameName = name,
-                roomSize = roomSize,
-                gameType = gameType,
-                sessionToUser = mutableMapOf()
-            )
+            val game =
+                Game(
+                    gameId = uuid,
+                    gameName = name,
+                    roomSize = roomSize,
+                    gameType = gameType,
+                    sessionToUser = mutableMapOf(),
+                )
 
             if (gameType == "BATTLE") {
                 game.redTeam = Team(mutableListOf())

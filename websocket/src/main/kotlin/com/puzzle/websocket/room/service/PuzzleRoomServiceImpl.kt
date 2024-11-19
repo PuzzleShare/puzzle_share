@@ -1,7 +1,7 @@
 package com.puzzle.websocket.room.service
 
 import com.puzzle.backend.common.exception.custom.RoomFullException
-import com.puzzle.websocket.common.exception.custom.NoneMasterException
+import com.puzzle.websocket.game.service.GameService
 import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import com.puzzle.websocket.room.repository.PuzzleRoomRepository
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service
 class PuzzleRoomServiceImpl(
     private val puzzleRoomRepository: PuzzleRoomRepository,
     private val messagingTemplate: SimpMessagingTemplate,
+    private val gameService: GameService,
 ) : PuzzleRoomService {
     fun findById(roomId: String): PuzzleRoom =
         puzzleRoomRepository
@@ -36,7 +37,6 @@ class PuzzleRoomServiceImpl(
         }
 
         puzzleRoomRepository.save(room)
-
         // 입장 이벤트 WebSocket 전송
 
         val entranceMessage = "User ${playerRequest.playerId} has entered the room."
@@ -117,19 +117,14 @@ class PuzzleRoomServiceImpl(
         playerRequest: PlayerRequest,
     ) {
         val room = findById(roomId)
-        if (playerRequest.playerId != room.master) {
-            throw NoneMasterException()
-        }
+        var game = gameService.createGame(room)
+        game = gameService.startGame(game.gameId)!!
+        println("gameStart")
+        println(game.toString())
 
-        val gameStartMessage = "The game has started!"
-        print(gameStartMessage)
         messagingTemplate.convertAndSend(
             "/topic/room/$roomId",
-            mapOf(
-                "event" to "start",
-                "message" to gameStartMessage,
-                "player" to playerRequest,
-            ),
+            game,
         )
     }
 }
