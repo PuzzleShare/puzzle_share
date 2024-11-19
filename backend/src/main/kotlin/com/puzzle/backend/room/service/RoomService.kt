@@ -29,7 +29,7 @@ class RoomService(
     }
 
     fun getRoomList(pageable: Pageable): Page<RoomListResponse> {
-        val roomList = roomRepository.findAll().toList()
+        val roomList = roomRepository.findAll().filterNotNull().toList()
         val start = pageable.pageNumber * pageable.pageSize
         val end = minOf(start + pageable.pageSize, roomList.size)
 
