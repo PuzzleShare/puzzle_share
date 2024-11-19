@@ -1,4 +1,4 @@
-package com.puzzle.websocket.puzzle.dto.response
+package com.puzzle.websocket.room.dto.response
 
 import java.io.Serializable
 

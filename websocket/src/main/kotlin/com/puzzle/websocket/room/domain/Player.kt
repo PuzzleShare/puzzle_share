@@ -1,6 +1,6 @@
-package com.puzzle.backend.room.domain
+package com.puzzle.websocket.room.domain
 
-import com.puzzle.backend.common.status.RoomRole
+import com.puzzle.backend.common.status.PuzzleRoomRole
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 
@@ -8,6 +8,10 @@ import org.springframework.data.redis.core.RedisHash
 data class Player(
     @Id
     val playerId: Long,
-    val role: RoomRole,
+    var role: PuzzleRoomRole,
     val roomId: String,
-)
+) {
+    fun updateRoomRole(role: PuzzleRoomRole) {
+        this.role = role
+    }
+}
