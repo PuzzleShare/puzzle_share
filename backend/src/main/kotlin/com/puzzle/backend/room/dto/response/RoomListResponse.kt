@@ -3,7 +3,7 @@ package com.puzzle.backend.room.dto.response
 import com.puzzle.backend.room.domain.Room
 import java.io.Serializable
 
-class RoomListResponse(
+data class RoomListResponse(
     val roomId: String,
     // 방 이름
     val roomName: String,

@@ -1,6 +1,7 @@
 package com.puzzle.backend.room.dto.response
 
 import com.puzzle.backend.room.domain.Room
+import com.puzzle.backend.room.dto.request.PlayerRequest
 import java.io.Serializable
 
 data class WaitingRoomResponse(
@@ -14,9 +15,10 @@ data class WaitingRoomResponse(
     // 현재 참가자 수
     val nowPlayers: Int,
     // 현재 참가자 목록
-    val redPlayers: List<Long> = listOf(),
+    val redPlayers: List<PlayerRequest> = listOf(),
     // 현재 참가자 목록
-    val bluePlayers: List<Long> = listOf(),
+    val bluePlayers: List<PlayerRequest> = listOf(),
+    val master: Long,
 ) : Serializable {
     companion object {
         fun toResponse(
@@ -32,6 +34,7 @@ data class WaitingRoomResponse(
                 nowPlayers,
                 room.redPlayers,
                 room.bluePlayers,
+                room.master,
             )
     }
 }

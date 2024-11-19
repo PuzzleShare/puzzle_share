@@ -1,13 +1,11 @@
 package com.puzzle.backend.room.service
 
-import com.puzzle.backend.common.status.RoomRole
-import com.puzzle.backend.room.domain.Player
 import com.puzzle.backend.room.domain.Room
 import com.puzzle.backend.room.dto.request.CreateRoomRequest
+import com.puzzle.backend.room.dto.request.PlayerRequest
 import com.puzzle.backend.room.dto.response.RoomIdResponse
 import com.puzzle.backend.room.dto.response.RoomListResponse
 import com.puzzle.backend.room.dto.response.WaitingRoomResponse
-import com.puzzle.backend.room.repository.PlayerRepository
 import com.puzzle.backend.room.repository.RoomRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -17,16 +15,14 @@ import org.springframework.stereotype.Service
 @Service
 class RoomService(
     private val roomRepository: RoomRepository,
-    private val playerRepository: PlayerRepository,
 ) {
     fun createRoom(request: CreateRoomRequest): RoomIdResponse {
-        val userId = 1L // TODO: 현재 사용자
-        val room = request.toRoom()
-        room.redPlayers.add(userId)
-        roomRepository.save(room)
+        val room = request.toRoom(request.playerId)
+        val player = PlayerRequest(request.playerId, request.playerImage, request.playerName)
 
-        val player = Player(userId, RoomRole.ROOM_MASTER, room.roomId)
-        playerRepository.save(player)
+        room.bluePlayers.add(player)
+        room.updateMaster(player.playerId)
+        roomRepository.save(room)
 
         val response = RoomIdResponse(room.roomId)
         return response
