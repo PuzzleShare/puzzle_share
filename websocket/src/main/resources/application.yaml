@@ -1,13 +1,25 @@
 server:
   port: 8082
+  tomcat:
+    max-threads: 200
+    websocket:
+      max-binary-message-buffer-size: 1024000 # 1MB
+      max-text-message-buffer-size: 1024000   # 1MB
+
 spring:
   application:
     name: websocket
+  websocket:
+    stomp:
+      endpoint: "/ws"
+      enabled: true
   data:
     redis:
       host: 43.202.42.147
       port: 6379
 
-kotlin:
-  code:
-    style: official
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG # 디버깅 로그 활성화

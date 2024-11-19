@@ -18,6 +18,7 @@ data class WaitingRoomResponse(
     val redPlayers: List<PlayerRequest> = listOf(),
     // 현재 참가자 목록
     val bluePlayers: List<PlayerRequest> = listOf(),
+    val master: Long
 ) : Serializable {
     companion object {
         fun toResponse(
@@ -33,6 +34,7 @@ data class WaitingRoomResponse(
                 nowPlayers,
                 room.redPlayers,
                 room.bluePlayers,
+                room.master
             )
     }
 }

@@ -1,11 +1,9 @@
 package com.puzzle.websocket.puzzle.service
 
 import com.puzzle.backend.common.exception.custom.RoomFullException
-import com.puzzle.backend.common.status.PuzzleRoomRole
-import com.puzzle.websocket.puzzle.domain.Player
+import com.puzzle.websocket.common.exception.custom.NoneMasterException
+import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import com.puzzle.websocket.puzzle.domain.PuzzleRoom
-import com.puzzle.websocket.puzzle.dto.request.RoomIdRequest
-import com.puzzle.websocket.puzzle.repository.PlayerRepository
 import com.puzzle.websocket.puzzle.repository.PuzzleRoomRepository
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
@@ -13,16 +11,14 @@ import org.springframework.stereotype.Service
 @Service
 class PuzzleRoomServiceImpl(
     private val puzzleRoomRepository: PuzzleRoomRepository,
-    private val playerRepository: PlayerRepository,
     private val messagingTemplate: SimpMessagingTemplate,
 ) : PuzzleRoomService {
 
     fun findById(roomId: String): PuzzleRoom = puzzleRoomRepository.findById(roomId)
         .orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
 
-    override fun enterRoom(roomId: RoomIdRequest) {
-        val userId = 2L // 현재 사용자 ID (예시)
-        val room = findById(roomId.roomId)
+    override fun enterRoom(roomId: String, playerRequest: PlayerRequest) {
+        val room = findById(roomId)
         val playerCount = room.redPlayers.size + room.bluePlayers.size
 
         if (playerCount >= room.maxPlayers) {
@@ -30,75 +26,64 @@ class PuzzleRoomServiceImpl(
         }
 
         if (room.redPlayers.size <= room.bluePlayers.size) {
-            room.redPlayers.add(userId)
+            room.redPlayers.add(playerRequest)
         } else {
-            room.bluePlayers.add(userId)
+            room.bluePlayers.add(playerRequest)
         }
 
         puzzleRoomRepository.save(room)
-        playerRepository.save(Player(userId, PuzzleRoomRole.USER, room.roomId))
 
         // 입장 이벤트 WebSocket 전송
-        val entranceMessage = "User $userId has entered the room."
-        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "enter", "message" to entranceMessage))
+        val entranceMessage = "User ${playerRequest.playerId} has entered the room."
+        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "enter", "message" to entranceMessage, "player" to playerRequest))
     }
 
-    override fun leaveRoom(roomId: RoomIdRequest) {
-        val userId = 1L // 현재 사용자 ID (예시)
-        val player = playerRepository.findById(userId).orElseThrow()
-
-        val room = findById(roomId.roomId)
-        room.redPlayers.remove(userId)
-        room.bluePlayers.remove(userId)
+    override fun leaveRoom(roomId: String, playerRequest: PlayerRequest) {
+        val room = findById(roomId)
+        room.redPlayers.remove(playerRequest)
+        room.bluePlayers.remove(playerRequest)
 
         if (room.redPlayers.size + room.bluePlayers.size == 0) {
-            playerRepository.deleteById(userId)
             puzzleRoomRepository.delete(room)
             return
-        } else if (player.role == PuzzleRoomRole.ROOM_MASTER && room.redPlayers.size > 0) {
-            val newMaster = playerRepository.findById(room.redPlayers[0]).orElseThrow()
-            newMaster.updateRoomRole(PuzzleRoomRole.ROOM_MASTER)
-            playerRepository.save(newMaster)
-        } else if (player.role == PuzzleRoomRole.ROOM_MASTER && room.bluePlayers.size > 0) {
-            val newMaster = playerRepository.findById(room.bluePlayers[0]).orElseThrow()
-            newMaster.updateRoomRole(PuzzleRoomRole.ROOM_MASTER)
-            playerRepository.save(newMaster)
+        } else if (playerRequest.playerId == room.master && room.redPlayers.size > 0) {
+            room.updateMaster(room.redPlayers[0].playerId)
+        } else if (playerRequest.playerId == room.master && room.bluePlayers.size > 0) {
+            room.updateMaster(room.bluePlayers[0].playerId)
         }
 
-        playerRepository.deleteById(userId)
         puzzleRoomRepository.save(room)
 
         // 퇴장 이벤트 WebSocket 전송
-        val leaveMessage = "User $userId has left the room."
-        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "exit", "message" to leaveMessage))
+        val leaveMessage = "User ${playerRequest.playerId} has left the room."
+        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "exit", "message" to leaveMessage, "player" to playerRequest))
     }
 
-    override fun moveTeam(roomId: RoomIdRequest) {
-        val userId = 1L // 현재 사용자 ID (예시)
-        val room = findById(roomId.roomId)
+    override fun moveTeam(roomId: String, playerRequest: PlayerRequest) {
+        val room = findById(roomId)
 
-        if (room.redPlayers.contains(userId)) {
-            room.redPlayers.remove(userId)
-            room.bluePlayers.add(userId)
+        if (room.redPlayers.contains(playerRequest)) {
+            room.redPlayers.remove(playerRequest)
+            room.bluePlayers.add(playerRequest)
         } else {
-            room.bluePlayers.remove(userId)
-            room.redPlayers.add(userId)
+            room.bluePlayers.remove(playerRequest)
+            room.redPlayers.add(playerRequest)
         }
 
         puzzleRoomRepository.save(room)
 
         // 팀 변경 알림 WebSocket 전송
-        val switchMessage = "User $userId switched teams."
-        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "switch", "message" to switchMessage))
+        val switchMessage = "User ${playerRequest.playerId} switched teams."
+        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "switch", "message" to switchMessage, "player" to playerRequest))
     }
 
-    override fun gameStart(roomId: RoomIdRequest) {
-        val userId = 1L
-        val player = playerRepository.findById(userId).orElseThrow()
-        if (player.role != PuzzleRoomRole.ROOM_MASTER) {
-            TODO("방장 아님")
+    override fun gameStart(roomId: String, playerRequest: PlayerRequest) {
+        val room = findById(roomId)
+        if (playerRequest.playerId != room.master) {
+            throw NoneMasterException()
         }
+
         val gameStartMessage = "The game has started!"
-        messagingTemplate.convertAndSend("/topic/room/${roomId.roomId}", mapOf("event" to "start", "message" to gameStartMessage))
+        messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "start", "message" to gameStartMessage, "player" to playerRequest))
     }
 }
