@@ -1,6 +1,6 @@
 package com.puzzle.websocket.room.domain
 
-import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
+import com.puzzle.websocket.room.dto.request.PlayerRequest
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 

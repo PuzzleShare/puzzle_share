@@ -1,6 +1,6 @@
 package com.puzzle.websocket.room.controller
 
-import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
+import com.puzzle.websocket.room.dto.request.PlayerRequest
 import com.puzzle.websocket.room.service.PuzzleRoomService
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping

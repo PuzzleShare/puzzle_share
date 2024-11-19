@@ -1,11 +1,10 @@
-package com.puzzle.websocket.puzzle.service
+package com.puzzle.websocket.room.service
 
 import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.websocket.game.service.GameService
-import com.puzzle.websocket.common.exception.custom.NoneMasterException
-import com.puzzle.websocket.puzzle.domain.PuzzleRoom
-import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
-import com.puzzle.websocket.puzzle.repository.PuzzleRoomRepository
+import com.puzzle.websocket.room.dto.request.PlayerRequest
+import com.puzzle.websocket.room.domain.PuzzleRoom
+import com.puzzle.websocket.room.repository.PuzzleRoomRepository
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 
@@ -38,9 +37,7 @@ class PuzzleRoomServiceImpl(
 
         puzzleRoomRepository.save(room)
 
-
         messagingTemplate.convertAndSend("/topic/room/$roomId", room)
-
     }
 
     override fun leaveRoom(roomId: String, playerRequest: PlayerRequest) {
@@ -85,9 +82,8 @@ class PuzzleRoomServiceImpl(
         println("gameStart")
         println(game.toString())
         messagingTemplate.convertAndSend(
-            "/topic/room/$roomId",
+            "/topic/room/$roomId/game",
             game,
         )
-
     }
 }
