@@ -35,6 +35,7 @@ class PuzzleRoomServiceImpl(
 
         // 입장 이벤트 WebSocket 전송
         val entranceMessage = "User ${playerRequest.playerId} has entered the room."
+        print(entranceMessage)
         messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "enter", "message" to entranceMessage, "player" to playerRequest))
     }
 
@@ -56,6 +57,7 @@ class PuzzleRoomServiceImpl(
 
         // 퇴장 이벤트 WebSocket 전송
         val leaveMessage = "User ${playerRequest.playerId} has left the room."
+        print(leaveMessage)
         messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "exit", "message" to leaveMessage, "player" to playerRequest))
     }
 
@@ -74,6 +76,7 @@ class PuzzleRoomServiceImpl(
 
         // 팀 변경 알림 WebSocket 전송
         val switchMessage = "User ${playerRequest.playerId} switched teams."
+        print(switchMessage)
         messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "switch", "message" to switchMessage, "player" to playerRequest))
     }
 
@@ -84,6 +87,7 @@ class PuzzleRoomServiceImpl(
         }
 
         val gameStartMessage = "The game has started!"
+        print(gameStartMessage)
         messagingTemplate.convertAndSend("/topic/room/${roomId}", mapOf("event" to "start", "message" to gameStartMessage, "player" to playerRequest))
     }
 }

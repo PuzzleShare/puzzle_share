@@ -9,10 +9,6 @@ server:
 spring:
   application:
     name: websocket
-  websocket:
-    stomp:
-      endpoint: "/ws"
-      enabled: true
   data:
     redis:
       host: 43.202.42.147

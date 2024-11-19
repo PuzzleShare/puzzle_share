@@ -33,11 +33,11 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 // 요청 URL별 권한 설정
                 it
-//                    .requestMatchers(
-//                        *PERMITTED_URL_PATTERNS,
-//                    ).permitAll()
-                    .anyRequest().permitAll()
-//                    .authenticated() // 나머지 모든 요청은 인증 확인
+                    .requestMatchers(
+                        *PERMITTED_URL_PATTERNS,
+                    ).permitAll()
+                    .anyRequest()
+                    .authenticated() // 나머지 모든 요청은 인증 확인
             }.oauth2Login {
                 it.userInfoEndpoint { it.userService(customOAuth2UserService::loadUser) }
                 it.successHandler(oAuth2AuthenticationSuccessHandler)
