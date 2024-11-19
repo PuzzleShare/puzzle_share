@@ -30,3 +30,12 @@ data class LoginSuccessResponse(
 
     fun toJson(): String = ObjectMapper().writeValueAsString(this)
 }
+
+data class RefreshDataResponse(
+    val userId: Long,
+    val userName: String,
+    val image: String,
+    val email: String,
+    val provider: String,
+    val token: String,
+)

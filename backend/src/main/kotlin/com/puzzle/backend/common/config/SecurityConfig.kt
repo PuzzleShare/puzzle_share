@@ -1,7 +1,6 @@
 package com.puzzle.backend.common.config
 
 import com.puzzle.backend.common.oauth.filter.JwtAuthFilter
-import com.puzzle.backend.common.oauth.handler.CustomLogoutSuccessHandler
 import com.puzzle.backend.common.oauth.handler.OAuth2AuthenticationFailureHandler
 import com.puzzle.backend.common.oauth.handler.OAuth2AuthenticationSuccessHandler
 import com.puzzle.backend.common.oauth.service.CustomOAuth2UserService
@@ -19,7 +18,6 @@ class SecurityConfig(
     private val jwtAuthFilter: JwtAuthFilter,
     private val customOAuth2UserService: CustomOAuth2UserService,
     private val corsConfig: CorsConfig,
-    private val customLogoutSuccessHandler: CustomLogoutSuccessHandler,
     private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
     private val oAuth2AuthenticationFailureHandler: OAuth2AuthenticationFailureHandler,
 ) {

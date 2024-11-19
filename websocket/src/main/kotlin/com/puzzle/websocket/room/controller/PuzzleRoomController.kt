@@ -1,32 +1,44 @@
 package com.puzzle.websocket.room.controller
 
-import com.puzzle.websocket.room.dto.request.RoomIdRequest
+import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import com.puzzle.websocket.room.service.PuzzleRoomService
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.stereotype.Controller
 
 @Controller
 class PuzzleRoomController(
-    private val puzzleRoomService: PuzzleRoomService
+    private val puzzleRoomService: PuzzleRoomService,
 ) {
-
-    @MessageMapping("/room/enter")
-    fun entranceRoom(roomId: RoomIdRequest) {
-        puzzleRoomService.enterRoom(roomId)
+    @MessageMapping("/room/{roomId}/enter")
+    fun entranceRoom(
+        @DestinationVariable("roomId") roomId: String,
+        playerRequest: PlayerRequest,
+    ) {
+        puzzleRoomService.enterRoom(roomId, playerRequest)
     }
 
-    @MessageMapping("/room/exit")
-    fun exitRoom(roomId: RoomIdRequest) {
-        puzzleRoomService.leaveRoom(roomId)
+    @MessageMapping("/room/{roomId}/exit")
+    fun exitRoom(
+        @DestinationVariable("roomId") roomId: String,
+        playerRequest: PlayerRequest,
+    ) {
+        puzzleRoomService.leaveRoom(roomId, playerRequest)
     }
 
-    @MessageMapping("/room/switch")
-    fun switchTeam(roomId: RoomIdRequest) {
-        puzzleRoomService.moveTeam(roomId)
+    @MessageMapping("/room/{roomId}/switch")
+    fun switchTeam(
+        @DestinationVariable("roomId") roomId: String,
+        playerRequest: PlayerRequest,
+    ) {
+        puzzleRoomService.moveTeam(roomId, playerRequest)
     }
 
-    @MessageMapping("/room/start")
-    fun startGame(roomId: RoomIdRequest) {
-        puzzleRoomService.gameStart(roomId)
+    @MessageMapping("/room/{roomId}/start")
+    fun startGame(
+        @DestinationVariable("roomId") roomId: String,
+        playerRequest: PlayerRequest,
+    ) {
+        puzzleRoomService.gameStart(roomId, playerRequest)
     }
 }

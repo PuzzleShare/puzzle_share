@@ -1,5 +1,6 @@
 package com.puzzle.websocket.room.domain
 
+import com.puzzle.websocket.puzzle.dto.request.PlayerRequest
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
 
@@ -12,6 +13,11 @@ class PuzzleRoom(
     val puzzleImage: String,
     val puzzlePiece: Int,
     val maxPlayers: Int, // 최대 참가자 수
-    val redPlayers: MutableList<Long> = mutableListOf(), // 현재 참가자 목록
-    val bluePlayers: MutableList<Long> = mutableListOf(), // 현재 참가자 목록
-)
+    val redPlayers: MutableList<PlayerRequest> = mutableListOf(), // 현재 참가자 목록
+    val bluePlayers: MutableList<PlayerRequest> = mutableListOf(), // 현재 참가자 목록
+    var master: Long
+) {
+    fun updateMaster(newMaster: Long) {
+        this.master = newMaster
+    }
+}

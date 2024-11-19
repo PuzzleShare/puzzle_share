@@ -11,8 +11,8 @@ data class CreateRoomRequest(
     val puzzlePiece: Int,
     val maxPlayers: Int,
     val playerId: Long,
-    val playerImage: String?="imahe",
-    val playerName: String?="null"
+    val playerImage: String? = "imahe",
+    val playerName: String? = "null",
 ) : Serializable {
     fun toRoom(playerId: Long): Room =
         Room(
@@ -22,6 +22,6 @@ data class CreateRoomRequest(
             puzzleImage = puzzleImage,
             puzzlePiece = puzzlePiece,
             maxPlayers = maxPlayers,
-            master = playerId
+            master = playerId,
         )
 }
