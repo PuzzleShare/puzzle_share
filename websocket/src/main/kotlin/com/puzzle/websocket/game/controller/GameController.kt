@@ -20,7 +20,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class GameController(
     private val gameService: GameService,
     private val sendingOperations: SimpMessageSendingOperations,
-//    private val imageService: ImageService
 ) {
     private val BATTLE_TIMER = 60
     private var sessionId: String? = null
@@ -33,11 +32,10 @@ class GameController(
         // System.out.println(event.message.headers["simpSessionId"])
         sessionId = event.message.headers["simpSessionId"] as String?
     }
-//
+
 //    @EventListener
 //    @Throws(InterruptedException::class)
 //    fun handleDisconnectEvent(event: SessionDisconnectEvent) {
-//        // System.out.println("MessageController.handleDisconnectEvent")
 //        val accessor: StompHeaderAccessor = StompHeaderAccessor.wrap(event.message)
 //        val sessionId: String = accessor.sessionId
 //        val gameId: String? = gameService.sessionToGame?.get(sessionId)
@@ -54,7 +52,6 @@ class GameController(
 //                gameService.sessionToGame?.remove(sessionId)
 //            } else {
 //                if (!game.isStarted) {
-//                    // 잠시 대기
 //                    // Thread.sleep(5000)
 //                    // if (game.isEmpty()) {
 //                    //     println("진짜 나간것같아. 게임 지울게!")
@@ -125,9 +122,9 @@ class GameController(
             }
         }
 
-        // 해당 방의 모든 사용자에게 게임 상태 전송
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
     }
+
 
 //  서버 타이머 제공
     @Scheduled(fixedRate = 1000)
@@ -156,4 +153,3 @@ class GameController(
             }
         }
     }
-}
