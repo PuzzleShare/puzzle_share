@@ -14,8 +14,12 @@ class PuzzleBoard {
     var widthCnt: Int = 0 // 가로 조각 개수
     var lengthCnt: Int = 0 // 세로 조각 개수
 
+    var totalEdges: Int = 0
+    var connectedEdges: Int = 0
+
+
     // 조합된 퍼즐 뭉탱이들
-    val bundles = Collections.synchronizedList(mutableListOf<MutableSet<Piece>>())
+    val bundles = mutableListOf<MutableSet<Piece>>()
     lateinit var isCorrected: Array<BooleanArray> // 조합된 퍼즐인지 확인하는 2차원 배열
     var correctedCount: Int = 0 // 현재까지 맞춘 개수
     var isCompleted: Boolean = false
@@ -97,7 +101,8 @@ class PuzzleBoard {
 
                 val (randI, randJ) = idxToCoordinate[idx]!!
                 val randomPiece = board[randI][randJ]
-                val x = (CANVAS_WIDTH / 2 - pieceSize / 2 + pieceSize * ((j * 2) + (i % 2)) - picture!!.imgWidth + 50).toDouble()
+                val x =
+                    (CANVAS_WIDTH / 2 - pieceSize / 2 + pieceSize * ((j * 2) + (i % 2)) - picture!!.imgWidth + 50).toDouble()
                 val y = (CANVAS_LENGTH / 2 - pieceSize / 2 + pieceSize * i - picture!!.imgHeight / 2).toDouble()
 
                 randomPiece.position_x = x
@@ -133,33 +138,21 @@ class PuzzleBoard {
         return Random().nextInt(2) + 1 // 1 또는 2 반환
     }
 
-    // 퍼즐 조각 결합
     fun addPiece(pieceList: List<Int>) {
-        val set = HashSet<Piece>()
-
         for (pieceIdx in pieceList) {
             if (pieceIdx == -1) continue
 
             val (i, j) = idxToCoordinate[pieceIdx]!!
             val piece = board[i][j]
 
-            // 기존에 포함된 뭉치가 있으면 합침
-            val iterator = bundles.iterator()
-            while (iterator.hasNext()) {
-                val bundle = iterator.next()
-                if (bundle.contains(piece)) {
-                    set.addAll(bundle)
-                    iterator.remove()
-                }
-            }
-
             // 결합 표시
             isCorrected[i][j] = true
-            set.add(piece)
         }
 
-        // 새로운 뭉치 추가
-        bundles.add(set)
+        // 병합 상태를 재구성
+        searchForGroupDisbandment()
+
+
         updatePieceCount()
 
         // 퍼즐 완성 여부 체크
@@ -169,9 +162,11 @@ class PuzzleBoard {
         }
     }
 
+
     // 맞춘 조각 수 업데이트
     private fun updatePieceCount() {
-        correctedCount = bundles.sumBy { it.size }
+//        correctedCount = bundles.sumBy { it.size }
+        correctedCount = bundles.sumOf { it.size } // 모든 덩어리의 조각 수 합산
     }
 
     // 결합된 조각 삭제
@@ -240,7 +235,10 @@ class PuzzleBoard {
     fun printBoard() {
         println("---------------------------------------")
         println("총 조각 : ${widthCnt * lengthCnt}")
+        println("총 연결가능 면 : $totalEdges")
         println("맞춘 조각 : $correctedCount")
+        println("연결한 면의 개수 : $connectedEdges")
+
         println("진행률 : ${(correctedCount.toDouble() / (widthCnt * lengthCnt) * 100)}%")
         println("맞춰진 조각 정보")
         for (i in 0 until lengthCnt) {
@@ -260,4 +258,30 @@ class PuzzleBoard {
     fun gcd(a: Int, b: Int): Int {
         return if (b == 0) a else gcd(b, a % b)
     }
+
+    // PuzzleBoard 클래스 내부
+    fun calculateMixedProgress(): Double {
+        val totalPieces = widthCnt * lengthCnt
+        totalEdges = (widthCnt * (lengthCnt - 1)) + (lengthCnt * (widthCnt - 1))
+        connectedEdges = 0
+        // 연결된 면의 개수를 계산
+        // 연결된 면의 개수를 정확히 계산
+        for (i in 0 until lengthCnt) {
+            for (j in 0 until widthCnt) {
+                if (isCorrected[i][j]) {
+                    // 상하좌우 연결 확인
+                    if (i > 0 && isCorrected[i - 1][j]) connectedEdges++ // 위쪽 연결
+                    if (j > 0 && isCorrected[i][j - 1]) connectedEdges++ // 왼쪽 연결
+                }
+            }
+        }
+
+        // 조각 기반과 연결 면 기반 혼합 계산
+        val pieceProgress = correctedCount.toDouble() / totalPieces * 100
+        val edgeProgress = connectedEdges.toDouble() / totalEdges * 100
+        val alpha = 0.7 // 조각 기반 가중치
+        val progress = alpha * pieceProgress + (1 - alpha) * edgeProgress
+        return if (progress > 100) 100.0 else progress // 진행률을 최대 100으로 제한
+    }
+
 }
