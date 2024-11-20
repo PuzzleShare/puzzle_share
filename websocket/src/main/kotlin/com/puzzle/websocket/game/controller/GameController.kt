@@ -51,7 +51,6 @@ class GameController(
 //                gameService.sessionToGame?.remove(sessionId)
 //            } else {
 //                if (!game.isStarted) {
-//                    // 잠시 대기
 //                    // Thread.sleep(5000)
 //                    // if (game.isEmpty()) {
 //                    //     println("진짜 나간것같아. 게임 지울게!")

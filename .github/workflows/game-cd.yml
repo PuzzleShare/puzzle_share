@@ -1,4 +1,4 @@
-name: game server CD
+name: game server cd
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean assemble
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
