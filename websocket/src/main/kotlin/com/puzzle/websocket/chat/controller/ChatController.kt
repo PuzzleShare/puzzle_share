@@ -1,5 +1,6 @@
 package com.puzzle.websocket.chat.controller
 
+import com.puzzle.websocket.chat.domain.InGameMessage
 import com.puzzle.websocket.chat.domain.MainChatMessage
 import com.puzzle.websocket.chat.service.ChatService
 import org.springframework.beans.factory.annotation.Qualifier
@@ -25,8 +26,8 @@ class ChatController(
         inRoomChatService.send(mainChatMessage)
     }
 
-    @MessageMapping("/chat/game")
-    fun inGameChat(mainChatMessage: MainChatMessage) {
-        inGameChatService.send(mainChatMessage)
+    @MessageMapping("/game/chat")
+    fun inGameChat(inGameMessage: InGameMessage) {
+        inGameChatService.send(inGameMessage)
     }
 }

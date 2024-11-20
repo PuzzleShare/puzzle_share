@@ -73,9 +73,15 @@ class PuzzleRoomServiceImpl(
         val room = findById(roomId)
 
         if (room.redPlayers.contains(playerRequest)) {
+            if (room.bluePlayers.size == room.maxPlayers / 2) {
+                return
+            }
             room.redPlayers.remove(playerRequest)
             room.bluePlayers.add(playerRequest)
         } else {
+            if (room.redPlayers.size == room.maxPlayers / 2) {
+                return
+            }
             room.bluePlayers.remove(playerRequest)
             room.redPlayers.add(playerRequest)
         }
