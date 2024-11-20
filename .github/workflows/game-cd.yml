@@ -48,6 +48,9 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
+      - name: List build artifacts
+        run: ls -al ./build/libs/
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -62,7 +65,7 @@ jobs:
           username: ${{ env.LIGHTSAIL_USERNAME }}
           port: 22
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'build/libs/*.jar'
+          source: './build/libs/*.jar'
           target: '/home/ubuntu/game/dist'
           use_insecure_cipher: true
 

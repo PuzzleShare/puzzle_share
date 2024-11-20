@@ -106,7 +106,6 @@ class GameController(
                 }
             }
 
-        // 해당 방의 모든 사용자에게 게임 상태 전송
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
     }
 
