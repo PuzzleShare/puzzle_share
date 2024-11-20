@@ -88,7 +88,7 @@ class JwtProvider(
         val accessExpire = DateTimeFormatter.RFC_1123_DATE_TIME.format(now.plusHours(1))
         response.addHeader(
             "Set-Cookie",
-            "jwt=$accessToken; Path=/; SameSite=None; Expires=$accessExpire",
+            "jwt=$accessToken; Path=/; Secure; SameSite=None; Expires=$accessExpire",
         )
 
         val refreshExpire = DateTimeFormatter.RFC_1123_DATE_TIME.format(now.plusDays(1))
