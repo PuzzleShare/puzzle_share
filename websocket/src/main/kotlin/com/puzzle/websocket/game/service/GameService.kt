@@ -92,7 +92,11 @@ class GameService {
             "ADD_PIECE" -> {
                 val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
                 println("ADD_PIECE")
-                ourPuzzle.addPiece(pieces)
+                if (ourColor == "RED") {
+                    ourPuzzle.addPiece(pieces)
+                } else {
+                    ourPuzzle.addPiece(pieces)
+                }
                 res.team = ourColor
                 res.message = "ADD_PIECE"
                 res.targets = targets
@@ -175,21 +179,23 @@ class GameService {
         // 진행도 추가
         if (game.gameType == "BATTLE") {
             if (ourColor == "RED") {
-                res.redProgressPercent = calculateProgress(ourPuzzle)
-                res.blueProgressPercent = calculateProgress(yourPuzzle)
+                res.redProgressPercent = calculateProgress(ourPuzzle) // 레드 팀 진행률
+                res.blueProgressPercent = calculateProgress(yourPuzzle) // 블루 팀 진행률
+                println("[레드 팀] 진행률: ${res.redProgressPercent}%")
+                println(ourPuzzle.printBoard())
             } else {
-                res.blueProgressPercent = calculateProgress(ourPuzzle)
-                res.redProgressPercent = calculateProgress(yourPuzzle)
+                res.blueProgressPercent = calculateProgress(ourPuzzle) // 블루 팀 진행률
+                res.redProgressPercent = calculateProgress(yourPuzzle) // 레드 팀 진행률
+                println("[블루 팀] 진행률: ${res.blueProgressPercent}%")
             }
         } else {
-            res.redProgressPercent = calculateProgress(ourPuzzle)
+            res.redProgressPercent = calculateProgress(ourPuzzle) // 협동 모드의 레드 팀 진행률
         }
         return res
     }
 
-    private fun calculateProgress(puzzle: PuzzleBoard): Double =
-        (
-            puzzle.correctedCount.toDouble() /
-                (puzzle.widthCnt.toDouble() * puzzle.lengthCnt.toDouble()) * 100
-        )
+    private fun calculateProgress(puzzle: PuzzleBoard): Double {
+        return puzzle.calculateMixedProgress() // PuzzleBoard의 혼합 진행률 계산 호출
+    }
+
 }

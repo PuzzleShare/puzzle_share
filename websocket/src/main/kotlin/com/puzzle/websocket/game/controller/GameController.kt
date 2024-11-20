@@ -95,18 +95,33 @@ class GameController(
             return
         }
 
-        val res =
-            gameService.playGame(sharePuzzle).apply {
-                redProgressPercent = game.redPuzzle!!.correctedCount.toDouble() /
-                    (game.redPuzzle!!.lengthCnt * game.redPuzzle!!.widthCnt) * 100
-                blueProgressPercent = game.bluePuzzle!!.correctedCount.toDouble() /
-                    (game.bluePuzzle!!.lengthCnt * game.bluePuzzle!!.widthCnt) * 100
-                isFinished = game.isFinished
-                redBundles = game.redPuzzle!!.bundles
-                if (game.gameType == "BATTLE") {
-                    blueBundles = game.bluePuzzle!!.bundles
-                }
+//        val res =
+//            gameService.playGame(sharePuzzle).apply {
+//                redProgressPercent = game.redPuzzle!!.correctedCount.toDouble() /
+//                    (game.redPuzzle!!.lengthCnt * game.redPuzzle!!.widthCnt) * 100
+//                blueProgressPercent = game.bluePuzzle!!.correctedCount.toDouble() /
+//                    (game.bluePuzzle!!.lengthCnt * game.bluePuzzle!!.widthCnt) * 100
+//                isFinished = game.isFinished
+//                redBundles = game.redPuzzle!!.bundles
+//                if (game.gameType == "BATTLE") {
+//                    blueBundles = game.bluePuzzle!!.bundles
+//                }
+//            }
+        val res = gameService.playGame(sharePuzzle).apply {
+
+            // 혼합 방식 진행률 계산 반영
+            redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+            blueProgressPercent = if (game.gameType == "BATTLE") {
+                game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+            } else {
+                0.0
             }
+            isFinished = game.isFinished
+            redBundles = game.redPuzzle!!.bundles
+            if (game.gameType == "BATTLE") {
+                blueBundles = game.bluePuzzle!!.bundles
+            }
+        }
 
         // 해당 방의 모든 사용자에게 게임 상태 전송
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
