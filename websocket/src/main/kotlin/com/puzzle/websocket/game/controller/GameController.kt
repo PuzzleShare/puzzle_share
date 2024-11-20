@@ -34,7 +34,6 @@ class GameController(
 //    @EventListener
 //    @Throws(InterruptedException::class)
 //    fun handleDisconnectEvent(event: SessionDisconnectEvent) {
-//        // System.out.println("MessageController.handleDisconnectEvent")
 //        val accessor: StompHeaderAccessor = StompHeaderAccessor.wrap(event.message)
 //        val sessionId: String = accessor.sessionId
 //        val gameId: String? = gameService.sessionToGame?.get(sessionId)
