@@ -30,7 +30,7 @@ class GameController(
         // System.out.println(event.message.headers["simpSessionId"])
         sessionId = event.message.headers["simpSessionId"] as String?
     }
-//
+
 //    @EventListener
 //    @Throws(InterruptedException::class)
 //    fun handleDisconnectEvent(event: SessionDisconnectEvent) {

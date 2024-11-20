@@ -68,7 +68,7 @@ jobs:
           username: ${{ env.LIGHTSAIL_USERNAME }}
           port: 22
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: './build/libs/*.jar'
+          source: 'websocket/build/libs/*.jar'
           target: '/home/ubuntu/game/dist'
           use_insecure_cipher: true
           debug: true
