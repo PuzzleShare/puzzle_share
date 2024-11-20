@@ -68,6 +68,7 @@ jobs:
           source: './build/libs/*.jar'
           target: '/home/ubuntu/game/dist'
           use_insecure_cipher: true
+          debug: true
 
       - name: Restart Spring Boot process
         uses: appleboy/ssh-action@master

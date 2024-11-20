@@ -109,7 +109,6 @@ class GameController(
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
     }
 
-    // 서버 타이머 제공
 //    @Scheduled(fixedRate = 1000)
 //    @Throws(Exception::class)
 //    fun sendServerTime() {
