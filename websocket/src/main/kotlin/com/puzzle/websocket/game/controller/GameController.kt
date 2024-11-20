@@ -18,7 +18,6 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class GameController(
     private val gameService: GameService,
     private val sendingOperations: SimpMessageSendingOperations,
-//    private val imageService: ImageService
 ) {
     private val BATTLE_TIMER = 303
     private var sessionId: String? = null
