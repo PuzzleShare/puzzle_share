@@ -106,27 +106,27 @@ class GameController(
 //                    blueBundles = game.bluePuzzle!!.bundles
 //                }
 //            }
-        val res = gameService.playGame(sharePuzzle).apply {
-
-            // 혼합 방식 진행률 계산 반영
-            redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
-            blueProgressPercent = if (game.gameType == "BATTLE") {
-                game.bluePuzzle?.calculateMixedProgress() ?: 0.0
-            } else {
-                0.0
+        val res =
+            gameService.playGame(sharePuzzle).apply {
+                // 혼합 방식 진행률 계산 반영
+                redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+                blueProgressPercent =
+                    if (game.gameType == "BATTLE") {
+                        game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+                    } else {
+                        0.0
+                    }
+                isFinished = game.isFinished
+                redBundles = game.redPuzzle!!.bundles
+                if (game.gameType == "BATTLE") {
+                    blueBundles = game.bluePuzzle!!.bundles
+                }
             }
-            isFinished = game.isFinished
-            redBundles = game.redPuzzle!!.bundles
-            if (game.gameType == "BATTLE") {
-                blueBundles = game.bluePuzzle!!.bundles
-            }
-        }
 
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
     }
 
-
-//  서버 타이머 제공
+    //  서버 타이머 제공
     @Scheduled(fixedRate = 1000)
     @Throws(Exception::class)
     fun sendServerTime() {
@@ -141,15 +141,13 @@ class GameController(
                     val timer = mapOf("time" to time)
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
                 } else {
+                    val res = ResponseMessage()
+                    res.isFinished = true
 
-
-                        val res = ResponseMessage()
-                        res.isFinished = true
-
-                        Thread.sleep(20)
-                        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-
+                    Thread.sleep(20)
+                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
                 }
             }
         }
     }
+}
