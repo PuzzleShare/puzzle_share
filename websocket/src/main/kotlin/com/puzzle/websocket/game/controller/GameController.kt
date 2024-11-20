@@ -1,5 +1,6 @@
 package com.puzzle.websocket.game.controller
 
+import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
 import com.puzzle.websocket.game.domain.User
 import com.puzzle.websocket.game.service.GameService
@@ -8,6 +9,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import org.springframework.web.socket.messaging.SessionConnectEvent
 import java.util.Queue
@@ -20,7 +22,7 @@ class GameController(
     private val sendingOperations: SimpMessageSendingOperations,
 //    private val imageService: ImageService
 ) {
-    private val BATTLE_TIMER = 303
+    private val BATTLE_TIMER = 60
     private var sessionId: String? = null
     private val waitingList: Queue<User> = ConcurrentLinkedQueue()
 
@@ -127,31 +129,31 @@ class GameController(
         sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
     }
 
-    // 서버 타이머 제공
-//    @Scheduled(fixedRate = 1000)
-//    @Throws(Exception::class)
-//    fun sendServerTime() {
-//        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
-//        for (game in allRooms.reversed()) {
-//            if (game!!.isStarted) {
-//                var time = game.getTime()
-//                if (game.gameType == "BATTLE") {
-//                    time = BATTLE_TIMER - time
-//                }
-//                if (time >= 0) {
-//                    val timer = mapOf("time" to time)
-//                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
-//                } else {
-//
-//
-//                        val res = ResponseMessage()
-//                        res.isFinished = true
-//
-//                        Thread.sleep(20)
-//                        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-//
-//                }
-//            }
-//        }
-//    }
+//  서버 타이머 제공
+    @Scheduled(fixedRate = 1000)
+    @Throws(Exception::class)
+    fun sendServerTime() {
+        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
+        for (game in allRooms.reversed()) {
+            if (game.isStarted) {
+                var time = game.getTime()
+                if (game.gameType == "BATTLE") {
+                    time = BATTLE_TIMER - time
+                }
+                if (time >= 0) {
+                    val timer = mapOf("time" to time)
+                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
+                } else {
+
+
+                        val res = ResponseMessage()
+                        res.isFinished = true
+
+                        Thread.sleep(20)
+                        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+
+                }
+            }
+        }
+    }
 }

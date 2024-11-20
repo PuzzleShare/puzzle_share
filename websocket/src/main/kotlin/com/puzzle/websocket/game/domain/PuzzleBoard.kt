@@ -156,9 +156,9 @@ class PuzzleBoard {
         updatePieceCount()
 
         // 퍼즐 완성 여부 체크
-        if (correctedCount == widthCnt * lengthCnt && bundles.size == 1) {
+        if (correctedCount == widthCnt * lengthCnt && bundles.size == 1 && connectedEdges == totalEdges) {
             isCompleted = true
-            println("게임 끝!")
+            println("---------------------------게임 끝!------------------------")
         }
     }
 
