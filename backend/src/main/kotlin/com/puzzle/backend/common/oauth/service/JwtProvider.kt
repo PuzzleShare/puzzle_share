@@ -13,9 +13,6 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.Date
 
 @Service
@@ -84,17 +81,14 @@ class JwtProvider(
         refreshToken: String,
         response: HttpServletResponse,
     ) {
-        val now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
-        val accessExpire = DateTimeFormatter.RFC_1123_DATE_TIME.format(now.plusHours(1))
         response.addHeader(
             "Set-Cookie",
-            "jwt=$accessToken; Path=/; Secure; SameSite=None; Expires=$accessExpire",
+            "jwt=$accessToken; Path=/; Secure; SameSite=None; Max-Age=$HOUR",
         )
 
-        val refreshExpire = DateTimeFormatter.RFC_1123_DATE_TIME.format(now.plusDays(1))
         response.addHeader(
             "Set-Cookie",
-            "refresh=$refreshToken; Path=/; HttpOnly; Secure; SameSite=None; Expires=$refreshExpire",
+            "refresh=$refreshToken; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=$DAY",
         )
     }
 }
