@@ -9,6 +9,7 @@ data class WaitingRoomResponse(
     // 방 이름
     val roomName: String,
     val gameMode: String,
+    val puzzleImage: String,
     val puzzlePiece: Int,
     // 최대 참가자 수
     val maxPlayers: Int,
@@ -29,6 +30,7 @@ data class WaitingRoomResponse(
                 room.roomId,
                 room.roomName,
                 room.gameMode,
+                room.puzzleImage,
                 room.puzzlePiece,
                 room.maxPlayers,
                 nowPlayers,
