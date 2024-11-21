@@ -31,7 +31,8 @@ class JwtProvider(
         val claims = Jwts.claims().setSubject(user.userId.toString())
         val now = Date()
         val expiryDate = Date(now.time + time) // 1시간 만료
-        return Jwts.builder()
+        return Jwts
+            .builder()
             .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(expiryDate)
@@ -39,9 +40,10 @@ class JwtProvider(
             .compact()
     }
 
-    fun validateToken(token: String): Boolean {
-        return try {
-            Jwts.parserBuilder()
+    fun validateToken(token: String): Boolean =
+        try {
+            Jwts
+                .parserBuilder()
                 .setSigningKey(signKey)
                 .build()
                 .parseClaimsJws(token)
@@ -49,20 +51,20 @@ class JwtProvider(
         } catch (e: Exception) {
             false
         }
-    }
 
-    fun getUid(token: String?): String {
-        return Jwts.parserBuilder()
+    fun getUid(token: String?): String =
+        Jwts
+            .parserBuilder()
             .setSigningKey(signKey)
             .build()
-            .parseClaimsJws(token).body.subject
-    }
+            .parseClaimsJws(token)
+            .body.subject
 
     fun refesh(
         request: HttpServletRequest,
         response: HttpServletResponse,
-    ): Boolean {
-        return try {
+    ): Boolean =
+        try {
             val refreshCookie = request.cookies?.find { it.name == "refresh" }!!
             val userId = getUid(refreshCookie.value)
             val cache = userCacheRepository.findById(userId.toLong()).orElseThrow()
@@ -74,7 +76,6 @@ class JwtProvider(
         } catch (e: Exception) {
             false
         }
-    }
 
     fun setCookie(
         accessToken: String,
