@@ -1,9 +1,9 @@
 package com.puzzle.backend.common.config
 
-import com.puzzle.backend.common.oauth.filter.JwtAuthFilter
-import com.puzzle.backend.common.oauth.handler.OAuth2AuthenticationFailureHandler
-import com.puzzle.backend.common.oauth.handler.OAuth2AuthenticationSuccessHandler
-import com.puzzle.backend.common.oauth.service.CustomOAuth2UserService
+import com.puzzle.backend.oauth.filter.JwtAuthFilter
+import com.puzzle.backend.oauth.handler.OAuth2AuthenticationFailureHandler
+import com.puzzle.backend.oauth.handler.OAuth2AuthenticationSuccessHandler
+import com.puzzle.backend.oauth.service.CustomOAuth2UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

@@ -1,4 +1,4 @@
-package com.puzzle.backend.common.oauth.handler
+package com.puzzle.backend.oauth.handler
 
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

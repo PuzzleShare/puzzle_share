@@ -1,11 +1,11 @@
-package com.puzzle.backend.common.oauth.service
+package com.puzzle.backend.oauth.service
 
 import com.puzzle.backend.common.BaseResponse
-import com.puzzle.backend.common.oauth.dto.response.LoginSuccessResponse
-import com.puzzle.backend.common.oauth.dto.response.RefreshDataResponse
-import com.puzzle.backend.common.oauth.handler.HOUR
-import com.puzzle.backend.common.oauth.repository.UserCacheRepository
-import com.puzzle.backend.common.oauth.repository.UsersRepository
+import com.puzzle.backend.oauth.dto.response.LoginSuccessResponse
+import com.puzzle.backend.oauth.dto.response.RefreshDataResponse
+import com.puzzle.backend.oauth.handler.HOUR
+import com.puzzle.backend.oauth.repository.UserCacheRepository
+import com.puzzle.backend.oauth.repository.UsersRepository
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value

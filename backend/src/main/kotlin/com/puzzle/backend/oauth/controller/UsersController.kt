@@ -1,9 +1,9 @@
-package com.puzzle.backend.common.oauth.controller
+package com.puzzle.backend.oauth.controller
 
 import com.puzzle.backend.common.BaseResponse
-import com.puzzle.backend.common.oauth.dto.response.LoginSuccessResponse
-import com.puzzle.backend.common.oauth.dto.response.RefreshDataResponse
-import com.puzzle.backend.common.oauth.service.UsersService
+import com.puzzle.backend.oauth.dto.response.LoginSuccessResponse
+import com.puzzle.backend.oauth.dto.response.RefreshDataResponse
+import com.puzzle.backend.oauth.service.UsersService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.web.bind.annotation.GetMapping

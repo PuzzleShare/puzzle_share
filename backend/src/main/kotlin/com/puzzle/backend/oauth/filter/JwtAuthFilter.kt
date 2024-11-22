@@ -1,6 +1,6 @@
-package com.puzzle.backend.common.oauth.filter
+package com.puzzle.backend.oauth.filter
 
-import com.puzzle.backend.common.oauth.service.JwtProvider
+import com.puzzle.backend.oauth.service.JwtProvider
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
