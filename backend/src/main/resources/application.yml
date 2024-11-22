@@ -3,5 +3,5 @@ spring:
     group:
       local: "local, key, oauth, localredis, docs"
       dev: "dev, datasource, key, oauth, docs,localredis"
-    active: local
+    active: dev
 
