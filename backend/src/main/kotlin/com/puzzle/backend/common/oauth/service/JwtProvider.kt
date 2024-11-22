@@ -90,6 +90,7 @@ class JwtProvider(
     ) {
         val hour = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1)
         val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+        println("frontDomain : $frontDomain")
         response.addHeader(
             "Set-Cookie",
             "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
