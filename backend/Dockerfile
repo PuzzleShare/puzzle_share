@@ -1,5 +1,10 @@
 # syntax=docker/dockerfile:experimental
 FROM openjdk:21-jdk-bullseye AS build-stage
+
+ENV TZ=Asia/Seoul
+RUN apt-get update && apt-get install -y tzdata && \
+    ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 WORKDIR /workspace/app
 
 COPY .editorconfig /workspace/app
