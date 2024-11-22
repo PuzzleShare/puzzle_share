@@ -45,13 +45,30 @@ data class Picture(
         )
 
     companion object {
-        fun create(): Picture =
-            Picture(
+        // 새로운 이미지 정보를 받아 생성하는 create 메서드 추가
+        fun create(
+            width: Int,
+            length: Int,
+            pieceSize: Int,
+            imageName: String,
+            encodedString: String
+        ): Picture
+            = Picture(
+                name = imageName,
+                width = width,
+                length = length,
+                pieceSize = pieceSize,
+                encodedString = encodedString
+            )
+
+        // 기존의 기본값으로 생성하는 create 메서드 유지
+        fun create(): Picture
+            = Picture(
                 name = "짱구.jpg",
                 width = 1000,
                 length = 551,
                 pieceSize = 40,
-                encodedString = "짱구.jpg",
+                encodedString = "짱구.jpg"
             )
     }
 }
