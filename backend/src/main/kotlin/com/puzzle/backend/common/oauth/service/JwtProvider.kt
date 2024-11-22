@@ -22,10 +22,13 @@ import java.util.Date
 class JwtProvider(
     @Value("\${jwt.secret-key}")
     private val secretKey: String,
+    @Value("\${login.redirect-url}")
+    private val redirectUrl: String,
     private val userCacheRepository: UserCacheRepository,
     private val usersRepository: UsersRepository,
 ) {
     private val signKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
+    private val frontDomain = redirectUrl.split("/")[2].split(":")[0]
 
     fun createToken(
         user: Users,
@@ -89,7 +92,7 @@ class JwtProvider(
         val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
         response.addHeader(
             "Set-Cookie",
-            "jwt=$accessToken; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
+            "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
         )
 
         val day = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusDays(1)
