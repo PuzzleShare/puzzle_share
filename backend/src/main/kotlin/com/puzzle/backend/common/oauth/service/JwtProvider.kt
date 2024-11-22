@@ -22,13 +22,17 @@ import java.util.Date
 class JwtProvider(
     @Value("\${jwt.secret-key}")
     private val secretKey: String,
-    @Value("\${login.redirect-url}")
-    private val redirectUrl: String,
+    @Value("\${spring.profiles.active}")
+    private val active: String,
     private val userCacheRepository: UserCacheRepository,
     private val usersRepository: UsersRepository,
 ) {
     private val signKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
-    private val frontDomain = redirectUrl.split("/")[2].split(":")[0]
+    private val frontDomain = if (active == "local") {
+        "localhost"
+    } else {
+        ".vercel.app"
+    }
 
     fun createToken(
         user: Users,
@@ -90,7 +94,6 @@ class JwtProvider(
     ) {
         val hour = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1)
         val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
-        println("frontDomain : $frontDomain")
         response.addHeader(
             "Set-Cookie",
             "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
