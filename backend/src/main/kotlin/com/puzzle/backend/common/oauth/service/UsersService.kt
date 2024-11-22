@@ -7,7 +7,10 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 
 interface UsersService {
-    fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse
+    fun getUserInfo(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): LoginSuccessResponse
 
     fun logout(request: HttpServletRequest): BaseResponse<String>
 

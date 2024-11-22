@@ -16,7 +16,10 @@ class UsersController(
     private val usersService: UsersService,
 ) : UsersControllerSpec {
     @GetMapping("/info")
-    override fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse = usersService.getUserInfo(request)
+    override fun getUserInfo(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): LoginSuccessResponse = usersService.getUserInfo(request, response)
 
     @GetMapping("/logout")
     override fun logout(request: HttpServletRequest): BaseResponse<String> = usersService.logout(request)

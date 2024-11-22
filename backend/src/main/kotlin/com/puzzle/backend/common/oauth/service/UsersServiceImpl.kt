@@ -29,10 +29,22 @@ class UsersServiceImpl(
         "puzzle-frontend-five.vercel.app"
     }
 
-    override fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse {
+    override fun getUserInfo(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): LoginSuccessResponse {
         val cookie = request.cookies?.find { it.name == "refresh" }
         val userId = jwtProvider.getUid(cookie?.value)
         val user = usersRepository.findById(userId.toLong()).orElseThrow()
+
+        val accessToken = jwtProvider.createToken(user, HOUR * 1000)
+        val hour = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1)
+        val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+        response.addHeader(
+            "Set-Cookie",
+            "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
+        )
+
         return LoginSuccessResponse.of(user)
     }
 
