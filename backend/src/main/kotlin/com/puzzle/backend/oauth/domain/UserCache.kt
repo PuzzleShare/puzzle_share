@@ -1,4 +1,4 @@
-package com.puzzle.backend.common.oauth.domain
+package com.puzzle.backend.oauth.domain
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash

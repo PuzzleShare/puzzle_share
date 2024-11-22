@@ -1,8 +1,8 @@
-package com.puzzle.backend.common.oauth.service
+package com.puzzle.backend.oauth.service
 
-import com.puzzle.backend.common.oauth.domain.Users
-import com.puzzle.backend.common.oauth.enums.SocialType
-import com.puzzle.backend.common.oauth.repository.UsersRepository
+import com.puzzle.backend.oauth.domain.Users
+import com.puzzle.backend.oauth.enums.SocialType
+import com.puzzle.backend.oauth.repository.UsersRepository
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException

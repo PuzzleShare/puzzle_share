@@ -1,6 +1,6 @@
-package com.puzzle.backend.common.oauth.handler
+package com.puzzle.backend.oauth.handler
 
-import com.puzzle.backend.common.oauth.enums.SocialType
+import com.puzzle.backend.oauth.enums.SocialType
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value

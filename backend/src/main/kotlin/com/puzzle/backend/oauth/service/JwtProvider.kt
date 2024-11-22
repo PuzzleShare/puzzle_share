@@ -1,11 +1,11 @@
-package com.puzzle.backend.common.oauth.service
+package com.puzzle.backend.oauth.service
 
-import com.puzzle.backend.common.oauth.domain.UserCache
-import com.puzzle.backend.common.oauth.domain.Users
-import com.puzzle.backend.common.oauth.handler.DAY
-import com.puzzle.backend.common.oauth.handler.HOUR
-import com.puzzle.backend.common.oauth.repository.UserCacheRepository
-import com.puzzle.backend.common.oauth.repository.UsersRepository
+import com.puzzle.backend.oauth.domain.UserCache
+import com.puzzle.backend.oauth.domain.Users
+import com.puzzle.backend.oauth.handler.DAY
+import com.puzzle.backend.oauth.handler.HOUR
+import com.puzzle.backend.oauth.repository.UserCacheRepository
+import com.puzzle.backend.oauth.repository.UsersRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys

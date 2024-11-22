@@ -1,6 +1,6 @@
-package com.puzzle.backend.common.oauth.repository
+package com.puzzle.backend.oauth.repository
 
-import com.puzzle.backend.common.oauth.domain.UserCache
+import com.puzzle.backend.oauth.domain.UserCache
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
 

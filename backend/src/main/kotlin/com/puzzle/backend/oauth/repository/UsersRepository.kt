@@ -1,6 +1,6 @@
-package com.puzzle.backend.common.oauth.repository
+package com.puzzle.backend.oauth.repository
 
-import com.puzzle.backend.common.oauth.domain.Users
+import com.puzzle.backend.oauth.domain.Users
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface UsersRepository : JpaRepository<Users, Long> {

@@ -1,10 +1,10 @@
-package com.puzzle.backend.common.oauth.handler
+package com.puzzle.backend.oauth.handler
 
-import com.puzzle.backend.common.oauth.domain.UserCache
-import com.puzzle.backend.common.oauth.enums.SocialType
-import com.puzzle.backend.common.oauth.repository.UserCacheRepository
-import com.puzzle.backend.common.oauth.repository.UsersRepository
-import com.puzzle.backend.common.oauth.service.JwtProvider
+import com.puzzle.backend.oauth.domain.UserCache
+import com.puzzle.backend.oauth.enums.SocialType
+import com.puzzle.backend.oauth.repository.UserCacheRepository
+import com.puzzle.backend.oauth.repository.UsersRepository
+import com.puzzle.backend.oauth.service.JwtProvider
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value

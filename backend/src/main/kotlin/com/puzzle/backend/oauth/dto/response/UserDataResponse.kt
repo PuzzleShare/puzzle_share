@@ -1,7 +1,7 @@
-package com.puzzle.backend.common.oauth.dto.response
+package com.puzzle.backend.oauth.dto.response
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.puzzle.backend.common.oauth.domain.Users
+import com.puzzle.backend.oauth.domain.Users
 
 data class UserDataResponse(
     val userName: String,
