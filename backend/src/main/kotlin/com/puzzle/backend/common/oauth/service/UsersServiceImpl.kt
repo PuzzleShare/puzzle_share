@@ -7,19 +7,44 @@ import com.puzzle.backend.common.oauth.handler.HOUR
 import com.puzzle.backend.common.oauth.repository.UserCacheRepository
 import com.puzzle.backend.common.oauth.repository.UsersRepository
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class UsersServiceImpl(
     private val usersRepository: UsersRepository,
     private val jwtProvider: JwtProvider,
     private val userCacheRepository: UserCacheRepository,
+    @Value("\${spring.profiles.active}")
+    private val active: String,
 ) : UsersService {
-    override fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse {
+    private val frontDomain = if (active == "local") {
+        "localhost"
+    } else {
+        "puzzle-frontend-five.vercel.app"
+    }
+
+    override fun getUserInfo(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): LoginSuccessResponse {
         val cookie = request.cookies?.find { it.name == "refresh" }
         val userId = jwtProvider.getUid(cookie?.value)
         val user = usersRepository.findById(userId.toLong()).orElseThrow()
+
+        val accessToken = jwtProvider.createToken(user, HOUR * 1000)
+        val hour = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1)
+        val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+        response.addHeader(
+            "Set-Cookie",
+            "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
+        )
+
         return LoginSuccessResponse.of(user)
     }
 
@@ -36,10 +61,21 @@ class UsersServiceImpl(
         )
     }
 
-    override fun getRefreshData(request: HttpServletRequest): RefreshDataResponse {
+    override fun getRefreshData(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): RefreshDataResponse {
         val refreshToken = request.cookies?.find { it.name == "refresh" }!!
         val userId = jwtProvider.getUid(refreshToken.value)
         val user = usersRepository.findById(userId.toLong()).orElseThrow()
+
+        val accessToken = jwtProvider.createToken(user, HOUR * 1000)
+        val hour = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1)
+        val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
+        response.addHeader(
+            "Set-Cookie",
+            "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
+        )
 
         return RefreshDataResponse(
             userId = user.userId,
@@ -47,7 +83,7 @@ class UsersServiceImpl(
             email = user.email,
             image = user.userImage,
             provider = user.socialType,
-            token = jwtProvider.createToken(user, HOUR * 1000),
+            token = accessToken,
         )
     }
 }
