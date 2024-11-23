@@ -6,6 +6,7 @@ import com.puzzle.websocket.game.domain.PieceDto
 import com.puzzle.websocket.game.domain.PuzzleBoard
 import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
+import com.puzzle.websocket.game.enums.GameItem
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import org.springframework.stereotype.Service
 import java.util.Date
@@ -147,6 +148,18 @@ class GameService {
                 }
                 res.targets = targets
                 res.team = ourColor
+            }
+
+            "USE_ITEM" -> {
+                val slotNum = targets.toIntOrNull()
+                if (slotNum != null && slotNum > 0 && slotNum < ourPuzzle.inventory.size) {
+                    val itemIdx = ourPuzzle.inventory[slotNum]
+                    if (itemIdx > 0 && itemIdx < GameItem.values().size){
+                        val gameItem = GameItem.values()[itemIdx]
+                        gameItem.use(game, ourColor, res)
+                        ourPuzzle.inventory[slotNum] = -1
+                    }
+                }
             }
 
             else -> {
