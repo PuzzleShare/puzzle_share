@@ -1,6 +1,6 @@
-package com.puzzle.backend.common.oauth.enums
+package com.puzzle.backend.oauth.enums
 
-import com.puzzle.backend.common.oauth.dto.response.UserDataResponse
+import com.puzzle.backend.oauth.dto.response.UserDataResponse
 import java.util.function.Function
 
 enum class SocialType(

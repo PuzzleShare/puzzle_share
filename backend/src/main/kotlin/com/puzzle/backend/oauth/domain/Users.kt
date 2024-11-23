@@ -1,7 +1,7 @@
-package com.puzzle.backend.common.oauth.domain
+package com.puzzle.backend.oauth.domain
 
 import com.puzzle.backend.common.domain.BaseEntity
-import com.puzzle.backend.common.oauth.dto.response.UserDataResponse
+import com.puzzle.backend.oauth.dto.response.UserDataResponse
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

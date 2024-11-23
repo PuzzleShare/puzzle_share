@@ -1,11 +1,12 @@
-package com.puzzle.backend.common.oauth.controller
+package com.puzzle.backend.oauth.controller
 
 import com.puzzle.backend.common.BaseResponse
-import com.puzzle.backend.common.oauth.dto.response.LoginSuccessResponse
+import com.puzzle.backend.oauth.dto.response.LoginSuccessResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 
 @Tag(name = "1. User API", description = "사용자 관련 API")
 interface UsersControllerSpec {
@@ -20,7 +21,10 @@ interface UsersControllerSpec {
             ),
         ],
     )
-    fun getUserInfo(request: HttpServletRequest): LoginSuccessResponse
+    fun getUserInfo(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): LoginSuccessResponse
 
     @Operation(
         summary = "로그아웃",

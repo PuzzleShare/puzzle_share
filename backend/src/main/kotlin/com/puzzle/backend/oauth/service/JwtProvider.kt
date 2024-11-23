@@ -1,11 +1,11 @@
-package com.puzzle.backend.common.oauth.service
+package com.puzzle.backend.oauth.service
 
-import com.puzzle.backend.common.oauth.domain.UserCache
-import com.puzzle.backend.common.oauth.domain.Users
-import com.puzzle.backend.common.oauth.handler.DAY
-import com.puzzle.backend.common.oauth.handler.HOUR
-import com.puzzle.backend.common.oauth.repository.UserCacheRepository
-import com.puzzle.backend.common.oauth.repository.UsersRepository
+import com.puzzle.backend.oauth.domain.UserCache
+import com.puzzle.backend.oauth.domain.Users
+import com.puzzle.backend.oauth.handler.DAY
+import com.puzzle.backend.oauth.handler.HOUR
+import com.puzzle.backend.oauth.repository.UserCacheRepository
+import com.puzzle.backend.oauth.repository.UsersRepository
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
@@ -22,10 +22,17 @@ import java.util.Date
 class JwtProvider(
     @Value("\${jwt.secret-key}")
     private val secretKey: String,
+    @Value("\${spring.profiles.active}")
+    private val active: String,
     private val userCacheRepository: UserCacheRepository,
     private val usersRepository: UsersRepository,
 ) {
     private val signKey = Keys.hmacShaKeyFor(secretKey.toByteArray())
+    private val frontDomain = if (active == "local") {
+        "localhost"
+    } else {
+        ".vercel.app"
+    }
 
     fun createToken(
         user: Users,
@@ -89,7 +96,7 @@ class JwtProvider(
         val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
         response.addHeader(
             "Set-Cookie",
-            "jwt=$accessToken; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
+            "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
         )
 
         val day = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusDays(1)
