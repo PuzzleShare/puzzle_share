@@ -9,12 +9,14 @@ import com.puzzle.websocket.game.domain.SharePuzzle
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import org.springframework.stereotype.Service
 import java.util.Date
+import java.util.concurrent.locks.ReentrantLock
 
 @Service
 class GameService {
     val gameRooms: MutableMap<String, Game> = mutableMapOf()
     val gson: Gson = Gson()
     val sessionToGame: MutableMap<String, String> = mutableMapOf()
+    private val lock = ReentrantLock()
 
     // 협동 게임방 불러오기
     fun findAllCooperationRoom(): List<Game> {
@@ -40,10 +42,6 @@ class GameService {
         print(game.toString())
         print(gameRooms[game.gameId])
         return game
-    }
-
-    fun deleteRoom(name: String) {
-        gameRooms.remove(name)
     }
 
     // 게임 시작
@@ -90,16 +88,18 @@ class GameService {
 
         when (message) {
             "ADD_PIECE" -> {
-                val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
-                println("ADD_PIECE")
-                if (ourColor == "RED") {
+                lock.lock() // 락 획득
+                try {
+                    val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
+                    println("ADD_PIECE")
                     ourPuzzle.addPiece(pieces)
-                } else {
-                    ourPuzzle.addPiece(pieces)
+
+                    res.team = ourColor
+                    res.message = "ADD_PIECE"
+                    res.targets = targets
+                } finally {
+                    lock.unlock() // 반드시 락 해제
                 }
-                res.team = ourColor
-                res.message = "ADD_PIECE"
-                res.targets = targets
             }
 
             "MOUSE_DOWN" -> {
@@ -197,5 +197,4 @@ class GameService {
     private fun calculateProgress(puzzle: PuzzleBoard): Double {
         return puzzle.calculateMixedProgress() // PuzzleBoard의 혼합 진행률 계산 호출
     }
-
 }

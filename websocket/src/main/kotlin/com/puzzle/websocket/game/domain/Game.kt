@@ -2,7 +2,8 @@ package com.puzzle.websocket.game.domain
 
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import com.puzzle.websocket.room.dto.request.PlayerRequest
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 data class Game(
     var gameId: String = "",
@@ -23,97 +24,7 @@ data class Game(
     var isFinished: Boolean = false,
     var isSaved: Boolean = false,
 ) {
-    fun changeTeam(
-        a: User?,
-        b: User?,
-    ) {
-//        when {
-//            a != null && redTeam.isIn(a) && b != null && blueTeam.isIn(b) -> {
-//                redTeam.deletePlayer(a)
-//                blueTeam.addPlayer(a)
-//                blueTeam.deletePlayer(b)
-//                redTeam.addPlayer(b)
-//            }
-//            a == null && b != null -> {
-//                if (redTeam.isIn(b)) {
-//                    redTeam.deletePlayer(b)
-//                    blueTeam.addPlayer(b)
-//                } else if (blueTeam.isIn(b)) {
-//                    blueTeam.deletePlayer(b)
-//                    redTeam.addPlayer(b)
-//                }
-//            }
-//            b == null && a != null -> {
-//                if (redTeam.isIn(a)) {
-//                    redTeam.deletePlayer(a)
-//                    blueTeam.addPlayer(a)
-//                } else if (blueTeam.isIn(a)) {
-//                    blueTeam.deletePlayer(a)
-//                    redTeam.addPlayer(a)
-//                }
-//            }
-//        }
-    }
-
-    fun exitPlayer(sessionId: String) {
-        val user: User? = sessionToUser[sessionId]
-        user?.let {
-            if (it == admin) {
-                val values = sessionToUser.values
-                if (values.size > 1) {
-                    admin = values.elementAt(1)
-                    println("방장이 ${admin?.id} 님으로 바뀌었습니다~")
-                }
-            }
-
-//            if (redTeam.players.contains(it)) {
-//                redTeam.deletePlayer(it)
-//            } else {
-//                blueTeam.deletePlayer(it)
-//            }
-            sessionToUser.remove(sessionId)
-        }
-    }
-
-    fun enterPlayer(
-        user: User,
-        sessionId: String,
-    ): Boolean {
-        return true
-//        if (sessionToUser.isEmpty()) {
-//            admin = user
-//        }
-//        sessionToUser[sessionId] = user
-//
-//        return if (gameType == "BATTLE") {
-//            if (redTeam.players.contains(user) || blueTeam.players.contains(user)) {
-//                true
-//            } else if (redTeam.players.size < roomSize / 2) {
-//                redTeam.addPlayer(user)
-//                true
-//            } else if (blueTeam.players.size < roomSize / 2) {
-//                blueTeam.addPlayer(user)
-//                true
-//            } else {
-//                false
-//            }
-//        } else {
-//            if (redTeam.players.contains(user)) {
-//                true
-//            } else if (redTeam.players.size < roomSize) {
-//                redTeam.addPlayer(user)
-//                true
-//            } else {
-//                false
-//            }
-//        }
-    }
-
-//    fun isEmpty(): Boolean = (redTeam.players.size + blueTeam.players.size) == 0
-
     fun start() {
-//        if (isStarted) return
-
         redPuzzle = PuzzleBoard()
         bluePuzzle = PuzzleBoard()
         redPuzzle?.init(picture!!, gameType)
@@ -133,10 +44,6 @@ data class Game(
         return (nowTime.time - (startTime?.time ?: 0)) / 1000
     }
 
-    fun updatePicture(p: Picture) {
-        picture = p
-    }
-
     companion object {
         fun create(room: PuzzleRoom): Game {
             val name = room.roomName
@@ -146,22 +53,24 @@ data class Game(
             val uuid = UUID.randomUUID().toString()
 
             // PuzzleRoom에서 받은 puzzleImage 값을 Picture에 전달
-            val picture = Picture.create(
-                width = 1000, // 적절한 width 값을 설정하세요.
-                length = 551, // 적절한 length 값을 설정하세요.
-                pieceSize = 40, // 적절한 퍼즐 조각 크기를 설정하세요.
-                imageName = puzzleImage,
-                encodedString = puzzleImage
-            )
+            val picture =
+                Picture.create(
+                    width = 1000, // 적절한 width 값을 설정하세요.
+                    length = 551, // 적절한 length 값을 설정하세요.
+                    pieceSize = 40, // 적절한 퍼즐 조각 크기를 설정하세요.
+                    imageName = puzzleImage,
+                    encodedString = puzzleImage,
+                )
 
-            val game = Game(
-                gameId = uuid,
-                gameName = name,
-                roomSize = roomSize,
-                gameType = gameType,
-                sessionToUser = mutableMapOf(),
-                picture = picture // 생성한 Picture 객체를 설정
-            )
+            val game =
+                Game(
+                    gameId = uuid,
+                    gameName = name,
+                    roomSize = roomSize,
+                    gameType = gameType,
+                    sessionToUser = mutableMapOf(),
+                    picture = picture, // 생성한 Picture 객체를 설정
+                )
 
             if (gameType == "BATTLE") {
                 game.redTeam = room.redPlayers

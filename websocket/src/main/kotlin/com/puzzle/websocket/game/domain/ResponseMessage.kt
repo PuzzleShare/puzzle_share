@@ -1,6 +1,5 @@
 package com.puzzle.websocket.game.domain
 
-
 data class ResponseMessage(
     var game: Game? = null,
     var senderId: String? = null,
@@ -15,6 +14,5 @@ data class ResponseMessage(
     var blueProgressPercent: Double = -1.0,
     var deleted: Map<Int, DoubleArray>? = null,
     var redBundles: List<Set<Piece>>? = null,
-    var blueBundles: List<Set<Piece>>? = null
-
+    var blueBundles: List<Set<Piece>>? = null,
 )
