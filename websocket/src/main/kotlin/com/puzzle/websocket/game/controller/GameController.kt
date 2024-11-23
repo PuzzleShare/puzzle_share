@@ -21,57 +21,15 @@ class GameController(
     private val gameService: GameService,
     private val sendingOperations: SimpMessageSendingOperations,
 ) {
-    private val BATTLE_TIMER = 60
+    private val battleTimer = 180
     private var sessionId: String? = null
     private val waitingList: Queue<User> = ConcurrentLinkedQueue()
 
     // 세션 아이디 설정
     @EventListener
     fun handleWebSocketConnectListener(event: SessionConnectEvent) {
-        // System.out.println("MessageController.handleWebSocketConnectListener")
-        // System.out.println(event.message.headers["simpSessionId"])
         sessionId = event.message.headers["simpSessionId"] as String?
     }
-
-//    @EventListener
-//    @Throws(InterruptedException::class)
-//    fun handleDisconnectEvent(event: SessionDisconnectEvent) {
-//        val accessor: StompHeaderAccessor = StompHeaderAccessor.wrap(event.message)
-//        val sessionId: String = accessor.sessionId
-//        val gameId: String? = gameService.sessionToGame?.get(sessionId)
-//        val game: Game? = gameService.findById(gameId!!)
-//
-//        if (game == null) {
-//            return
-//        }
-//
-//        if (accessor.command == StompCommand.DISCONNECT) {
-//            if (game.isFinished) {
-//                println("${game.sessionToUser[sessionId]?.id} 님이 퇴장하십니다.")
-//                game.exitPlayer(sessionId)
-//                gameService.sessionToGame?.remove(sessionId)
-//            } else {
-//                if (!game.isStarted) {
-//                    // Thread.sleep(5000)
-//                    // if (game.isEmpty()) {
-//                    //     println("진짜 나간것같아. 게임 지울게!")
-//                    //     gameService.deleteRoom(gameId)
-//                    // } else {
-//                    //     println("새로고침이였어. 다시 연결한다!")
-//                    //     return
-//                    // }
-//                    println("${game.sessionToUser[sessionId]?.id} 님이 퇴장하십니다.")
-//                    game.exitPlayer(sessionId)
-//                    gameService.sessionToGame?.remove(sessionId)
-//                } else {
-//                    println("어딜 나가 이자식아")
-//                    return
-//                }
-//            }
-//        }
-//
-//        sendingOperations.convertAndSend("/topic/game/room/$gameId", game)
-//    }
 
     @MessageMapping("/{roomId}/game/enter")
     @Throws(Exception::class)
@@ -94,18 +52,6 @@ class GameController(
             return
         }
 
-//        val res =
-//            gameService.playGame(sharePuzzle).apply {
-//                redProgressPercent = game.redPuzzle!!.correctedCount.toDouble() /
-//                    (game.redPuzzle!!.lengthCnt * game.redPuzzle!!.widthCnt) * 100
-//                blueProgressPercent = game.bluePuzzle!!.correctedCount.toDouble() /
-//                    (game.bluePuzzle!!.lengthCnt * game.bluePuzzle!!.widthCnt) * 100
-//                isFinished = game.isFinished
-//                redBundles = game.redPuzzle!!.bundles
-//                if (game.gameType == "BATTLE") {
-//                    blueBundles = game.bluePuzzle!!.bundles
-//                }
-//            }
         val res =
             gameService.playGame(sharePuzzle).apply {
                 // 혼합 방식 진행률 계산 반영
@@ -117,9 +63,15 @@ class GameController(
                         0.0
                     }
                 isFinished = game.isFinished
-                redBundles = game.redPuzzle!!.bundles
-                if (game.gameType == "BATTLE") {
-                    blueBundles = game.bluePuzzle!!.bundles
+                redBundles = game.redPuzzle
+                    ?.bundles
+                    ?.values
+                    ?.map { it.toSet() } ?: emptyList()
+                if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                    blueBundles = game.bluePuzzle
+                        ?.bundles
+                        ?.values
+                        ?.map { it.toSet() } ?: emptyList()
                 }
             }
 
@@ -135,7 +87,7 @@ class GameController(
             if (game.isStarted) {
                 var time = game.getTime()
                 if (game.gameType == "BATTLE") {
-                    time = BATTLE_TIMER - time
+                    time = battleTimer - time
                 }
                 if (time >= 0) {
                     val timer = mapOf("time" to time)
