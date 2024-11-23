@@ -36,6 +36,8 @@ class PuzzleBoard {
     private val dx = arrayOf(1, -1, 0, 0)
     private val dy = arrayOf(0, 0, -1, 1)
 
+    val inventory: Array<Int> = Array(8) { -1 }
+
     // 퍼즐 판 초기화
     fun init(
         p: Picture,
