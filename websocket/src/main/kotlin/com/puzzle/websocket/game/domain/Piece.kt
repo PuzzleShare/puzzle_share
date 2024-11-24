@@ -19,4 +19,17 @@ data class Piece(
         position_y = 0.0,
         locked = false,
     )
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Piece
+
+        return index == other.index
+    }
+
+    override fun hashCode(): Int {
+        return index
+    }
 }
