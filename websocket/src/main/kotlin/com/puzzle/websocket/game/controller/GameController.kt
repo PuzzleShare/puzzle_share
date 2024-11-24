@@ -79,27 +79,27 @@ class GameController(
     }
 
     //  서버 타이머 제공
-    @Scheduled(fixedRate = 1000)
-    @Throws(Exception::class)
-    fun sendServerTime() {
-        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
-        for (game in allRooms.reversed()) {
-            if (game.isStarted) {
-                var time = game.getTime()
-                if (game.gameType == "BATTLE") {
-                    time = battleTimer - time
-                }
-                if (time >= 0) {
-                    val timer = mapOf("time" to time)
-                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
-                } else {
-                    val res = ResponseMessage()
-                    res.isFinished = true
-
-                    Thread.sleep(20)
-                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-                }
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 1000)
+//    @Throws(Exception::class)
+//    fun sendServerTime() {
+//        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
+//        for (game in allRooms.reversed()) {
+//            if (game.isStarted) {
+//                var time = game.getTime()
+//                if (game.gameType == "BATTLE") {
+//                    time = battleTimer - time
+//                }
+//                if (time >= 0) {
+//                    val timer = mapOf("time" to time)
+//                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
+//                } else {
+//                    val res = ResponseMessage()
+//                    res.isFinished = true
+//
+//                    Thread.sleep(20)
+//                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+//                }
+//            }
+//        }
+//    }
 }
