@@ -1,56 +1,58 @@
 package com.puzzle.websocket.game.domain
 
+import java.io.Serializable
 import java.util.Random
-import kotlin.collections.HashMap
 
-class PuzzleBoard {
-    private var picture: Picture? = null // 퍼즐에 쓰이는 사진
-    var idxToCoordinate: HashMap<Int, IntArray> = HashMap()
+class PuzzleBoard : Serializable {
+    var picture: Picture? = null // 퍼즐에 쓰이는 사진
+    val idxToCoordinate: MutableMap<Int, List<Int>> = mutableMapOf()
 
     // 조각들이 들어있는 2차원 배열
-    lateinit var board: Array<Array<Piece>>
-    private var pieceSize: Int = 0 // 조각 크기
-    private var widthCnt: Int = 0 // 가로 조각 개수
-    private var lengthCnt: Int = 0 // 세로 조각 개수
+    var board: MutableList<MutableList<Piece>> = mutableListOf()
+    var pieceSize: Int = 0 // 조각 크기
+    var widthCnt: Int = 0 // 가로 조각 개수
+    var lengthCnt: Int = 0 // 세로 조각 개수
 
-    private var totalEdges: Int = 0
-    private var connectedEdges: Int = 0
+    var totalEdges: Int = 0
+    var connectedEdges: Int = 0
 
     // 조합된 퍼즐 뭉탱이들
-    val bundles = hashMapOf<Int, MutableSet<Piece>>()
-    private lateinit var isCorrected: Array<BooleanArray> // 조합된 퍼즐인지 확인하는 2차원 배열
-    private var correctedCount: Int = 0 // 현재까지 맞춘 개수
+    var bundles = hashMapOf<Int, MutableSet<Piece>>()
+    lateinit var isCorrected: MutableList<MutableList<Boolean>> // 조합된 퍼즐인지 확인하는 2차원 배열
+    var correctedCount: Int = 0 // 현재까지 맞춘 개수
     var isCompleted: Boolean = false
         private set
 
-    // 랜덤 타입 적용에 쓰일 인덱스 상수
-    private val top = 0
-    private val right = 1
-    private val button = 2
-    private val left = 3
+    companion object {
+        // 랜덤 타입 적용에 쓰일 인덱스 상수
+        const val TOP = 0
+        const val RIGHT = 1
+        const val BOTTOM = 2
+        const val LEFT = 3
 
-    private val canvasWidth = 1000
-    private val canvasLength = 750
+        // 방향 이동을 위한 배열
+        val dx = listOf(1, -1, 0, 0)
+        val dy = listOf(0, 0, -1, 1)
 
-    // 방향 이동을 위한 배열
-    private val dx = arrayOf(1, -1, 0, 0)
-    private val dy = arrayOf(0, 0, -1, 1)
+        const val CANVAS_WIDTH = 1000
+        const val CANVAS_LENGTH = 750
+    }
 
-    val inventory: Array<Int> = Array(8) { -1 }
+    var inventory: MutableList<Int> = MutableList(8) { -1 }
 
     // 퍼즐 판 초기화
     fun init(
         p: Picture,
         gameType: String,
-    ): Array<Array<Piece>> {
+    ): MutableList<MutableList<Piece>> {
         picture = p
         pieceSize = p.pieceSize
         widthCnt = p.widthPieceCnt
         lengthCnt = p.lengthPieceCnt
         totalEdges = (widthCnt * (lengthCnt - 1)) + (lengthCnt * (widthCnt - 1))
+        board = MutableList(lengthCnt) { MutableList(widthCnt) { Piece(0) } }
+        isCorrected = MutableList(lengthCnt * 2 - 1) { MutableList(widthCnt * 2 - 1) { false } }
 
-        board = Array(lengthCnt) { Array(widthCnt) { Piece(0) } }
-        isCorrected = Array(lengthCnt * 2 - 1) { BooleanArray(widthCnt * 2 - 1) }
         var cnt = 0
 
         // 고유 인덱스 할당 및 주변 퍼즐에 대한 고유 인덱스 정보 초기화
@@ -59,7 +61,7 @@ class PuzzleBoard {
                 val piece = Piece(cnt)
                 bundles[cnt] = mutableSetOf(piece)
                 board[i][j] = piece
-                idxToCoordinate[cnt] = intArrayOf(i, j)
+                idxToCoordinate[cnt] = mutableListOf(i, j)
 
                 piece.correctIndex[0] = if (j + 1 < widthCnt) cnt + 1 else -1
                 piece.correctIndex[1] = if (j - 1 >= 0) cnt - 1 else -1
@@ -77,6 +79,36 @@ class PuzzleBoard {
         return board
     }
 
+    fun reload(
+        p: Picture,
+        board: MutableList<MutableList<Piece>>,
+        isCorrected: MutableList<MutableList<Boolean>>,
+        correctedCount: Int,
+    ): PuzzleBoard {
+        picture = p
+        pieceSize = p.pieceSize
+        widthCnt = p.widthPieceCnt
+        lengthCnt = p.lengthPieceCnt
+        totalEdges = (widthCnt * (lengthCnt - 1)) + (lengthCnt * (widthCnt - 1))
+        this.correctedCount = correctedCount
+
+        this.board = board
+        this.isCorrected = isCorrected
+
+        for (i in 0 until lengthCnt) {
+            for (j in 0 until widthCnt) {
+                val piece = board[i][j]
+                val bundleNum = piece.bundleNum
+
+                // 해당 bundleNum에 해당하는 Set을 가져오거나, 없으면 새로 생성
+                val bundleSet = bundles.getOrPut(bundleNum) { mutableSetOf() }
+                bundleSet.add(piece)
+            }
+        }
+
+        return this
+    }
+
     // 퍼즐 조각 생성 알고리즘
     private fun generatePuzzlePieces() {
         val randomVisited = BooleanArray(widthCnt * lengthCnt)
@@ -89,10 +121,10 @@ class PuzzleBoard {
                 val type = IntArray(4)
 
                 // 각 변에 대한 타입 결정
-                type[top] = if (i == 0) 0 else invertType(board[i - 1][j].type[button])
-                type[button] = if (i == lengthCnt - 1) 0 else randomType()
-                type[left] = if (j == 0) 0 else invertType(board[i][j - 1].type[right])
-                type[right] = if (j == widthCnt - 1) 0 else randomType()
+                type[TOP] = if (i == 0) 0 else invertType(board[i - 1][j].type[BOTTOM])
+                type[BOTTOM] = if (i == lengthCnt - 1) 0 else randomType()
+                type[LEFT] = if (j == 0) 0 else invertType(board[i][j - 1].type[RIGHT])
+                type[RIGHT] = if (j == widthCnt - 1) 0 else randomType()
 
                 now.type = type
 
@@ -133,8 +165,8 @@ class PuzzleBoard {
         i: Int,
         j: Int,
     ): Pair<Double, Double> {
-        val x = (canvasWidth / 2 - pieceSize / 2 + pieceSize * ((j * 2) + (i % 2)) - picture!!.imgWidth + 50).toDouble()
-        val y = (canvasLength / 2 - pieceSize / 2 + pieceSize * i - picture!!.imgHeight / 2).toDouble()
+        val x = (CANVAS_WIDTH / 2 - pieceSize / 2 + pieceSize * ((j * 2) + (i % 2)) - picture!!.imgWidth + 50).toDouble()
+        val y = (CANVAS_LENGTH / 2 - pieceSize / 2 + pieceSize * i - picture!!.imgHeight / 2).toDouble()
         return Pair(x, y)
     }
 

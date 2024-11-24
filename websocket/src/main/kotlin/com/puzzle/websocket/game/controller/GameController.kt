@@ -98,6 +98,7 @@ class GameController(
 
                     Thread.sleep(20)
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+                    gameService.deleteGame(game.gameId)
                 }
             }
         }
