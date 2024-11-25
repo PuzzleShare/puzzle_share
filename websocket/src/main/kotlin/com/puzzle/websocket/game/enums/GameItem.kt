@@ -58,7 +58,19 @@ enum class GameItem(
         res.targetList = null
     }),
     TYPHOON({ game, team, res ->
+        val (targetPuzzle, targetTeam) = if (team.uppercase() == "RED") {
+            game.bluePuzzle!! to "BLUE"
+        } else {
+            game.redPuzzle!! to "RED"
+        }
 
+        val targets = targetPuzzle.bundles.values
+            .filter { it.size == 1 }
+
+        targets.forEach { it.forEach(targetPuzzle::randomPosition) }
+
+        res.targetList = targets.map { it.elementAt(0).index }
+        res.targets = targetTeam
     }),
     BROOMSTICK({ game, team, res ->
 
