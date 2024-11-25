@@ -84,6 +84,7 @@ class PuzzleBoard : Serializable {
         board: MutableList<MutableList<Piece>>,
         isCorrected: MutableList<MutableList<Boolean>>,
         correctedCount: Int,
+        connectedEdges: Int,
     ): PuzzleBoard {
         picture = p
         pieceSize = p.pieceSize
@@ -91,17 +92,19 @@ class PuzzleBoard : Serializable {
         lengthCnt = p.lengthPieceCnt
         totalEdges = (widthCnt * (lengthCnt - 1)) + (lengthCnt * (widthCnt - 1))
         this.correctedCount = correctedCount
-
+        this.connectedEdges = connectedEdges
         this.board = board
         this.isCorrected = isCorrected
 
+        println("totalEdges $totalEdges")
+        println("connectedEdges $connectedEdges")
         for (i in 0 until lengthCnt) {
             for (j in 0 until widthCnt) {
                 val piece = board[i][j]
                 val bundleNum = piece.bundleNum
-
                 // 해당 bundleNum에 해당하는 Set을 가져오거나, 없으면 새로 생성
                 val bundleSet = bundles.getOrPut(bundleNum) { mutableSetOf() }
+
                 bundleSet.add(piece)
             }
         }
