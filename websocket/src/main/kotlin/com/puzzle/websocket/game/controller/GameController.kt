@@ -36,9 +36,30 @@ class GameController(
     fun enterGame(
         @DestinationVariable roomId: String,
     ) {
+        val game = gameService.findById(roomId)!!
         sendingOperations.convertAndSend(
             "/topic/game/room/$roomId/init",
-            gameService.findById(roomId)!!,
+            ResponseMessage(game = game).apply {
+                // 혼합 방식 진행률 계산 반영
+                redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+                blueProgressPercent =
+                    if (game.gameType == "BATTLE") {
+                        game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+                    } else {
+                        0.0
+                    }
+                isFinished = game.isFinished
+                redBundles = game.redPuzzle
+                    ?.bundles
+                    ?.values
+                    ?.map { it.toSet() } ?: emptyList()
+                if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                    blueBundles = game.bluePuzzle
+                        ?.bundles
+                        ?.values
+                        ?.map { it.toSet() } ?: emptyList()
+                }
+            },
         )
     }
 

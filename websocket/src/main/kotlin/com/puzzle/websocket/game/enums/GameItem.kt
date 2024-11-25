@@ -1,6 +1,7 @@
 package com.puzzle.websocket.game.enums
 
 import com.puzzle.websocket.game.domain.Game
+import com.puzzle.websocket.game.domain.Piece
 import com.puzzle.websocket.game.domain.ResponseMessage
 import java.util.PriorityQueue
 
@@ -83,7 +84,7 @@ enum class GameItem(
             .filter { it.size == 1 }
         val (x, y) = targetPuzzle.getCanvasCenter()
         targets.forEach {
-            it.forEach{
+            it.forEach {
                 it.position_x = x
                 it.position_y = y
             }
@@ -93,7 +94,51 @@ enum class GameItem(
         res.targets = targetTeam
     }),
     FRAME({ game, team, res ->
+        val (targetPuzzle, targetTeam) = if (team.uppercase() == "RED") {
+            game.redPuzzle!! to "RED"
+        } else {
+            game.bluePuzzle!! to "BLUE"
+        }
 
+        val board = targetPuzzle.board
+        val maxRow = board.size
+        val maxCol = board[0].size
+        // 둘레 피스 그룹화
+        for (i in 0 until maxCol - 1){
+            targetPuzzle.addPiece(
+                listOf(board[0][i].index, board[0][i+1].index)
+            )
+        }
+        for (i in 0 until maxRow-1){
+            targetPuzzle.addPiece(
+                listOf(board[i][maxCol-1].index, board[i+1][maxCol-1].index)
+            )
+        }
+        for (i in maxCol-1 downTo 1){
+            targetPuzzle.addPiece(
+                listOf(board[maxRow-1][i].index, board[maxRow-1][i-1].index)
+            )
+        }
+        for (i in maxRow-1 downTo 1){
+            targetPuzzle.addPiece(
+                listOf(board[i][0].index, board[i-1][0].index)
+            )
+        }
+
+        // 그룹화한 피스 위치 조정
+        val pieceSize = targetPuzzle.picture!!.pieceSize
+        val cnt = targetPuzzle.picture!!.widthPieceCnt
+        var (startX, startY) = targetPuzzle.getCanvasCenter()
+        startX -= targetPuzzle.picture!!.imgWidth / 2
+        startY -= targetPuzzle.picture!!.imgHeight / 2
+        val targetBundle = targetPuzzle.bundles[targetPuzzle.board[0][0].bundleNum]!!
+        targetBundle.forEach {
+            it.position_x = (it.index % cnt) * pieceSize + startX
+            it.position_y = (it.index / cnt) * pieceSize + startY
+        }
+
+        res.targetList = targetBundle.map { it.index }
+        res.targets = targetTeam
     });
 
     fun use(game: Game, team: String, res: ResponseMessage) = func.invoke(game, team, res)
