@@ -17,6 +17,8 @@ class PuzzleBoard : Serializable {
 
     var totalEdges: Int = 0
     var connectedEdges: Int = 0
+    private val canvasWidth = 1000
+    private val canvasLength = 750
 
     // 조합된 퍼즐 뭉탱이들
     var bundles = hashMapOf<Int, MutableSet<Piece>>()
@@ -39,7 +41,6 @@ class PuzzleBoard : Serializable {
         const val CANVAS_WIDTH = 1000
         const val CANVAS_LENGTH = 750
     }
-
 
     val inventory: Array<Int> = Array(8) { 3 }
 
@@ -271,7 +272,10 @@ class PuzzleBoard : Serializable {
         piece.position_y = Math.random() * canvasLength
     }
 
-    fun deletePiece(bundleKey: Int, piece: Piece) {
+    fun deletePiece(
+        bundleKey: Int,
+        piece: Piece,
+    ) {
         if (bundleKey in bundles) {
             bundles[bundleKey]!!.remove(piece)
             piece.correctIndex.filter { it != -1 }.forEach {
@@ -294,8 +298,9 @@ class PuzzleBoard : Serializable {
         val q: Queue<Piece> = LinkedList()
 
         for (piece in oldBundle) {
-            if (piece.index in visit)
+            if (piece.index in visit) {
                 continue
+            }
 
             q.add(piece)
             newBundle.add(piece)
