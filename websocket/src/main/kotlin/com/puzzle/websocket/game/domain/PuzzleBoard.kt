@@ -42,7 +42,7 @@ class PuzzleBoard : Serializable {
         const val CANVAS_LENGTH = 750
     }
 
-    val inventory: Array<Int> = Array(8) { 4 }
+    val inventory: Array<Int> = Array(8) { 5 }
 
     // 퍼즐 판 초기화
     fun init(
