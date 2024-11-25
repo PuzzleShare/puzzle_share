@@ -208,12 +208,14 @@ class GameService(
 
             "USE_ITEM" -> {
                 val slotNum = targets.toIntOrNull()
-                if (slotNum != null && slotNum > 0 && slotNum < ourPuzzle.inventory.size) {
+                if (slotNum != null && slotNum >= 0 && slotNum < ourPuzzle.inventory.size) {
                     val itemIdx = ourPuzzle.inventory[slotNum]
-                    if (itemIdx > 0 && itemIdx < GameItem.values().size) {
+                    if (itemIdx > 0 && itemIdx <= GameItem.values().size){
                         val gameItem = GameItem.values()[itemIdx]
                         gameItem.use(game, ourColor, res)
-                        ourPuzzle.inventory[slotNum] = -1
+                        ourPuzzle.inventory[slotNum] = 0
+                        res.message = gameItem.name
+                        res.game = game
                     }
                 }
             }

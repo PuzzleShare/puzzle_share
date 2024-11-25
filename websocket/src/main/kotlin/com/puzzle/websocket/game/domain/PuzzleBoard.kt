@@ -1,6 +1,8 @@
 package com.puzzle.websocket.game.domain
 
 import java.io.Serializable
+import java.util.LinkedList
+import java.util.Queue
 import java.util.Random
 
 class PuzzleBoard : Serializable {
@@ -38,7 +40,8 @@ class PuzzleBoard : Serializable {
         const val CANVAS_LENGTH = 750
     }
 
-    var inventory: MutableList<Int> = MutableList(8) { -1 }
+
+    val inventory: Array<Int> = Array(8) { 3 }
 
     // 퍼즐 판 초기화
     fun init(
@@ -262,4 +265,54 @@ class PuzzleBoard : Serializable {
     // PuzzleBoard 클래스 내부
     fun calculateMixedProgress(): Double = (connectedEdges * 100.0 / totalEdges)
 //    fun calculateMixedProgress(): Double = (connectedEdges * 100.0 / totalEdges).coerceAtMost(100.0)
+
+    fun randomPosition(piece: Piece) {
+        piece.position_x = Math.random() * canvasWidth
+        piece.position_y = Math.random() * canvasLength
+    }
+
+    fun deletePiece(bundleKey: Int, piece: Piece) {
+        if (bundleKey in bundles) {
+            bundles[bundleKey]!!.remove(piece)
+            piece.correctIndex.filter { it != -1 }.forEach {
+                val (x, y) = correctedCoordinate(piece.index, it)
+                if (isCorrected[x][y]) {
+                    isCorrected[x][y] = false
+                    connectedEdges--
+                }
+            }
+        }
+    }
+
+    fun bundleSplit(bundleKey: Int) {
+        val oldBundle = bundles[bundleKey]!!
+        val indexToPiece = mutableMapOf<Int, Piece>()
+        oldBundle.forEach { indexToPiece[it.index] = it }
+
+        var newBundle = mutableSetOf<Piece>()
+        val visit = mutableSetOf<Int>()
+        val q: Queue<Piece> = LinkedList()
+
+        for (piece in oldBundle) {
+            if (piece.index in visit)
+                continue
+
+            q.add(piece)
+            newBundle.add(piece)
+            while (q.isNotEmpty()) {
+                val poll = q.poll()
+                for (i in poll.correctIndex) {
+                    if (i == -1) continue
+                    if (i in visit) continue
+                    if (i !in indexToPiece) continue
+                    q.add(indexToPiece[i])
+                    visit.add(i)
+                    newBundle.add(indexToPiece[i]!!)
+                }
+            }
+            bundles[piece.index] = newBundle
+            newBundle.forEach { it.bundleNum = piece.index }
+            newBundle = mutableSetOf()
+        }
+    }
 }
