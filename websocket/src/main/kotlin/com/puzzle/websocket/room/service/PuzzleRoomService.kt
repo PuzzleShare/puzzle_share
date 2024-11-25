@@ -1,5 +1,6 @@
 package com.puzzle.websocket.room.service
 
+import com.puzzle.websocket.room.dto.request.InviteRequest
 import com.puzzle.websocket.room.dto.request.PlayerRequest
 
 interface PuzzleRoomService {
@@ -21,5 +22,10 @@ interface PuzzleRoomService {
     fun gameStart(
         roomId: String,
         playerRequest: PlayerRequest,
+    )
+
+    fun invitePlayerToRoom(
+        roomId: String,
+        playerRequest: InviteRequest,
     )
 }
