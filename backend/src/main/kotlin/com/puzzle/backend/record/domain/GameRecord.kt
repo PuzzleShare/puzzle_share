@@ -28,13 +28,13 @@ data class GameRecord(
     @Column(nullable = false)
     val gameType: String,
     @Lob
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     val players: String? = null,
     @Lob
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     val teamMates: String?,
     @Lob
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     val opponents: String? = null,
     @Column(nullable = true)
     val myTeam: String?,
