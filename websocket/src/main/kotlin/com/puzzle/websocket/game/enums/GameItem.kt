@@ -73,7 +73,24 @@ enum class GameItem(
         res.targets = targetTeam
     }),
     BROOMSTICK({ game, team, res ->
+        val (targetPuzzle, targetTeam) = if (team.uppercase() == "RED") {
+            game.bluePuzzle!! to "BLUE"
+        } else {
+            game.redPuzzle!! to "RED"
+        }
 
+        val targets = targetPuzzle.bundles.values
+            .filter { it.size == 1 }
+        val (x, y) = targetPuzzle.getCanvasCenter()
+        targets.forEach {
+            it.forEach{
+                it.position_x = x
+                it.position_y = y
+            }
+        }
+
+        res.targetList = targets.map { it.elementAt(0).index }
+        res.targets = targetTeam
     }),
     FRAME({ game, team, res ->
 
