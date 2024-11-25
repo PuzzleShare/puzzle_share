@@ -1,26 +1,77 @@
 package com.puzzle.websocket.game.service
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.google.gson.Gson
 import com.puzzle.websocket.game.domain.Game
+import com.puzzle.websocket.game.domain.ListStringUtils
+import com.puzzle.websocket.game.domain.Picture
+import com.puzzle.websocket.game.domain.Piece
 import com.puzzle.websocket.game.domain.PieceDto
 import com.puzzle.websocket.game.domain.PuzzleBoard
 import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
+import com.puzzle.websocket.game.domain.User
+import com.puzzle.websocket.game.enums.GameItem
 import com.puzzle.websocket.room.domain.PuzzleRoom
+import com.puzzle.websocket.room.dto.request.PlayerRequest
+import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import java.util.Date
+import java.util.concurrent.locks.ReentrantLock
 
 @Service
-class GameService {
+class GameService(
+    private val redisTemplate: RedisTemplate<String, Any>,
+) {
     val gameRooms: MutableMap<String, Game> = mutableMapOf()
     val gson: Gson = Gson()
     val sessionToGame: MutableMap<String, String> = mutableMapOf()
+    private val lock = ReentrantLock()
+
+    val objectMapper = jacksonObjectMapper()
+    val jsonMapper: ObjectMapper =
+        ObjectMapper()
+            .registerKotlinModule()
+            .findAndRegisterModules()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     // 협동 게임방 불러오기
     fun findAllCooperationRoom(): List<Game> {
         val result = gameRooms.values.filter { it.gameType == "COOPERATION" }.toMutableList()
         result.reverse()
         return result
+    }
+
+    fun deleteGame(gameId: String) {
+        val basicKey = "$gameKeyPrefix$gameId"
+        gameRooms.remove(gameId)
+        val keysToDelete =
+            listOf(
+                "$basicKey:meta",
+                "$basicKey:redTeam",
+                "$basicKey:blueTeam",
+                "$basicKey:players",
+                "$basicKey:picture",
+                "$basicKey:admin",
+                "$basicKey:redPuzzle:correctedCount",
+                "$basicKey:redPuzzle:isCompleted",
+                "$basicKey:redPuzzle:idxToCoordinate",
+                "$basicKey:redPuzzle:board",
+                "$basicKey:redPuzzle:isCorrected",
+                "$basicKey:bluePuzzle:correctedCount",
+                "$basicKey:bluePuzzle:isCompleted",
+                "$basicKey:bluePuzzle:idxToCoordinate",
+                "$basicKey:bluePuzzle:board",
+                "$basicKey:bluePuzzle:isCorrected",
+            )
+        redisTemplate.delete(keysToDelete)
     }
 
     // 배틀 게임방 불러오기
@@ -30,29 +81,31 @@ class GameService {
         return result
     }
 
-    fun findById(roomId: String): Game? = gameRooms[roomId]
+    fun findById(roomId: String): Game? {
+        if (gameRooms[roomId] == null) {
+            val game = load(roomId)
+            println(game.gameId)
+            println(game.gameName)
+            println(game.bluePuzzle!!.printBoard())
+            gameRooms[roomId] = game
+        }
+        return gameRooms[roomId]
+    }
 
     // 채팅방 생성
     fun createGame(room: PuzzleRoom): Game {
         val game = Game.create(room)
         gameRooms[game.gameId] = game
-        println(game.gameId)
-        print(game.toString())
-        print(gameRooms[game.gameId])
-        return game
-    }
 
-    fun deleteRoom(name: String) {
-        gameRooms.remove(name)
+        return game
     }
 
     // 게임 시작
     fun startGame(roomId: String): Game? {
         val game = findById(roomId)
-        println("startGame")
-        print(game.toString())
         if (game != null) {
             game.start()
+            save(game)
         }
         return game
     }
@@ -90,16 +143,20 @@ class GameService {
 
         when (message) {
             "ADD_PIECE" -> {
-                val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
-                println("ADD_PIECE")
-                if (ourColor == "RED") {
+                lock.lock() // 락 획득
+                try {
+                    val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
+                    println("ADD_PIECE")
                     ourPuzzle.addPiece(pieces)
-                } else {
-                    ourPuzzle.addPiece(pieces)
+
+                    res.team = ourColor
+                    res.message = "ADD_PIECE"
+                    res.targets = targets
+                } finally {
+                    lock.unlock() // 반드시 락 해제
                 }
-                res.team = ourColor
-                res.message = "ADD_PIECE"
-                res.targets = targets
+
+                savePuzzle(game)
             }
 
             "MOUSE_DOWN" -> {
@@ -149,6 +206,20 @@ class GameService {
                 res.team = ourColor
             }
 
+            "USE_ITEM" -> {
+                val slotNum = targets.toIntOrNull()
+                if (slotNum != null && slotNum >= 0 && slotNum < ourPuzzle.inventory.size) {
+                    val itemIdx = ourPuzzle.inventory[slotNum]
+                    if (itemIdx > 0 && itemIdx <= GameItem.values().size){
+                        val gameItem = GameItem.values()[itemIdx]
+                        gameItem.use(game, ourColor, res)
+                        ourPuzzle.inventory[slotNum] = 0
+                        res.message = gameItem.name
+                        res.game = game
+                    }
+                }
+            }
+
             else -> {
                 println("구현중인 명령어 : $message")
                 println("targets = $targets")
@@ -156,24 +227,12 @@ class GameService {
         }
 
         // 게임 끝났는지 마지막에 확인
-        if (!game.isSaved) {
-            if (game.gameType == "BATTLE") {
-                if (ourPuzzle.isCompleted || yourPuzzle.isCompleted) {
-                    game.isFinished = true
-                    game.finishTime = Date()
-                    res.isFinished = true
-//                    save(game)
-                    game.isSaved = true
-                }
-            } else if (game.gameType == "COOPERATION") {
-                if (ourPuzzle.isCompleted) {
-                    game.isFinished = true
-                    game.finishTime = Date()
-                    res.isFinished = true
-//                    save(game)
-                    game.isSaved = true
-                }
-            }
+
+        if (ourPuzzle.isCompleted || yourPuzzle.isCompleted) {
+            game.isFinished = true
+            game.finishTime = Date()
+            res.isFinished = true
+            deleteGame(game.gameId)
         }
 
         // 진행도 추가
@@ -198,4 +257,196 @@ class GameService {
         return puzzle.calculateMixedProgress() // PuzzleBoard의 혼합 진행률 계산 호출
     }
 
+    private fun savePuzzle(game: Game) {
+        val basicKey = "$gameKeyPrefix${game.gameId}"
+        game.redPuzzle?.let { it ->
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString())
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString())
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString())
+            for (idxToCord in it.idxToCoordinate) {
+                redisTemplate.opsForHash<String, String>().put(
+                    "$basicKey:redPuzzle:idxToCoordinate",
+                    idxToCord.key.toString(),
+                    ListStringUtils.listToString(idxToCord.value),
+                )
+            }
+
+            val boardJson = objectMapper.writeValueAsString(it.board)
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:board", boardJson)
+            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCorrected", correctedJson)
+        }
+
+        game.bluePuzzle?.let { it ->
+
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString())
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString())
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString())
+            for (idxToCord in it.idxToCoordinate) {
+                redisTemplate.opsForHash<String, String>().put(
+                    "$basicKey:bluePuzzle:idxToCoordinate",
+                    idxToCord.key.toString(),
+                    ListStringUtils.listToString(idxToCord.value),
+                )
+            }
+
+            val boardJson = objectMapper.writeValueAsString(it.board)
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:board", boardJson)
+            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCorrected", correctedJson)
+        }
+    }
+
+    private val gameKeyPrefix = "Game:"
+
+    private fun save(game: Game) {
+        val basicKey = "$gameKeyPrefix${game.gameId}"
+        val metaData =
+            mapOf(
+                "gameId" to game.gameId,
+                "gameName" to game.gameName,
+                "roomSize" to game.roomSize,
+                "gameType" to game.gameType,
+                "startTime" to game.startTime?.time,
+                "finishTime" to game.finishTime?.time,
+                "isStarted" to game.isStarted,
+                "isFinished" to game.isFinished,
+                "isSaved" to game.isSaved,
+            )
+        redisTemplate.opsForValue().set("$basicKey:meta", objectMapper.writeValueAsString(metaData))
+
+        redisTemplate.opsForValue().set("$basicKey:redTeam", objectMapper.writeValueAsString(game.redTeam))
+        redisTemplate.opsForValue().set("$basicKey:blueTeam", objectMapper.writeValueAsString(game.blueTeam))
+        redisTemplate.opsForValue().set("$basicKey:players", objectMapper.writeValueAsString(game.players))
+
+        game.picture?.let { redisTemplate.opsForValue().set("$basicKey:picture", objectMapper.writeValueAsString(it)) }
+
+        game.admin?.let { redisTemplate.opsForValue().set("$basicKey:admin", objectMapper.writeValueAsString(it)) }
+
+        game.redPuzzle?.let { it ->
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString())
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString())
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString())
+            for (idxToCord in it.idxToCoordinate) {
+                redisTemplate.opsForHash<String, String>().put(
+                    "$basicKey:redPuzzle:idxToCoordinate",
+                    idxToCord.key.toString(),
+                    ListStringUtils.listToString(idxToCord.value),
+                )
+            }
+
+            val boardJson = objectMapper.writeValueAsString(it.board)
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:board", boardJson)
+            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
+            redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCorrected", correctedJson)
+        }
+
+        game.bluePuzzle?.let { it ->
+
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString())
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString())
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString())
+            for (idxToCord in it.idxToCoordinate) {
+                redisTemplate.opsForHash<String, String>().put(
+                    "$basicKey:bluePuzzle:idxToCoordinate",
+                    idxToCord.key.toString(),
+                    ListStringUtils.listToString(idxToCord.value),
+                )
+            }
+
+            val boardJson = objectMapper.writeValueAsString(it.board)
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:board", boardJson)
+            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
+            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCorrected", correctedJson)
+        }
+    }
+
+    private fun load(gameId: String): Game {
+        val basicKey = "$gameKeyPrefix$gameId"
+
+        class MapStringAnyTypeReference : TypeReference<Map<String, Any>>()
+        // Retrieve and parse metadata
+        val metaDataJson: String = redisTemplate.opsForValue().get("$basicKey:meta")as? String ?: throw Exception("Game not found")
+        val metaData: Map<String, String> =
+            objectMapper.readValue<Map<String, String>>(
+                metaDataJson,
+            )
+        println("metaData $metaData")
+        val gameId = metaData["gameId"] as String
+        val gameName = metaData["gameName"] as String
+        val roomSize = (metaData["roomSize"] as String).toInt()
+        val gameType = metaData["gameType"] as String
+        val startTime = (metaData["startTime"] as String?)?.let { Date(it.toLong()) }
+        val finishTime = (metaData["finishTime"] as String?)?.let { Date(it.toLong()) }
+
+        // Retrieve teams and players
+        val redTeamJson = redisTemplate.opsForValue().get("$basicKey:redTeam").toString() as? String ?: "[]"
+        val redTeam: MutableList<PlayerRequest> = objectMapper.readValue<MutableList<PlayerRequest>>(redTeamJson)
+
+        val blueTeamJson = redisTemplate.opsForValue().get("$basicKey:blueTeam").toString() as? String ?: "[]"
+        val blueTeam: MutableList<PlayerRequest> = objectMapper.readValue(blueTeamJson)
+
+        val playersJson = redisTemplate.opsForValue().get("$basicKey:players").toString() as? String ?: "[]"
+        val players: MutableList<User> = objectMapper.readValue(playersJson)
+
+        // Retrieve optional fields
+        val pictureJson = redisTemplate.opsForValue().get("$basicKey:picture").toString()
+        val picture: Picture = objectMapper.readValue(pictureJson)
+        val adminJson = redisTemplate.opsForValue().get("$basicKey:admin").toString()
+        val admin: User = objectMapper.readValue(adminJson)
+
+        // Helper function to load a puzzle
+        fun loadPuzzle(prefix: String): PuzzleBoard? {
+            val correctedCount =
+                redisTemplate
+                    .opsForValue()
+                    .get("$prefix:correctedCount")
+                    .toString()
+                    .toInt() ?: 0
+            val connectedEdges =
+                redisTemplate
+                    .opsForValue()
+                    .get("$prefix:connectedEdges")
+                    .toString()
+                    .toInt() ?: 0
+
+            val idxToCoordinateEntries = redisTemplate.opsForHash<String, String>().entries("$prefix:idxToCoordinate")
+            val idxToCoordinate: MutableMap<Int, List<Int>> = mutableMapOf()
+            for ((key, value) in idxToCoordinateEntries) {
+                idxToCoordinate[key.toInt()] = ListStringUtils.stringToList(value).map { it.toString().toInt() }
+            }
+
+            val boardJson = redisTemplate.opsForValue().get("$prefix:board").toString() as? String ?: "[]"
+            val board: MutableList<MutableList<Piece>> = objectMapper.readValue(boardJson)
+
+            val isCorrectedJson = redisTemplate.opsForValue().get("$prefix:isCorrected").toString() as? String ?: "[]"
+            val isCorrected: MutableList<MutableList<Boolean>> = objectMapper.readValue(isCorrectedJson)
+
+            return PuzzleBoard().reload(picture, board, isCorrected, correctedCount, connectedEdges, idxToCoordinate)
+        }
+
+        // Retrieve puzzles
+        val redPuzzle = loadPuzzle("$basicKey:redPuzzle")
+        val bluePuzzle = loadPuzzle("$basicKey:bluePuzzle")
+
+        // Construct and return the Game object
+        return Game(
+            gameId = gameId,
+            gameName = gameName,
+            roomSize = roomSize,
+            gameType = gameType,
+            startTime = startTime,
+            finishTime = finishTime,
+            isStarted = true,
+            isFinished = false,
+            isSaved = true,
+            redTeam = redTeam,
+            blueTeam = blueTeam,
+            players = players,
+            picture = picture,
+            admin = admin,
+            redPuzzle = redPuzzle,
+            bluePuzzle = bluePuzzle,
+        )
+    }
 }

@@ -1,5 +1,7 @@
 package com.puzzle.websocket.game.domain
 
+import java.io.Serializable
+
 data class Picture(
     var id: Long? = null,
     var name: String? = null,
@@ -11,11 +13,9 @@ data class Picture(
     var widthPieceCnt: Int = 0,
     var lengthPieceCnt: Int = 0,
     var encodedString: String? = null,
-) {
-    private val levelSize: Map<Int, Int> = mapOf(1 to 400, 2 to 500, 3 to 600)
-
+) : Serializable {
     init {
-        val levelOneSize = levelSize[1]!!
+        val levelOneSize = Companion.levelSize[1]!!
 
         if (length >= width) {
             imgWidth = ((levelOneSize * width) / length / 100) * 100
@@ -29,46 +29,33 @@ data class Picture(
         lengthPieceCnt = (imgHeight / pieceSize.toDouble()).toInt()
     }
 
-    fun create(
-        width: Int,
-        length: Int,
-        name: String,
-        pieceSize: Int,
-        encodedString: String,
-    ): Picture =
-        Picture(
-            name = name,
-            width = width,
-            length = length,
-            pieceSize = pieceSize,
-            encodedString = encodedString,
-        )
-
     companion object {
+        private val levelSize: Map<Int, Int> = mapOf(1 to 400, 2 to 500, 3 to 600)
+
         // 새로운 이미지 정보를 받아 생성하는 create 메서드 추가
         fun create(
             width: Int,
             length: Int,
             pieceSize: Int,
             imageName: String,
-            encodedString: String
-        ): Picture
-            = Picture(
+            encodedString: String,
+        ): Picture =
+            Picture(
                 name = imageName,
                 width = width,
                 length = length,
                 pieceSize = pieceSize,
-                encodedString = encodedString
+                encodedString = encodedString,
             )
 
         // 기존의 기본값으로 생성하는 create 메서드 유지
-        fun create(): Picture
-            = Picture(
+        fun create(): Picture =
+            Picture(
                 name = "짱구.jpg",
                 width = 1000,
                 length = 551,
                 pieceSize = 40,
-                encodedString = "짱구.jpg"
+                encodedString = "짱구.jpg",
             )
     }
 }

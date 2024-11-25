@@ -27,11 +27,11 @@ class RedisConfig {
         val redisTemplate = RedisTemplate<String, Any>()
         redisTemplate.connectionFactory = redisConnectionFactory()
 
-        // 일반적인 key:value의 경우 시리얼라이저
+        // String serializer for keys
+        redisTemplate.keySerializer = StringRedisSerializer()
+        redisTemplate.hashKeySerializer = StringRedisSerializer()
         redisTemplate.keySerializer = StringRedisSerializer()
         redisTemplate.valueSerializer = StringRedisSerializer()
-
-        // Hash를 사용할 경우 시리얼라이저
         redisTemplate.hashKeySerializer = StringRedisSerializer()
         redisTemplate.hashValueSerializer = StringRedisSerializer()
 
