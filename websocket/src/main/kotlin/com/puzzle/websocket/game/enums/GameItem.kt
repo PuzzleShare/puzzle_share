@@ -16,7 +16,6 @@ enum class GameItem(
             game.redPuzzle!! to "RED"
         }
 
-
         val keyList = targetPuzzle.bundles
             .map { it.key to it.value.size }
             .sortedBy { it.second }
@@ -50,6 +49,13 @@ enum class GameItem(
     }),
     MUD({ game, team, res ->
         // front 에서 구현
+        val targetTeam = if (team.uppercase() == "RED") {
+            "BLUE"
+        } else {
+            "RED"
+        }
+        res.targets = targetTeam
+        res.targetList = null
     }),
     TYPHOON({ game, team, res ->
 
