@@ -5,7 +5,7 @@ import java.util.Random
 
 class PuzzleBoard : Serializable {
     var picture: Picture? = null // 퍼즐에 쓰이는 사진
-    val idxToCoordinate: MutableMap<Int, List<Int>> = mutableMapOf()
+    var idxToCoordinate: MutableMap<Int, List<Int>> = mutableMapOf()
 
     // 조각들이 들어있는 2차원 배열
     var board: MutableList<MutableList<Piece>> = mutableListOf()
@@ -85,6 +85,7 @@ class PuzzleBoard : Serializable {
         isCorrected: MutableList<MutableList<Boolean>>,
         correctedCount: Int,
         connectedEdges: Int,
+        idxToCoordinate: MutableMap<Int, List<Int>>,
     ): PuzzleBoard {
         picture = p
         pieceSize = p.pieceSize
@@ -95,6 +96,7 @@ class PuzzleBoard : Serializable {
         this.connectedEdges = connectedEdges
         this.board = board
         this.isCorrected = isCorrected
+        this.idxToCoordinate = idxToCoordinate
 
         println("totalEdges $totalEdges")
         println("connectedEdges $connectedEdges")

@@ -225,26 +225,12 @@ class GameService(
         }
 
         // 게임 끝났는지 마지막에 확인
-        if (!game.isSaved) {
-            if (game.gameType == "BATTLE") {
-                if (ourPuzzle.isCompleted || yourPuzzle.isCompleted) {
-                    game.isFinished = true
-                    game.finishTime = Date()
-                    res.isFinished = true
-//                    save(game)
-                    game.isSaved = true
-                    save(game)
-                }
-            } else if (game.gameType == "COOPERATION") {
-                if (ourPuzzle.isCompleted) {
-                    game.isFinished = true
-                    game.finishTime = Date()
-                    res.isFinished = true
-//                    save(game)
-                    game.isSaved = true
-                    save(game)
-                }
-            }
+
+        if (ourPuzzle.isCompleted || yourPuzzle.isCompleted) {
+            game.isFinished = true
+            game.finishTime = Date()
+            res.isFinished = true
+            deleteGame(game.gameId)
         }
 
         // 진행도 추가
@@ -423,9 +409,9 @@ class GameService(
                     .toInt() ?: 0
 
             val idxToCoordinateEntries = redisTemplate.opsForHash<String, String>().entries("$prefix:idxToCoordinate")
-            val idxToCoordinate: MutableMap<Int, List<Float>> = mutableMapOf()
+            val idxToCoordinate: MutableMap<Int, List<Int>> = mutableMapOf()
             for ((key, value) in idxToCoordinateEntries) {
-                idxToCoordinate[key.toInt()] = ListStringUtils.stringToList(value).map { it.toString().toFloat() }
+                idxToCoordinate[key.toInt()] = ListStringUtils.stringToList(value).map { it.toString().toInt() }
             }
 
             val boardJson = redisTemplate.opsForValue().get("$prefix:board").toString() as? String ?: "[]"
@@ -434,7 +420,7 @@ class GameService(
             val isCorrectedJson = redisTemplate.opsForValue().get("$prefix:isCorrected").toString() as? String ?: "[]"
             val isCorrected: MutableList<MutableList<Boolean>> = objectMapper.readValue(isCorrectedJson)
 
-            return PuzzleBoard().reload(picture, board, isCorrected, correctedCount, connectedEdges)
+            return PuzzleBoard().reload(picture, board, isCorrected, correctedCount, connectedEdges, idxToCoordinate)
         }
 
         // Retrieve puzzles
