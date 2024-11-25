@@ -3,6 +3,7 @@ package com.puzzle.websocket.room.service
 import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.websocket.game.service.GameService
 import com.puzzle.websocket.room.domain.PuzzleRoom
+import com.puzzle.websocket.room.dto.request.InviteRequest
 import com.puzzle.websocket.room.dto.request.PlayerRequest
 import com.puzzle.websocket.room.repository.PuzzleRoomRepository
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -103,6 +104,23 @@ class PuzzleRoomServiceImpl(
         messagingTemplate.convertAndSend(
             "/topic/room/$roomId/game",
             game,
+        )
+    }
+
+    override fun invitePlayerToRoom(
+        roomId: String,
+        inviteRequest: InviteRequest) {
+        val inviteMessage = mapOf(
+            "type" to "invite",
+            "roomId" to roomId,
+            "fromPlayerId" to inviteRequest.fromPlayerId,
+            "toPlayerId" to inviteRequest.toPlayerId,
+            "fromUserName" to inviteRequest.fromUserName,
+        )
+
+        messagingTemplate.convertAndSend(
+            "/topic/invite/${inviteRequest.toPlayerId}",
+            inviteMessage
         )
     }
 }

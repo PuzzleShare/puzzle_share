@@ -1,7 +1,7 @@
 package com.puzzle.backend.friend.controller
 
+import com.puzzle.backend.friend.dto.response.CombinedFriendResponse
 import com.puzzle.backend.friend.service.FriendService
-import com.puzzle.backend.oauth.dto.response.UserDataResponse
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,10 +19,7 @@ class FriendController(
     @GetMapping("/{userId}")
     fun getFriends(
         @PathVariable userId: Long,
-    ): List<UserDataResponse> {
-        val friends = friendService.getFriends(userId)
-        return friends.map { it.toUserDataResponse() }
-    }
+    ): CombinedFriendResponse = friendService.getFriends(userId)
 
     // 친구 삭제 API
     @DeleteMapping("/remove")
