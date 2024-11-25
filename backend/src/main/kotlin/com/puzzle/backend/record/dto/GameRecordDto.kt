@@ -5,16 +5,26 @@ import com.puzzle.backend.record.domain.GameRecord
 import java.time.LocalDateTime
 
 data class GameRecordDto(
-    val recordId: Long = 0,              // 게임 기록 ID
-    val userId: Long,                // 사용자 ID
-    val gameType: String,            // 게임 유형 (BATTLE, COOPERATION)
-    val players: List<Long>? = null, // 협동 모드: 참가자 ID
-    val puzzleImage: String,         // 퍼즐 이미지 URL
-    val totalPieceCount: Int,        // 퍼즐 조각 수
-    val durationInMinutes: Int,      // 게임 시간 (분)
-    val playedAt: LocalDateTime,     // 게임 종료 시간
-    val teamMates: String? = null,           // JSON 형태의 동료 팀원 ID 리스트
-    val opponents: String? = null,   // JSON 형태의 상대 팀원 ID 리스트 (협동 모드의 경우 NULL)
+    // 게임 기록 ID
+    val recordId: Long = 0,
+    // 사용자 ID
+    val userId: Long,
+    // 게임 유형 (BATTLE, COOPERATION)
+    val gameType: String,
+    // 협동 모드: 참가자 ID
+    val players: List<Long>? = null,
+    // 퍼즐 이미지 URL
+    val puzzleImage: String,
+    // 퍼즐 조각 수
+    val totalPieceCount: Int,
+    // 게임 시간 (분)
+    val durationInMinutes: Int,
+    // 게임 종료 시간
+    val playedAt: LocalDateTime,
+    // JSON 형태의 동료 팀원 ID 리스트
+    val teamMates: String? = null,
+    // JSON 형태의 상대 팀원 ID 리스트 (협동 모드의 경우 NULL)
+    val opponents: String? = null,
     val myTeam: String? = null,
     val gameStatus: String? = null,
 ) {

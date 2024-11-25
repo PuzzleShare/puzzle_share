@@ -25,18 +25,16 @@ class Users(
     @Column(updatable = false)
     var socialType: String,
     var userImage: String,
-
     @Column(columnDefinition = "INT DEFAULT 0")
     var winCount: Int = 0,
     @Column(columnDefinition = "INT DEFAULT 0")
     var lossCount: Int = 0,
     @Column(columnDefinition = "INT DEFAULT 0")
     var drawCount: Int = 0,
-
     @Column(columnDefinition = "INT DEFAULT 0")
     var totalGames: Int = 0,
     @Column(columnDefinition = "INT DEFAULT 0")
-    var winRate: Double = 0.0
+    var winRate: Double = 0.0,
 ) : BaseEntity() {
     fun toUserDataResponse(): UserDataResponse = UserDataResponse(userName, userImage, email, socialType)
 
@@ -59,7 +57,8 @@ class Users(
     private fun calculateWinRate() {
         winRate = if (totalGames > 0) {
             (winCount.toDouble() / totalGames) * 100
-        } else 0.0
+        } else {
+            0.0
+        }
     }
-
 }

@@ -4,7 +4,16 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.puzzle.backend.oauth.domain.Users
 import com.puzzle.backend.record.dto.GameRecordDto
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.Lob
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
@@ -12,47 +21,34 @@ import java.time.LocalDateTime
 data class GameRecord(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val recordId: Long = 0L,          // 게임 기록 ID
-
+    val recordId: Long = 0L,
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    val user: Users,                 // 사용자 엔티티와 연관 관계
-
+    val user: Users,
     @Column(nullable = false)
-    val gameType: String,            // 게임 유형 (BATTLE, COOPERATION)
-
+    val gameType: String,
     @Lob
     @Column(nullable = true)
-    val players: String? = null,     // JSON 형태로 저장된 협동 모드 참가자 ID 리스트
-
+    val players: String? = null,
     @Lob
     @Column(nullable = true)
-    val teamMates: String?,           // JSON 형태의 동료 팀원 ID 리스트
-
+    val teamMates: String?,
     @Lob
     @Column(nullable = true)
-    val opponents: String? = null,   // JSON 형태의 상대 팀원 ID 리스트 (협동 모드의 경우 NULL)
-
+    val opponents: String? = null,
     @Column(nullable = true)
-    val myTeam: String?,         // 내 팀 (RED, BLUE, 또는 NULL)
-
+    val myTeam: String?,
     @Column(nullable = true)
-    val gameStatus: String?,          // 승리 여부 (RED, BLUE, DRAW)
-
+    val gameStatus: String?,
     @Column(nullable = false)
-    val puzzleImage: String,         // 퍼즐 이미지 URL
-
+    val puzzleImage: String,
     @Column(nullable = false)
-    val totalPieceCount: Int,        // 퍼즐 조각 수
-
+    val totalPieceCount: Int,
     @Column(nullable = false)
-    val durationInMinutes: Int,      // 게임 시간 (분)
-
+    val durationInMinutes: Int,
     @Column(nullable = false)
-    val playedAt: LocalDateTime,     // 게임 종료 시간
-
-)
-{
+    val playedAt: LocalDateTime,
+) {
     fun toDto(): GameRecordDto {
         val objectMapper = jacksonObjectMapper()
 
@@ -60,13 +56,16 @@ data class GameRecord(
             recordId = this.recordId,
             userId = this.user.userId,
             gameType = this.gameType,
-            players = this.players?.let { objectMapper.readValue<List<Long>>(it) }, // JSON -> List<Long>
+            // JSON -> List<Long>
+            players = this.players?.let { objectMapper.readValue<List<Long>>(it) },
             puzzleImage = this.puzzleImage,
             totalPieceCount = this.totalPieceCount,
             durationInMinutes = this.durationInMinutes,
             playedAt = this.playedAt,
-            teamMates = this.teamMates, // 이미 JSON 문자열이므로 그대로 전달
-            opponents = this.opponents, // 이미 JSON 문자열이므로 그대로 전달
+            // 이미 JSON 문자열이므로 그대로 전달
+            teamMates = this.teamMates,
+            // 이미 JSON 문자열이므로 그대로 전달
+            opponents = this.opponents,
             myTeam = this.myTeam,
             gameStatus = this.gameStatus,
         )

@@ -11,12 +11,13 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GameRecordService(
     private val usersRepository: UsersRepository,
-    private val gameRecordRepository: GameRecordRepository
+    private val gameRecordRepository: GameRecordRepository,
 ) {
-
     @Transactional
-    fun handleGameEnd(gameDataDto: GameDataDto, userId: Long) {
-        println("Handling game end for userId: $userId")
+    fun handleGameEnd(
+        gameDataDto: GameDataDto,
+        userId: Long,
+    ) {
         val user = usersRepository.findById(userId).orElseThrow {
             IllegalArgumentException("User not found with ID: $userId")
         }
@@ -28,10 +29,13 @@ class GameRecordService(
         }
     }
 
-    private fun handleBattleMode(gameDataDto: GameDataDto, user: Users) {
+    private fun handleBattleMode(
+        gameDataDto: GameDataDto,
+        user: Users,
+    ) {
         val winnerTeam = determineWinner(
             gameDataDto.redProgressPercent ?: 0,
-            gameDataDto.blueProgressPercent ?: 0
+            gameDataDto.blueProgressPercent ?: 0,
         )
 
         if (winnerTeam == "DRAW") {
@@ -41,7 +45,10 @@ class GameRecordService(
         }
     }
 
-    private fun determineWinner(redProgress: Int, blueProgress: Int): String {
+    private fun determineWinner(
+        redProgress: Int,
+        blueProgress: Int,
+    ): String {
         return when {
             redProgress > blueProgress -> "RED"
             redProgress < blueProgress -> "BLUE"
@@ -49,7 +56,11 @@ class GameRecordService(
         }
     }
 
-    private fun saveBattleRecords(gameDataDto: GameDataDto, user: Users, winnerTeam: String) {
+    private fun saveBattleRecords(
+        gameDataDto: GameDataDto,
+        user: Users,
+        winnerTeam: String,
+    ) {
         val myTeam = determineUserTeam(gameDataDto, user)
         val isWinningTeam = winnerTeam == myTeam
 
@@ -60,7 +71,7 @@ class GameRecordService(
             myTeam = myTeam,
             gameStatus = if (isWinningTeam) "WIN" else "LOSS",
             withTeam = withTeam,
-            vsTeam = vsTeam
+            vsTeam = vsTeam,
         )
 
         val gameRecord = gameRecordDto.toEntity(user)
@@ -69,7 +80,10 @@ class GameRecordService(
         updateUserStats(user, if (isWinningTeam) "WIN" else "LOSS")
     }
 
-    private fun saveDrawRecords(gameDataDto: GameDataDto, user: Users) {
+    private fun saveDrawRecords(
+        gameDataDto: GameDataDto,
+        user: Users,
+    ) {
         val myTeam = determineUserTeam(gameDataDto, user)
         val (withTeam, vsTeam) = determineBattleTeams(gameDataDto, user, myTeam)
 
@@ -78,7 +92,7 @@ class GameRecordService(
             myTeam = myTeam,
             gameStatus = "DRAW",
             withTeam = withTeam,
-            vsTeam = vsTeam
+            vsTeam = vsTeam,
         )
 
         val gameRecord = gameRecordDto.toEntity(user)
@@ -87,7 +101,10 @@ class GameRecordService(
         updateUserStats(user, "DRAW")
     }
 
-    private fun determineUserTeam(gameDataDto: GameDataDto, user: Users): String? {
+    private fun determineUserTeam(
+        gameDataDto: GameDataDto,
+        user: Users,
+    ): String? {
         return when {
             gameDataDto.redTeam?.any { it.playerId == user.userId } == true -> "RED"
             gameDataDto.blueTeam?.any { it.playerId == user.userId } == true -> "BLUE"
@@ -98,23 +115,28 @@ class GameRecordService(
     private fun determineBattleTeams(
         gameDataDto: GameDataDto,
         user: Users,
-        myTeam: String?
+        myTeam: String?,
     ): Pair<List<Long>, List<Long>> {
         return when (myTeam) {
             "RED" -> Pair(
                 gameDataDto.redTeam!!.filter { it.playerId != user.userId }.map { it.playerId },
-                gameDataDto.blueTeam?.map { it.playerId } ?: emptyList()
+                gameDataDto.blueTeam?.map { it.playerId } ?: emptyList(),
             )
+
             "BLUE" -> Pair(
                 gameDataDto.blueTeam!!.filter { it.playerId != user.userId }.map { it.playerId },
-                gameDataDto.redTeam?.map { it.playerId } ?: emptyList()
+                gameDataDto.redTeam?.map { it.playerId } ?: emptyList(),
             )
+
             else -> Pair(emptyList(), emptyList())
         }
     }
 
     @Transactional(readOnly = true)
-    fun getUserGameRecords(userId: Long, gameType: String): List<GameRecordDto> {
+    fun getUserGameRecords(
+        userId: Long,
+        gameType: String,
+    ): List<GameRecordDto> {
         val user = usersRepository.findById(userId).orElseThrow()
         val records = if (gameType == "ALL") {
             gameRecordRepository.findByUser(user)
@@ -124,7 +146,10 @@ class GameRecordService(
         return records.map { it.toDto() }
     }
 
-    private fun updateUserStats(user: Users, gameStatus: String) {
+    private fun updateUserStats(
+        user: Users,
+        gameStatus: String,
+    ) {
         when (gameStatus) {
             "WIN" -> user.updateOnWin()
             "LOSS" -> user.updateOnLoss()
@@ -134,7 +159,10 @@ class GameRecordService(
         usersRepository.save(user)
     }
 
-    private fun handleCooperationMode(gameDataDto: GameDataDto, user: Users) {
+    private fun handleCooperationMode(
+        gameDataDto: GameDataDto,
+        user: Users,
+    ) {
         val isPuzzleCompleted = gameDataDto.redProgressPercent == 100 // Assuming progress for cooperative mode
         val gameStatus = if (isPuzzleCompleted) "COMPLETED" else "FAILED"
         // 자기 자신을 제외한 팀원 리스트
@@ -147,7 +175,7 @@ class GameRecordService(
             myTeam = "COOPERATION",
             gameStatus = gameStatus,
             withTeam = withTeam,
-            vsTeam = emptyList()
+            vsTeam = emptyList(),
         )
 
         val gameRecord = gameRecordDto.toEntity(user)
@@ -155,5 +183,4 @@ class GameRecordService(
 
         updateUserStats(user, if (isPuzzleCompleted) "WIN" else "LOSS")
     }
-
 }
