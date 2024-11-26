@@ -92,7 +92,6 @@ class GameService(
         return gameRooms[roomId]
     }
 
-    // 채팅방 생성
     fun createGame(room: PuzzleRoom): Game {
         val game = Game.create(room)
         gameRooms[game.gameId] = game
