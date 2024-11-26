@@ -51,7 +51,7 @@ class GameService(
 
     fun deleteGame(gameId: String) {
         val basicKey = "$gameKeyPrefix$gameId"
-        gameRooms.remove(gameId)
+//        gameRooms.remove(gameId)
         val keysToDelete =
             listOf(
                 "$basicKey:meta",
