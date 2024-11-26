@@ -99,8 +99,6 @@ class PuzzleRoomServiceImpl(
         val room = findById(roomId)
         var game = gameService.createGame(room)
         game = gameService.startGame(game.gameId)!!
-        println("gameStart")
-        println(game.toString())
         messagingTemplate.convertAndSend(
             "/topic/room/$roomId/game",
             game,

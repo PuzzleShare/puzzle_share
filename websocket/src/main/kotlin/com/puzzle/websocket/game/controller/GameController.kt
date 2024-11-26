@@ -70,7 +70,6 @@ class GameController(
         val game = gameService.findById(sharePuzzle.roomId) ?: return
 
         if (!game.isStarted) {
-            println("게임이 시작되지 않았습니다. 명령을 무시합니다.")
             return
         }
 

@@ -87,9 +87,6 @@ class GameService(
     fun findById(roomId: String): Game? {
         if (gameRooms[roomId] == null) {
             val game = load(roomId)
-            println(game.gameId)
-            println(game.gameName)
-            println(game.bluePuzzle!!.printBoard())
             gameRooms[roomId] = game
         }
         return gameRooms[roomId]
@@ -149,7 +146,6 @@ class GameService(
                 lock.lock() // 락 획득
                 try {
                     val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
-                    println("ADD_PIECE")
                     ourPuzzle.addPiece(pieces)
                     pieces.forEach {
                         if(ourPuzzle.itemPiece.contains(it) && !ourPuzzle.itemPiece[it]!!){
@@ -204,7 +200,6 @@ class GameService(
                         ourPuzzle.board[p[0]][p[1]].locked = false
                     }
                 }
-                println("$targets 피스 잠금 해제")
                 res.message = "UNLOCKED"
                 res.targets = targets
                 res.team = ourColor
@@ -258,12 +253,9 @@ class GameService(
             if (ourColor == "RED") {
                 res.redProgressPercent = calculateProgress(ourPuzzle) // 레드 팀 진행률
                 res.blueProgressPercent = calculateProgress(yourPuzzle) // 블루 팀 진행률
-                println("[레드 팀] 진행률: ${res.redProgressPercent}%")
-                println(ourPuzzle.printBoard())
             } else {
                 res.blueProgressPercent = calculateProgress(ourPuzzle) // 블루 팀 진행률
                 res.redProgressPercent = calculateProgress(yourPuzzle) // 레드 팀 진행률
-                println("[블루 팀] 진행률: ${res.blueProgressPercent}%")
             }
         } else {
             res.redProgressPercent = calculateProgress(ourPuzzle) // 협동 모드의 레드 팀 진행률
@@ -389,7 +381,6 @@ class GameService(
             objectMapper.readValue<Map<String, String>>(
                 metaDataJson,
             )
-        println("metaData $metaData")
         val gameId = metaData["gameId"] as String
         val gameName = metaData["gameName"] as String
         val roomSize = (metaData["roomSize"] as String).toInt()

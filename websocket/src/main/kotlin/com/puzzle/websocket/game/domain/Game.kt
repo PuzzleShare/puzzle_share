@@ -36,7 +36,6 @@ data class Game(
             }
         startTime = Date()
         isStarted = true
-        println("------------------게임 시작-------------------")
     }
 
     fun getTime(): Long {
@@ -76,12 +75,10 @@ data class Game(
                 game.redTeam = room.redPlayers
                 game.blueTeam = room.bluePlayers
                 game.startTime = Date()
-                println("$name 배틀 방 생성 / id = $uuid")
             } else if (gameType == "COOPERATION") {
                 game.redTeam = room.redPlayers
                 game.blueTeam = room.bluePlayers
                 game.startTime = Date()
-                println("$name 협동 방 생성 / id = $uuid")
             }
 
             return game
