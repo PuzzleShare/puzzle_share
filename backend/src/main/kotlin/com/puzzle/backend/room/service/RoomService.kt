@@ -11,6 +11,11 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.net.URI
+import javax.imageio.ImageIO
 
 @Service
 class RoomService(
@@ -61,4 +66,53 @@ class RoomService(
         }
         return participantCount
     }
+
+    private val restTemplate = RestTemplate()
+
+    fun isPuzzleImageValid(imageUrl: String): Boolean {
+        // 1. URL 형식 및 이미지 확장자 검사
+        println(imageUrl)
+        if (!isValidImageUrl(imageUrl)) {
+            println("isValidImageUrl")
+            return false
+        }
+
+        try {
+            // 2. 이미지 다운로드 시도
+            val imageBytes: ByteArray? = restTemplate.getForObject(URI.create(imageUrl), ByteArray::class.java)
+            if (imageBytes == null) {
+                println("imageBytes")
+                return false
+            }
+
+            // 3. 이미지 파일 읽기
+            val image: BufferedImage? = ImageIO.read(ByteArrayInputStream(imageBytes))
+            print(image.toString())
+            if (image == null) {
+                println("image")
+                return false
+            }
+
+            return true
+        } catch (e: Exception) {
+            // 로그를 남기고 false 반환 (선택 사항)
+            println("printStackTrace")
+            e.printStackTrace()
+            return false
+        }
+    }
+
+    private fun isValidImageUrl(url: String): Boolean =
+        try {
+            val uri = URI.create(url)
+            val path = uri.path.lowercase()
+            path.endsWith(".jpeg") ||
+                path.endsWith(".jpg") ||
+                path.endsWith(".png") ||
+                path.endsWith(".gif") ||
+                path.endsWith(".webp") ||
+                path.endsWith(".bmp")
+        } catch (e: Exception) {
+            false
+        }
 }
