@@ -42,7 +42,7 @@ class PuzzleBoard : Serializable {
         const val CANVAS_LENGTH = 750
     }
 
-    val inventory: Array<Int> = Array(8) { 3 }
+    val inventory: Array<Int> = Array(8) { 5 }
 
     // 퍼즐 판 초기화
     fun init(
@@ -320,4 +320,6 @@ class PuzzleBoard : Serializable {
             newBundle = mutableSetOf()
         }
     }
+
+    fun getCanvasCenter(): Pair<Double, Double> = CANVAS_WIDTH / 2.0 to CANVAS_LENGTH / 2.0
 }

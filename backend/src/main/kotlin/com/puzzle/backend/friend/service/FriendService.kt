@@ -2,8 +2,9 @@ package com.puzzle.backend.friend.service
 
 import com.puzzle.backend.friend.domain.Friend
 import com.puzzle.backend.friend.domain.RequestStatus
+import com.puzzle.backend.friend.dto.response.CombinedFriendResponse
+import com.puzzle.backend.friend.dto.response.FriendDataResponse
 import com.puzzle.backend.friend.repository.FriendRepository
-import com.puzzle.backend.oauth.domain.Users
 import com.puzzle.backend.oauth.repository.UsersRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -15,11 +16,19 @@ class FriendService(
     private val userRepository: UsersRepository,
 ) {
     // 친구 목록 조회 기능
-    fun getFriends(userId: Long): List<Users> {
+    fun getFriends(userId: Long): CombinedFriendResponse {
         val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("사용자를 찾을 수 없습니다.") }
         val friends = friendRepository.findByRequesterAndStatus(user, RequestStatus.ACCEPTED) +
             friendRepository.findByReceiverAndStatus(user, RequestStatus.ACCEPTED)
-        return friends.map { if (it.requester == user) it.receiver else it.requester }
+        val friendData = friends
+            .map { if (it.requester == user) it.receiver else it.requester }
+            .map { FriendDataResponse.from(it) }
+
+        // pending 상태 친구 요청 목록 조회
+        val pendingRequests = friendRepository.findByReceiverAndStatus(user, RequestStatus.PENDING)
+        val pendingData = pendingRequests.map { FriendDataResponse.from(it.requester) }
+
+        return CombinedFriendResponse(friends = friendData, pendingRequests = pendingData)
     }
 
     // 친구 요청 보내기

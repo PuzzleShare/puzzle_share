@@ -25,15 +25,15 @@ interface FriendRepository : JpaRepository<Friend, Long> {
         receiver: Users,
     ): Friend?
 
-    // 특정 사용자의 친구 목록 조회 (수락된 요청만)
+    // 특정 사용자의 친구 목록 조회
     fun findByRequesterAndStatus(
         requester: Users,
-        status: RequestStatus = RequestStatus.ACCEPTED,
+        status: RequestStatus,
     ): List<Friend>
 
     // 특정 사용자가 친구로 등록된 목록 조회
     fun findByReceiverAndStatus(
         receiver: Users,
-        status: RequestStatus = RequestStatus.ACCEPTED,
+        status: RequestStatus,
     ): List<Friend>
 }
