@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/test")
 class TestController : TestControllerSpec {
     @GetMapping("/success")
-    override fun success(name: String): String = "Hello $name"
+    override fun success(name: String): String = "Hellodd $name"
 }
