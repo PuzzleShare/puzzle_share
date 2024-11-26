@@ -99,7 +99,6 @@ class GameService(
         return game
     }
 
-    // 게임 시작
     fun startGame(roomId: String): Game? {
         val game = findById(roomId)
         if (game != null) {

@@ -91,7 +91,6 @@ jobs:
               sleep 5
             fi
             DEPLOY_PATH=/home/ubuntu/game/deploy/
-            mkdir $DEPLOY_PATH
             cp $BUILD_PATH $DEPLOY_PATH
             cd $DEPLOY_PATH
             DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
