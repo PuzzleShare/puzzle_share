@@ -95,7 +95,7 @@ jobs:
               sleep 1
             else
               echo "Killing process ${CURRENT_PID} for ${JAR_NAME}."
-              kill -15 "${CURRENT_PID}"
+              kill -9 "${CURRENT_PID}"
               sleep 5
             fi
 

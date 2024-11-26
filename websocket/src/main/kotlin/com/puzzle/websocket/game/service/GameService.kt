@@ -225,7 +225,6 @@ class GameService(
         }
 
         // 게임 끝났는지 마지막에 확인
-
         if (ourPuzzle.isCompleted || yourPuzzle.isCompleted) {
             game.isFinished = true
             game.finishTime = Date()
