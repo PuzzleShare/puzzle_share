@@ -31,6 +31,14 @@ class FriendService(
         return CombinedFriendResponse(friends = friendData, pendingRequests = pendingData)
     }
 
+    fun searchFriends(keyword: String): List<FriendDataResponse> {
+        // 키워드로 사용자 검색 (대소문자 구분 없이 포함되는 이름 검색)
+        val matchedUsers = userRepository.findByUserNameContainingIgnoreCase(keyword)
+
+        // 검색된 사용자 정보를 FriendDataResponse 형태로 변환
+        return matchedUsers.map { FriendDataResponse.from(it) }
+    }
+
     // 친구 요청 보내기
     fun sendFriendRequest(
         requesterId: Long,
