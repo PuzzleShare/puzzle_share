@@ -42,7 +42,9 @@ class PuzzleBoard : Serializable {
         const val CANVAS_LENGTH = 750
     }
 
-    val inventory: Array<Int> = Array(8) { 5 }
+    val inventory: Array<Int> = Array(8) { 0 }
+    val itemPiece = hashMapOf<Int, Boolean>()
+    var addedFrame = false
 
     // 퍼즐 판 초기화
     fun init(
@@ -80,6 +82,13 @@ class PuzzleBoard : Serializable {
         generatePuzzlePieces()
 
         correctedCount = 0
+
+        inventory[0] = (Math.random() * 4).toInt() + 1
+        inventory[1] = (Math.random() * 4).toInt() + 1
+        val firstItenPieceIndex = (Math.random() * cnt).toInt()
+        itemPiece[firstItenPieceIndex] = false
+        itemPiece[(firstItenPieceIndex + cnt / 3) % cnt] = false
+
         return board
     }
 
@@ -322,4 +331,13 @@ class PuzzleBoard : Serializable {
     }
 
     fun getCanvasCenter(): Pair<Double, Double> = CANVAS_WIDTH / 2.0 to CANVAS_LENGTH / 2.0
+
+    fun addItem(itemIdx: Int){
+        for (i in 0 until inventory.size){
+            if (inventory[i] == 0){
+                inventory[i] = itemIdx
+                break
+            }
+        }
+    }
 }

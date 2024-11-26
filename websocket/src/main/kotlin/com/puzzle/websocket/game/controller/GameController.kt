@@ -3,6 +3,7 @@ package com.puzzle.websocket.game.controller
 import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
 import com.puzzle.websocket.game.domain.User
+import com.puzzle.websocket.game.dto.response.InventoryResponse
 import com.puzzle.websocket.game.service.GameService
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.handler.annotation.DestinationVariable
@@ -92,6 +93,24 @@ class GameController(
                         ?.bundles
                         ?.values
                         ?.map { it.toSet() } ?: emptyList()
+
+                    if(Math.abs(redProgressPercent - blueProgressPercent) >= 25){
+                        val targetTeam = if (redProgressPercent > blueProgressPercent) { "BLUE" } else { "RED" }
+                        val targetPuzzle = if (redProgressPercent > blueProgressPercent) { game.bluePuzzle } else { game.redPuzzle }!!
+                        // item frame add
+                        if (!targetPuzzle.addedFrame){
+                            targetPuzzle.addedFrame = true
+                            targetPuzzle.addItem(5)
+                            sendingOperations.convertAndSend(
+                                "/topic/game/room/${game.gameId}/help",
+                                InventoryResponse(
+                                    team = targetTeam,
+                                    inventory = targetPuzzle.inventory,
+                                    fitPieceIndex = -1,
+                                )
+                            )
+                        }
+                    }
                 }
             }
 

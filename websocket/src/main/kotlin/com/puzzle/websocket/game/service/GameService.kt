@@ -17,10 +17,12 @@ import com.puzzle.websocket.game.domain.PuzzleBoard
 import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
 import com.puzzle.websocket.game.domain.User
+import com.puzzle.websocket.game.dto.response.InventoryResponse
 import com.puzzle.websocket.game.enums.GameItem
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import com.puzzle.websocket.room.dto.request.PlayerRequest
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Service
 import java.util.Date
 import java.util.concurrent.locks.ReentrantLock
@@ -28,6 +30,7 @@ import java.util.concurrent.locks.ReentrantLock
 @Service
 class GameService(
     private val redisTemplate: RedisTemplate<String, Any>,
+    private val sendingOperations: SimpMessageSendingOperations,
 ) {
     val gameRooms: MutableMap<String, Game> = mutableMapOf()
     val gson: Gson = Gson()
@@ -146,6 +149,21 @@ class GameService(
                     val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
                     println("ADD_PIECE")
                     ourPuzzle.addPiece(pieces)
+                    pieces.forEach {
+                        if(ourPuzzle.itemPiece.contains(it) && !ourPuzzle.itemPiece[it]!!){
+                            val attackItem = listOf(1, 2, 3, 4)
+                            ourPuzzle.addItem(attackItem[(Math.random() * attackItem.size).toInt()])
+                            ourPuzzle.itemPiece[it] = true
+                            sendingOperations.convertAndSend(
+                                "/topic/game/room/$roomId/useItem",
+                                InventoryResponse(
+                                    team = ourColor,
+                                    inventory = ourPuzzle.inventory,
+                                    fitPieceIndex = it,
+                                )
+                            )
+                        }
+                    }
 
                     res.team = ourColor
                     res.message = "ADD_PIECE"
