@@ -50,13 +50,12 @@ data class Game(
             val roomSize = room.maxPlayers
             val gameType = "BATTLE"
             val puzzleImage = room.puzzleImage
+
             val uuid = UUID.randomUUID().toString()
 
             // PuzzleRoom에서 받은 puzzleImage 값을 Picture에 전달
             val picture =
                 Picture.create(
-                    width = 1000, // 적절한 width 값을 설정하세요.
-                    length = 551, // 적절한 length 값을 설정하세요.
                     pieceSize = 40, // 적절한 퍼즐 조각 크기를 설정하세요.
                     imageName = puzzleImage,
                     encodedString = puzzleImage,
