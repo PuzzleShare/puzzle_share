@@ -106,12 +106,6 @@ jobs:
             # 배포 디렉토리로 이동
             cd "${DEPLOY_PATH}" || exit
 
-            # 기존 JAR 실행 중인지 다시 한번 확인 (선택 사항)
-            if pgrep -f "${JAR_NAME}" > /dev/null; then
-              echo "Process still running. Exiting deployment."
-              exit 1
-            fi
-
             # 새 JAR 파일 실행
             echo "Starting ${DEPLOY_JAR}."
             nohup java -jar "${DEPLOY_JAR}" > /dev/null 2> /dev/null < /dev/null &
