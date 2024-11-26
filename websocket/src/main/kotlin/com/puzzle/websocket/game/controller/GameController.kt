@@ -25,7 +25,6 @@ class GameController(
     private var sessionId: String? = null
     private val waitingList: Queue<User> = ConcurrentLinkedQueue()
 
-    // 세션 아이디 설정
     @EventListener
     fun handleWebSocketConnectListener(event: SessionConnectEvent) {
         sessionId = event.message.headers["simpSessionId"] as String?

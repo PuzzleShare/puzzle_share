@@ -80,7 +80,7 @@ jobs:
           username: ${{env.LIGHTSAIL_USERNAME}}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            BUILD_PATH=$(ls /home/ubuntu/game/websocket/dist/build/libs/*.jar)
+            BUILD_PATH=$(ls /home/ubuntu/game/dist/websocket/build/libs/*.jar)
             JAR_NAME=$(basename $BUILD_PATH)
             CURRENT_PID=$(pgrep -f $JAR_NAME)
             if [ -z $CURRENT_PID ]
