@@ -46,7 +46,6 @@ data class Picture(
         ): Picture {
             try {
                 val imageData = getImageDimensions(encodedString)
-                println("_____--------- ${imageData.width}  height ${imageData.height}")
                 return Picture(
                     name = imageName,
                     width = imageData.width,
@@ -55,7 +54,6 @@ data class Picture(
                     encodedString = encodedString,
                 )
             } catch (e: Exception) {
-                println("_____--------- Wkdrn_________________")
                 return Picture(
                     name = "짱구.jpg",
                     width = 1000,
