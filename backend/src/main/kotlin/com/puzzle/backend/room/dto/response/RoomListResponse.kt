@@ -14,6 +14,8 @@ data class RoomListResponse(
     val maxPlayers: Int,
     // 현재 참가자 수
     val nowPlayers: Int,
+    val masterImage: String,
+    val masterName: String,
 ) : Serializable {
     companion object {
         fun toResponse(
@@ -28,6 +30,8 @@ data class RoomListResponse(
                 room.puzzlePiece,
                 room.maxPlayers,
                 nowPlayers,
+                room.masterImage,
+                room.masterName,
             )
     }
 }
