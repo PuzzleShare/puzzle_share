@@ -96,7 +96,11 @@ class PuzzleRoomServiceImpl(
         roomId: String,
         playerRequest: PlayerRequest,
     ) {
+
         val room = findById(roomId)
+        if(room.master!=playerRequest.playerId){
+            return
+        }
         var game = gameService.createGame(room)
         game = gameService.startGame(game.gameId)!!
         println("gameStart")
