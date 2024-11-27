@@ -16,8 +16,12 @@ class PuzzleRoom(
     val redPlayers: MutableList<PlayerRequest> = mutableListOf(), // 현재 참가자 목록
     val bluePlayers: MutableList<PlayerRequest> = mutableListOf(), // 현재 참가자 목록
     var master: Long,
+    var masterImage: String,
+    var masterName: String,
 ) {
-    fun updateMaster(newMaster: Long) {
-        this.master = newMaster
+    fun updateMaster(newMaster: PlayerRequest) {
+        this.master = newMaster.playerId
+        this.masterImage = newMaster.playerImage
+        this.masterName = newMaster.playerName
     }
 }

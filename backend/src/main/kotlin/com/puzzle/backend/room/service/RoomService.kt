@@ -30,7 +30,7 @@ class RoomService(
         val player = PlayerRequest(request.playerId, request.playerImage, request.playerName)
 
         room.bluePlayers.add(player)
-        room.updateMaster(player.playerId)
+        room.updateMaster(player)
         roomRepository.save(room)
 
         val response = RoomIdResponse(room.roomId)
