@@ -7,7 +7,6 @@ import com.puzzle.backend.room.dto.response.WaitingRoomResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.data.domain.Page
 import org.springframework.http.ResponseEntity
 
 @Tag(name = "2. Room API", description = "방 관련 API")
