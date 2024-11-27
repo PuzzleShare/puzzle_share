@@ -134,7 +134,11 @@ class GameRecordService(
         }
     }
 
-    fun getPagedGameRecords(userId: Long, gameType: String, pageable: Pageable): Page<GameRecordDto> {
+    fun getPagedGameRecords(
+        userId: Long,
+        gameType: String,
+        pageable: Pageable,
+    ): Page<GameRecordDto> {
         val user = usersRepository.findById(userId).orElseThrow {
             IllegalArgumentException("User not found with ID: $userId")
         }

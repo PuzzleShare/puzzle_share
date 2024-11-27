@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 class GameRecordController(
     private val gameRecordService: GameRecordService,
     private val usersRepository: UsersRepository,
-    ) {
+) {
     @PostMapping("/end/{userId}")
     fun handleGameEnd(
         @RequestBody
@@ -46,7 +46,7 @@ class GameRecordController(
         page: Int,
         // 페이지 크기 (기본값 10)
         @RequestParam(required = false, defaultValue = "10")
-        size: Int
+        size: Int,
     ): ResponseEntity<UserGameRecordsResponse> {
         val user = usersRepository.findById(userId).orElseThrow {
             IllegalArgumentException("User not found with ID: $userId")
@@ -67,10 +67,11 @@ class GameRecordController(
             lossCount = user.lossCount,
             drawCount = user.drawCount,
             totalGames = user.totalGames,
-            records = pagedGameRecords.content, // 페이징된 결과의 내용만 추가
+            // 페이징된 결과의 내용만 추가
+            records = pagedGameRecords.content,
             totalPages = pagedGameRecords.totalPages,
             totalElements = pagedGameRecords.totalElements,
-            currentPage = pagedGameRecords.number
+            currentPage = pagedGameRecords.number,
         )
         return ResponseEntity.ok(response)
     }

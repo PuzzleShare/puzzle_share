@@ -15,5 +15,5 @@ data class UserGameRecordsResponse(
     // 총 게임 기록 수
     val totalElements: Long,
     // 현재 페이지 번호
-    val currentPage: Int
+    val currentPage: Int,
 )

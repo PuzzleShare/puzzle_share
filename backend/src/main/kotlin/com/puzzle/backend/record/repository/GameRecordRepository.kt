@@ -17,8 +17,15 @@ interface GameRecordRepository : JpaRepository<GameRecord, Long> {
     ): List<GameRecord>
 
     // 특정 사용자의 게임 기록을 페이징으로 가져오기
-    fun findByUserOrderByPlayedAtDesc(user: Users, pageable: Pageable): Page<GameRecord>
+    fun findByUserOrderByPlayedAtDesc(
+        user: Users,
+        pageable: Pageable,
+    ): Page<GameRecord>
 
     // 특정 게임 유형의 기록을 페이징 처리
-    fun findByUserAndGameTypeOrderByPlayedAtDesc(user: Users, gameType: String, pageable: Pageable): Page<GameRecord>
+    fun findByUserAndGameTypeOrderByPlayedAtDesc(
+        user: Users,
+        gameType: String,
+        pageable: Pageable,
+    ): Page<GameRecord>
 }
