@@ -20,6 +20,8 @@ data class Room(
     // 현재 참가자 목록
     val bluePlayers: MutableList<PlayerRequest> = mutableListOf(),
     var master: Long,
+    val masterImage: String,
+    val masterName: String,
 ) {
     fun updateMaster(newMaster: Long) {
         this.master = newMaster
