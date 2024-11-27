@@ -5,6 +5,8 @@ import com.puzzle.backend.oauth.repository.UsersRepository
 import com.puzzle.backend.record.dto.GameDataDto
 import com.puzzle.backend.record.dto.GameRecordDto
 import com.puzzle.backend.record.repository.GameRecordRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -116,35 +118,49 @@ class GameRecordService(
         gameDataDto: GameDataDto,
         user: Users,
         myTeam: String?,
-    ): Pair<List<Long>, List<Long>> {
+    ): Pair<List<String>, List<String>> {
         return when (myTeam) {
             "RED" -> Pair(
-                gameDataDto.redTeam!!.filter { it.playerId != user.userId }.map { it.playerId },
-                gameDataDto.blueTeam?.map { it.playerId } ?: emptyList(),
+                gameDataDto.redTeam!!.filter { it.playerName != user.userName }.map { it.playerName },
+                gameDataDto.blueTeam?.map { it.playerName } ?: emptyList(),
             )
 
             "BLUE" -> Pair(
-                gameDataDto.blueTeam!!.filter { it.playerId != user.userId }.map { it.playerId },
-                gameDataDto.redTeam?.map { it.playerId } ?: emptyList(),
+                gameDataDto.blueTeam!!.filter { it.playerName != user.userName }.map { it.playerName },
+                gameDataDto.redTeam?.map { it.playerName } ?: emptyList(),
             )
 
             else -> Pair(emptyList(), emptyList())
         }
     }
 
-    @Transactional(readOnly = true)
-    fun getUserGameRecords(
-        userId: Long,
-        gameType: String,
-    ): List<GameRecordDto> {
-        val user = usersRepository.findById(userId).orElseThrow()
-        val records = if (gameType == "ALL") {
-            gameRecordRepository.findByUser(user)
-        } else {
-            gameRecordRepository.findByUserAndGameType(user, gameType)
+    fun getPagedGameRecords(userId: Long, gameType: String, pageable: Pageable): Page<GameRecordDto> {
+        val user = usersRepository.findById(userId).orElseThrow {
+            IllegalArgumentException("User not found with ID: $userId")
         }
-        return records.map { it.toDto() }
+        // 게임 유형에 따라 필터링
+        val gameRecords = if (gameType == "ALL") {
+            gameRecordRepository.findByUserOrderByPlayedAtDesc(user, pageable)
+        } else {
+            gameRecordRepository.findByUserAndGameTypeOrderByPlayedAtDesc(user, gameType, pageable)
+        }
+        // 페이징된 결과를 DTO로 변환
+        return gameRecords.map { it.toDto() }
     }
+    // 페이징 추가하면서 사용하지 않는 메서드
+//    @Transactional(readOnly = true)
+//    fun getUserGameRecords(
+//        userId: Long,
+//        gameType: String,
+//    ): List<GameRecordDto> {
+//        val user = usersRepository.findById(userId).orElseThrow()
+//        val records = if (gameType == "ALL") {
+//            gameRecordRepository.findByUser(user)
+//        } else {
+//            gameRecordRepository.findByUserAndGameType(user, gameType)
+//        }
+//        return records.map { it.toDto() }
+//    }
 
     private fun updateUserStats(
         user: Users,
@@ -167,8 +183,8 @@ class GameRecordService(
         val gameStatus = if (isPuzzleCompleted) "COMPLETED" else "FAILED"
         // 자기 자신을 제외한 팀원 리스트
         val withTeam = gameDataDto.players
-            ?.filter { it.playerId != user.userId }
-            ?.map { it.playerId } ?: emptyList()
+            ?.filter { it.playerName != user.userName }
+            ?.map { it.playerName } ?: emptyList()
 
         val gameRecordDto = gameDataDto.toGameRecordDto(
             userId = user.userId,

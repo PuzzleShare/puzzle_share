@@ -26,6 +26,8 @@ data class GameRecord(
     @JoinColumn(name = "user_id", nullable = false)
     val user: Users,
     @Column(nullable = false)
+    val gameName: String,
+    @Column(nullable = false)
     val gameType: String,
     @Lob
     @Column(nullable = true, columnDefinition = "TEXT")
@@ -55,9 +57,10 @@ data class GameRecord(
         return GameRecordDto(
             recordId = this.recordId,
             userId = this.user.userId,
+            gameName = this.gameName,
             gameType = this.gameType,
             // JSON -> List<Long>
-            players = this.players?.let { objectMapper.readValue<List<Long>>(it) },
+            players = this.players?.let { objectMapper.readValue<List<String>>(it) },
             puzzleImage = this.puzzleImage,
             totalPieceCount = this.totalPieceCount,
             durationInMinutes = this.durationInMinutes,
