@@ -55,4 +55,6 @@ private val PERMITTED_URL_PATTERNS =
         "/swagger-ui/**",
         "/v3/api-docs/**",
         "/games/**",
+        "/api/sessions/**",
+        "/api/get-token",
     )
