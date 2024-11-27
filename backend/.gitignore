@@ -44,3 +44,4 @@ src/main/resources/application-devkey.yml
 src/main/resources/application-localkey.yml
 src/main/resources/application-datasource.yml
 src/main/resources/application-localredis.yml
+src/main/resources/application-key.yml

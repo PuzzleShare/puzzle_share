@@ -21,13 +21,18 @@ data class Picture(
 ) : Serializable {
     init {
         val levelOneSize = Companion.levelSize[1]!!
-
         if (length >= width) {
             imgWidth = ((levelOneSize * width) / length / 100) * 100
             imgHeight = levelOneSize
+            if (imgWidth == 0) {
+                imgWidth = pieceSize
+            }
         } else {
             imgWidth = levelOneSize
             imgHeight = ((levelOneSize * length) / width / 100) * 100
+            if (imgHeight == 0) {
+                imgHeight = pieceSize
+            }
         }
 
         widthPieceCnt = (imgWidth / pieceSize.toDouble()).toInt()
