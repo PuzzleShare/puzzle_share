@@ -95,7 +95,7 @@ jobs:
               sleep 1
             else
               echo "Killing process ${CURRENT_PID} for ${JAR_NAME}."
-              kill -9 "${CURRENT_PID}"
+              pkill -9 -f java
               sleep 5
             fi
 

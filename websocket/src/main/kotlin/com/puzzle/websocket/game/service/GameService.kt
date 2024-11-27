@@ -77,7 +77,6 @@ class GameService(
         redisTemplate.delete(keysToDelete)
     }
 
-    // 배틀 게임방 불러오기
     fun findAllBattleRoom(): List<Game> {
         val result = gameRooms.values.filter { it.gameType == "BATTLE" }.toMutableList()
         result.reverse()
