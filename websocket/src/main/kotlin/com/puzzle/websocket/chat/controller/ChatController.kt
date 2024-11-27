@@ -17,6 +17,7 @@ class ChatController(
     @Qualifier("inGameChatService")
     private val inGameChatService: ChatService,
 ) {
+
     @MessageMapping("/chat/main")
     fun mainChat(mainChatMessage: MainChatMessage) {
         mainChatService.send(mainChatMessage)
