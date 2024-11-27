@@ -39,7 +39,6 @@ class GameController(
     ) {
         val game = gameService.findById(roomId)!!
         val res = ResponseMessage(game = game).apply {
-            // 혼합 방식 진행률 계산 반영
             redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
             blueProgressPercent =
                 if (game.gameType == "BATTLE") {
