@@ -51,12 +51,14 @@ class Users(
     }
 
     fun updateOnDraw() {
-        drawCount++
+        drawCount += 1
+        totalGames += 1
+        calculateWinRate()
     }
 
     private fun calculateWinRate() {
         winRate = if (totalGames > 0) {
-            (winCount.toDouble() / totalGames) * 100
+            (winCount.toDouble() / totalGames.toDouble()) * 100.0
         } else {
             0.0
         }

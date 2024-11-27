@@ -8,6 +8,7 @@ import java.time.ZoneId
 import java.util.Date
 
 data class GameDataDto(
+    var gameName: String,
     // 게임 유형 (BATTLE, COOPERATION)
     var gameType: String,
     // 배틀 모드: 레드 팀 참가자
@@ -25,29 +26,30 @@ data class GameDataDto(
     // 퍼즐 조각 수
     var totalPieceCount: Int,
     // 퍼즐 시작 시간
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     var startTime: LocalDateTime,
     // 퍼즐 종료 시간
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     var finishTime: LocalDateTime,
 ) {
     fun toGameRecordDto(
         userId: Long,
         myTeam: String?,
         gameStatus: String?,
-        withTeam: List<Long>,
-        vsTeam: List<Long>,
+        withTeam: List<String>,
+        vsTeam: List<String>,
     ): GameRecordDto {
-        val durationInMinutes = (this.finishTime.minute - this.startTime.minute) / 1000 / 60
+        val durationInMinutes = (this.finishTime.second - this.startTime.second)
 
         return GameRecordDto(
             userId = userId,
+            gameName = this.gameName,
             gameType = this.gameType,
-            players = players?.map { it.playerId },
+            players = players?.map { it.playerName },
             puzzleImage = this.puzzleImage,
             totalPieceCount = this.totalPieceCount,
             durationInMinutes = durationInMinutes,
-            playedAt = this.finishTime,
+            playedAt = this.finishTime.plusHours(9),
             teamMates = ObjectMapper().writeValueAsString(withTeam),
             opponents = ObjectMapper().writeValueAsString(vsTeam),
             myTeam = myTeam,
