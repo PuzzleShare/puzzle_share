@@ -57,9 +57,9 @@ class PuzzleRoomServiceImpl(
             puzzleRoomRepository.delete(room)
             return
         } else if (playerRequest.playerId == room.master && room.redPlayers.size > 0) {
-            room.updateMaster(room.redPlayers[0].playerId)
+            room.updateMaster(room.redPlayers[0])
         } else if (playerRequest.playerId == room.master && room.bluePlayers.size > 0) {
-            room.updateMaster(room.bluePlayers[0].playerId)
+            room.updateMaster(room.bluePlayers[0])
         }
 
         puzzleRoomRepository.save(room)
@@ -96,9 +96,8 @@ class PuzzleRoomServiceImpl(
         roomId: String,
         playerRequest: PlayerRequest,
     ) {
-
         val room = findById(roomId)
-        if(room.master!=playerRequest.playerId){
+        if (room.master != playerRequest.playerId) {
             return
         }
         var game = gameService.createGame(room)
@@ -111,18 +110,20 @@ class PuzzleRoomServiceImpl(
 
     override fun invitePlayerToRoom(
         roomId: String,
-        inviteRequest: InviteRequest) {
-        val inviteMessage = mapOf(
-            "type" to "invite",
-            "roomId" to roomId,
-            "fromPlayerId" to inviteRequest.fromPlayerId,
-            "toPlayerId" to inviteRequest.toPlayerId,
-            "fromUserName" to inviteRequest.fromUserName,
-        )
+        inviteRequest: InviteRequest,
+    ) {
+        val inviteMessage =
+            mapOf(
+                "type" to "invite",
+                "roomId" to roomId,
+                "fromPlayerId" to inviteRequest.fromPlayerId,
+                "toPlayerId" to inviteRequest.toPlayerId,
+                "fromUserName" to inviteRequest.fromUserName,
+            )
 
         messagingTemplate.convertAndSend(
             "/topic/invite/${inviteRequest.toPlayerId}",
-            inviteMessage
+            inviteMessage,
         )
     }
 }

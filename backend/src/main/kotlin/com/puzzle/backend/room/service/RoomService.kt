@@ -7,9 +7,6 @@ import com.puzzle.backend.room.dto.response.RoomIdResponse
 import com.puzzle.backend.room.dto.response.RoomListResponse
 import com.puzzle.backend.room.dto.response.WaitingRoomResponse
 import com.puzzle.backend.room.repository.RoomRepository
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.awt.image.BufferedImage
@@ -29,28 +26,21 @@ class RoomService(
     private val roomRepository: RoomRepository,
 ) {
     fun createRoom(request: CreateRoomRequest): RoomIdResponse {
-        val room = request.toRoom(request.playerId)
-        val player = PlayerRequest(request.playerId, request.playerImage!!, request.playerName!!)
+        val room = request.toRoom()
+        val player = PlayerRequest(request.playerId, request.playerImage, request.playerName)
 
         room.bluePlayers.add(player)
-        room.updateMaster(player.playerId)
+        room.updateMaster(player)
         roomRepository.save(room)
 
         val response = RoomIdResponse(room.roomId)
         return response
     }
 
-    fun getRoomList(pageable: Pageable): Page<RoomListResponse> {
+    fun getRoomList(): List<RoomListResponse> {
         val roomList = roomRepository.findAll().filterNotNull().toList()
-        val start = pageable.pageNumber * pageable.pageSize
-        val end = minOf(start + pageable.pageSize, roomList.size)
-
-        val pagedRooms =
-            roomList
-                .subList(start, end)
-                .map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
-
-        return PageImpl(pagedRooms, pageable, roomList.size.toLong())
+        val response = roomList.map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
+        return response
     }
 
     fun findById(roomId: String): Room = roomRepository.findById(roomId).orElseThrow()
