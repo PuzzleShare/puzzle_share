@@ -11,6 +11,18 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
+import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.net.URI
+import javax.imageio.ImageIO
+
+private const val MIN_ASPECT_RATIO = 0.5
+private const val MAX_ASPECT_RATIO = 2.0
+private const val MIN_WIDTH = 100
+private const val MAX_WIDTH = 2000
+private const val MIN_HEIGHT = 100
+private const val MAX_HEIGHT = 2000
 
 @Service
 class RoomService(
@@ -61,4 +73,75 @@ class RoomService(
         }
         return participantCount
     }
+
+    private val restTemplate = RestTemplate()
+    // 비율 검증을 위한 최소 및 최대 비율 정의
+
+    fun isPuzzleImageValid(imageUrl: String): Boolean {
+        // 1. URL 형식 및 이미지 확장자 검사
+        println(imageUrl)
+        if (!isValidImageUrl(imageUrl)) {
+            return false
+        }
+
+        try {
+            // 2. 이미지 다운로드 시도
+            val imageBytes: ByteArray? = restTemplate.getForObject(URI.create(imageUrl), ByteArray::class.java)
+            if (imageBytes == null) {
+                return false
+            }
+
+            // 3. 이미지 파일 읽기
+            val image: BufferedImage? = ImageIO.read(ByteArrayInputStream(imageBytes))
+            print(image.toString())
+            if (image == null) {
+                return false
+            }
+            val width = image.width
+            val height = image.height
+
+            // 원본 이미지 비율 계산
+            val originalAspectRatio = if (height >= width) {
+                height.toDouble() / width
+            } else {
+                width.toDouble() / height
+            }
+
+            if (!isValidImageSize(width, height)) {
+                return false
+            }
+            // 비율 검증
+            if (originalAspectRatio < MIN_ASPECT_RATIO || originalAspectRatio > MAX_ASPECT_RATIO) {
+                throw IllegalArgumentException(
+                    "이미지 비율이 허용 범위(${MIN_ASPECT_RATIO}~${MAX_ASPECT_RATIO})를 벗어났습니다. 현재 비율: $originalAspectRatio",
+                )
+            }
+
+            return true
+        } catch (e: Exception) {
+            // 로그를 남기고 false 반환 (선택 사항)
+            println("printStackTrace")
+            e.printStackTrace()
+            return false
+        }
+    }
+
+    private fun isValidImageSize(
+        width: Int,
+        height: Int,
+    ): Boolean = width in MIN_WIDTH..MAX_WIDTH && height in MIN_HEIGHT..MAX_HEIGHT
+
+    private fun isValidImageUrl(url: String): Boolean =
+        try {
+            val uri = URI.create(url)
+            val path = uri.path.lowercase()
+            path.endsWith(".jpeg") ||
+                path.endsWith(".jpg") ||
+                path.endsWith(".png") ||
+                path.endsWith(".gif") ||
+                path.endsWith(".webp") ||
+                path.endsWith(".bmp")
+        } catch (e: Exception) {
+            false
+        }
 }

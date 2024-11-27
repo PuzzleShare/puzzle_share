@@ -111,8 +111,6 @@ class PuzzleBoard : Serializable {
         this.isCorrected = isCorrected
         this.idxToCoordinate = idxToCoordinate
 
-        println("totalEdges $totalEdges")
-        println("connectedEdges $connectedEdges")
         for (i in 0 until lengthCnt) {
             for (j in 0 until widthCnt) {
                 val piece = board[i][j]
@@ -254,22 +252,6 @@ class PuzzleBoard : Serializable {
         val (x1, y1) = idxToCoordinate[piece1]!!
         val (x2, y2) = idxToCoordinate[piece2]!!
         return Pair(x1 + x2, y1 + y2)
-    }
-
-    // 디버그용 출력
-    fun printBoard() {
-        println("---------------------------------------")
-        println("총 조각 : ${widthCnt * lengthCnt}")
-        println("총 연결가능 면 : $totalEdges")
-        println("맞춘 조각 : $correctedCount")
-        println("연결한 면의 개수 : $connectedEdges")
-
-        println("진행률 : ${connectedEdges * 100.0 / totalEdges}%")
-        println("조각 뭉탱이들 정보")
-        for (set in bundles.values) {
-            println(set)
-        }
-        println("---------------------------------------")
     }
 
     // PuzzleBoard 클래스 내부

@@ -48,4 +48,12 @@ class RoomController(
         val room = roomService.getRoom(roomId)
         return ResponseEntity.ok(room)
     }
+
+    @PostMapping("/image/dimensions")
+    fun getImageDimensions(
+        @RequestParam imageUrl: String,
+    ): ResponseEntity<Boolean> {
+        val response = roomService.isPuzzleImageValid(imageUrl)
+        return ResponseEntity.ok(response)
+    }
 }
