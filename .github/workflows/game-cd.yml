@@ -3,7 +3,7 @@ name: game server cd
 on:
   push:
     branches:
-      - test # 배포 트리거 대상 브랜치 on.push.branch -> 해당 브랜치가 푸시될 때 트리깅
+      - test # 배포 트리거 대상 브랜치
     paths:
       - 'websocket/**'
 
@@ -68,8 +68,8 @@ jobs:
           username: ${{ env.LIGHTSAIL_USERNAME }}
           port: 22
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
-          source: 'websocket/build/libs/*.jar'
-          target: '/home/ubuntu/game/dist'
+          source: 'websocket/build/libs/websocket-0.0.1-SNAPSHOT.jar' # 고정된 JAR 파일 이름 사용
+          target: '/home/ubuntu/game/dist/websocket/build/libs/' # 타겟 디렉토리 수정
           use_insecure_cipher: true
           debug: true
 
@@ -77,22 +77,35 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{env.LIGHTSAIL_USERNAME}}
+          username: ${{ env.LIGHTSAIL_USERNAME }}
           key: ${{ secrets.LIGHTSAIL_SSH_KEY }}
           script: |
-            BUILD_PATH=$(ls /home/ubuntu/game/dist/build/libs/*.jar)
-            JAR_NAME=$(basename $BUILD_PATH)
-            CURRENT_PID=$(pgrep -f $JAR_NAME)
-            if [ -z $CURRENT_PID ]
-            then
+            # 고정된 JAR 파일 이름 설정
+            JAR_NAME="websocket-0.0.1-SNAPSHOT.jar"
+            BUILD_PATH="/home/ubuntu/game/dist/websocket/build/libs/${JAR_NAME}"
+            DEPLOY_PATH="/home/ubuntu/game/deploy/"
+            DEPLOY_JAR="${DEPLOY_PATH}${JAR_NAME}"
+
+            # 현재 실행 중인 JAR 프로세스 찾기
+            CURRENT_PID=$(pgrep -f "${JAR_NAME}")
+
+            # 현재 실행 중인 프로세스가 있으면 종료
+            if [ -z "${CURRENT_PID}" ]; then
+              echo "No running process found for ${JAR_NAME}."
               sleep 1
             else
-              kill -15 $CURRENT_PID
+              echo "Killing process ${CURRENT_PID} for ${JAR_NAME}."
+              kill -9 "${CURRENT_PID}"
               sleep 5
             fi
-            DEPLOY_PATH=/home/ubuntu/game/deploy/
-            mkdir $DEPLOY_PATH
-            cp $BUILD_PATH $DEPLOY_PATH
-            cd $DEPLOY_PATH
-            DEPLOY_JAR=$DEPLOY_PATH$JAR_NAME
-            nohup java -jar $DEPLOY_JAR > /dev/null 2> /dev/null < /dev/null &
+
+            # 새 JAR 파일을 배포 디렉토리로 복사
+            echo "Copying ${BUILD_PATH} to ${DEPLOY_PATH}."
+            cp "${BUILD_PATH}" "${DEPLOY_PATH}"
+
+            # 배포 디렉토리로 이동
+            cd "${DEPLOY_PATH}" || exit
+
+            # 새 JAR 파일 실행
+            echo "Starting ${DEPLOY_JAR}."
+            nohup java -jar "${DEPLOY_JAR}" > /dev/null 2> /dev/null < /dev/null &

@@ -92,7 +92,6 @@ class GameService(
         return gameRooms[roomId]
     }
 
-    // 채팅방 생성
     fun createGame(room: PuzzleRoom): Game {
         val game = Game.create(room)
         gameRooms[game.gameId] = game
@@ -100,7 +99,6 @@ class GameService(
         return game
     }
 
-    // 게임 시작
     fun startGame(roomId: String): Game? {
         val game = findById(roomId)
         if (game != null) {
@@ -240,7 +238,6 @@ class GameService(
         }
 
         // 게임 끝났는지 마지막에 확인
-
         if (ourPuzzle.isCompleted || yourPuzzle.isCompleted) {
             game.isFinished = true
             game.finishTime = Date()
