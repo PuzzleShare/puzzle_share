@@ -89,23 +89,9 @@ jobs:
             # 현재 실행 중인 JAR 프로세스 찾기
             CURRENT_PID=$(pgrep -f "${JAR_NAME}")
 
-            # 현재 실행 중인 프로세스가 있으면 종료
-            if [ -z "${CURRENT_PID}" ]; then
-              echo "No running process found for ${JAR_NAME}."
-              sleep 1
-            else
-              echo "Killing process ${CURRENT_PID} for ${JAR_NAME}."
-              kill -15 "${CURRENT_PID}"
-              sleep 5
-            fi
-
             # 새 JAR 파일을 배포 디렉토리로 복사
             echo "Copying ${BUILD_PATH} to ${DEPLOY_PATH}."
             cp "${BUILD_PATH}" "${DEPLOY_PATH}"
 
             # 배포 디렉토리로 이동
             cd "${DEPLOY_PATH}" || exit
-
-            # 새 JAR 파일 실행
-            echo "Starting ${DEPLOY_JAR}."
-            nohup java -jar "${DEPLOY_JAR}" > /dev/null 2> /dev/null < /dev/null &
