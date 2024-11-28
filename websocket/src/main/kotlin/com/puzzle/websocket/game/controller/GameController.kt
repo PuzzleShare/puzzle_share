@@ -23,7 +23,7 @@ class GameController(
     private val gameService: GameService,
     private val sendingOperations: SimpMessageSendingOperations,
 ) {
-    private val battleTimer = 10
+    private val battleTimer = 300
     private var sessionId: String? = null
     private val waitingList: Queue<User> = ConcurrentLinkedQueue()
 
@@ -38,30 +38,32 @@ class GameController(
         @DestinationVariable roomId: String,
     ) {
         val game = gameService.findById(roomId)!!
-        val res = ResponseMessage(game = game).apply {
-            // 혼합 방식 진행률 계산 반영
-            redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
-            blueProgressPercent =
-                if (game.gameType == "BATTLE") {
-                    game.bluePuzzle?.calculateMixedProgress() ?: 0.0
-                } else {
-                    0.0
-                }
-            isFinished = game.isFinished
-            redBundles = game.redPuzzle
-                ?.bundles
-                ?.values
-                ?.map { it.toSet() } ?: emptyList()
-            if (game.gameType.equals("BATTLE", ignoreCase = true)) {
-                blueBundles = game.bluePuzzle
+        val res =
+            ResponseMessage(game = game).apply {
+                // 혼합 방식 진행률 계산 반영
+                redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+                blueProgressPercent =
+                    if (game.gameType == "BATTLE") {
+                        game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+                    } else {
+                        0.0
+                    }
+                isFinished = game.isFinished
+                redBundles = game.redPuzzle
                     ?.bundles
                     ?.values
                     ?.map { it.toSet() } ?: emptyList()
+                if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                    blueBundles = game.bluePuzzle
+                        ?.bundles
+                        ?.values
+                        ?.map { it.toSet() } ?: emptyList()
+                }
             }
-        }
         sendingOperations.convertAndSend("/topic/game/room/$roomId/init", res)
 
-        val pointerMoveDTOS = game.redTeam.map { PointerMoveDTO.of(it, "red", "red") } +
+        val pointerMoveDTOS =
+            game.redTeam.map { PointerMoveDTO.of(it, "red", "red") } +
                 game.blueTeam.map { PointerMoveDTO.of(it, "blue", "blue") }
         sendingOperations.convertAndSend("/topic/game/${game.gameId}/pointer/init", pointerMoveDTOS)
     }
@@ -96,23 +98,35 @@ class GameController(
                         ?.values
                         ?.map { it.toSet() } ?: emptyList()
 
-                    if(Math.abs(redProgressPercent - blueProgressPercent) >= 25){
-                        val targetTeam = if (redProgressPercent > blueProgressPercent) { "BLUE" } else { "RED" }
-                        val targetPuzzle = if (redProgressPercent > blueProgressPercent) { game.bluePuzzle } else { game.redPuzzle }!!
-                        // item frame add
-                        if (!targetPuzzle.addedFrame){
-                            targetPuzzle.addedFrame = true
-                            targetPuzzle.addItem(5)
-                            sendingOperations.convertAndSend(
-                                "/topic/game/room/${game.gameId}/help",
-                                InventoryResponse(
-                                    team = targetTeam,
-                                    inventory = targetPuzzle.inventory,
-                                    fitPieceIndex = -1,
-                                )
-                            )
+                    if (Math.abs(redProgressPercent - blueProgressPercent) >= 25)
+                        {
+                            val targetTeam =
+                                if (redProgressPercent > blueProgressPercent) {
+                                    "BLUE"
+                                } else {
+                                    "RED"
+                                }
+                            val targetPuzzle =
+                                if (redProgressPercent > blueProgressPercent) {
+                                    game.bluePuzzle
+                                } else {
+                                    game.redPuzzle
+                                }!!
+                            // item frame add
+                            if (!targetPuzzle.addedFrame)
+                                {
+                                    targetPuzzle.addedFrame = true
+                                    targetPuzzle.addItem(5)
+                                    sendingOperations.convertAndSend(
+                                        "/topic/game/room/${game.gameId}/help",
+                                        InventoryResponse(
+                                            team = targetTeam,
+                                            inventory = targetPuzzle.inventory,
+                                            fitPieceIndex = -1,
+                                        ),
+                                    )
+                                }
                         }
-                    }
                 }
             }
 
@@ -124,8 +138,8 @@ class GameController(
     fun pointerMove(
         @DestinationVariable
         gameId: String,
-        pointerMoveDTO: PointerMoveDTO
-    ){
+        pointerMoveDTO: PointerMoveDTO,
+    )  {
         sendingOperations.convertAndSend("/topic/game/$gameId/mouse", pointerMoveDTO)
     }
 
@@ -145,26 +159,29 @@ class GameController(
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
                 } else {
                     game.finishTime = Date()
-                    val res = ResponseMessage(game = game).apply {
-                        redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
-                        blueProgressPercent = if (game.gameType == "BATTLE") {
-                            game.bluePuzzle?.calculateMixedProgress() ?: 0.0
-                        } else {
-                            -1.0
-                        }
-                        redBundles = game.redPuzzle
-                            ?.bundles
-                            ?.values
-                            ?.map { it.toSet() } ?: emptyList()
-                        blueBundles = if (game.gameType.equals("BATTLE", ignoreCase = true)) {
-                            game.bluePuzzle
+                    val res =
+                        ResponseMessage(game = game).apply {
+                            redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+                            blueProgressPercent =
+                                if (game.gameType == "BATTLE") {
+                                    game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+                                } else {
+                                    -1.0
+                                }
+                            redBundles = game.redPuzzle
                                 ?.bundles
                                 ?.values
                                 ?.map { it.toSet() } ?: emptyList()
-                        } else {
-                            emptyList()
+                            blueBundles =
+                                if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                                    game.bluePuzzle
+                                        ?.bundles
+                                        ?.values
+                                        ?.map { it.toSet() } ?: emptyList()
+                                } else {
+                                    emptyList()
+                                }
                         }
-                    }
                     game.isFinished = true
                     res.isFinished = game.isFinished
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
@@ -176,5 +193,4 @@ class GameController(
             }
         }
     }
-
 }
