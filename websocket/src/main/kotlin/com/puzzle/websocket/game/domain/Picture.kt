@@ -6,6 +6,9 @@ import java.io.ByteArrayInputStream
 import java.io.Serializable
 import java.net.URI
 import javax.imageio.ImageIO
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
 data class Picture(
     var id: Long? = null,
@@ -20,23 +23,57 @@ data class Picture(
     var encodedString: String? = null,
 ) : Serializable {
     init {
-        val levelOneSize = Companion.levelSize[1]!!
-        if (length >= width) {
-            imgWidth = ((levelOneSize * width) / length / 100) * 100
-            imgHeight = levelOneSize
-            if (imgWidth == 0) {
-                imgWidth = pieceSize
-            }
-        } else {
-            imgWidth = levelOneSize
-            imgHeight = ((levelOneSize * length) / width / 100) * 100
-            if (imgHeight == 0) {
-                imgHeight = pieceSize
-            }
+
+        // 초기 퍼즐 조각 수 계산 (내림)
+        var initialWidthPieces: Int = width / pieceSize
+        var initialLengthPieces: Int = length / pieceSize
+
+        // 최소 1개의 조각은 필요
+        initialWidthPieces = max(initialWidthPieces.toDouble(), 1.0).toInt()
+        initialLengthPieces = max(initialLengthPieces.toDouble(), 1.0).toInt()
+
+        // 초기 새로운 너비와 높이 계산
+        var initialNewWidth = initialWidthPieces * pieceSize
+        var initialNewLength = initialLengthPieces * pieceSize
+
+        // 최대 크기 제한이 필요한지 확인
+        var scaleFactor = 1.0
+        if (initialNewWidth > 500 || initialNewLength > 500) {
+            // 너비와 높이 중 큰 비율을 찾아 스케일 팩터 계산
+            val widthScale = 500.0 / initialNewWidth
+            val lengthScale = 500.0 / initialNewLength
+            scaleFactor = min(widthScale, lengthScale)
+
+            // 스케일 팩터를 적용하여 새로운 크기 계산
+            val scaledWidth = initialNewWidth * scaleFactor
+            val scaledLength = initialNewLength * scaleFactor
+
+            // 퍼즐 조각 수 재계산 (내림)
+            initialWidthPieces = floor(scaledWidth / pieceSize).toInt()
+            initialLengthPieces = floor(scaledLength / pieceSize).toInt()
+
+            // 최소 1개의 조각은 필요
+            widthPieceCnt = max(initialWidthPieces.toDouble(), 1.0).toInt()
+            lengthPieceCnt = max(initialLengthPieces.toDouble(), 1.0).toInt()
+
+            // 최종 새로운 너비와 높이 계산
+            imgWidth = initialWidthPieces * pieceSize
+            imgHeight = initialLengthPieces * pieceSize
         }
 
-        widthPieceCnt = (imgWidth / pieceSize.toDouble()).toInt()
-        lengthPieceCnt = (imgHeight / pieceSize.toDouble()).toInt()
+//        if (length >= width) {
+//            imgWidth = ((levelOneSize * width) / length / 100) * 100
+//            imgHeight = levelOneSize
+//        } else {
+//            imgWidth = levelOneSize
+//            imgHeight = ((levelOneSize * length) / width / 100) * 100
+//        }
+
+        println("length : $length 이고 width : $width")
+        println("imgHeight : $imgHeight 이고 imgWidth : $imgWidth")
+//        widthPieceCnt = ceil(imgWidth / pieceSize.toDouble()).toInt()
+//        lengthPieceCnt = ceil(imgHeight / pieceSize.toDouble()).toInt()
+        println("widthPieceCnt : $widthPieceCnt 이고 lengthPieceCnt : $lengthPieceCnt")
     }
 
     companion object {
