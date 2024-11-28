@@ -14,7 +14,7 @@ class PuzzleBoard : Serializable {
     var pieceSize: Int = 0 // 조각 크기
     var widthCnt: Int = 0 // 가로 조각 개수
     var lengthCnt: Int = 0 // 세로 조각 개수
-
+    var totalBundles: Int = 0
     var totalEdges: Int = 0
     var connectedEdges: Int = 0
     private val canvasWidth = 1000
@@ -55,6 +55,7 @@ class PuzzleBoard : Serializable {
         pieceSize = p.pieceSize
         widthCnt = p.widthPieceCnt
         lengthCnt = p.lengthPieceCnt
+        totalBundles = widthCnt * lengthCnt
         totalEdges = (widthCnt * (lengthCnt - 1)) + (lengthCnt * (widthCnt - 1))
         board = MutableList(lengthCnt) { MutableList(widthCnt) { Piece(0) } }
         isCorrected = MutableList(lengthCnt * 2 - 1) { MutableList(widthCnt * 2 - 1) { false } }
@@ -219,7 +220,7 @@ class PuzzleBoard : Serializable {
         bundles[largeIdx]!!.addAll(bundleSmall)
         bundles.remove(smallIdx)
 
-        isCompleted = bundles.size == 1 && connectedEdges == totalEdges
+        isCompleted = bundles.size == 1 // && connectedEdges == totalEdges
     }
 
     private fun indexToPiece(index: Int): Piece {
@@ -254,9 +255,11 @@ class PuzzleBoard : Serializable {
         return Pair(x1 + x2, y1 + y2)
     }
 
-    // PuzzleBoard 클래스 내부
-    fun calculateMixedProgress(): Double = (connectedEdges * 100.0 / totalEdges)
-//    fun calculateMixedProgress(): Double = (connectedEdges * 100.0 / totalEdges).coerceAtMost(100.0)
+    fun calculateMixedProgress(): Double {
+        val bundleProgress = (totalBundles - bundles.size) * 100.0 / (totalBundles - 1)
+        // val connectedProgress = connectedEdges * 100.0 / totalEdges
+        return bundleProgress
+    }
 
     fun randomPosition(piece: Piece) {
         piece.position_x = Math.random() * canvasWidth
@@ -314,9 +317,9 @@ class PuzzleBoard : Serializable {
 
     fun getCanvasCenter(): Pair<Double, Double> = CANVAS_WIDTH / 2.0 to CANVAS_LENGTH / 2.0
 
-    fun addItem(itemIdx: Int){
-        for (i in 0 until inventory.size){
-            if (inventory[i] == 0){
+    fun addItem(itemIdx: Int) {
+        for (i in 0 until inventory.size) {
+            if (inventory[i] == 0) {
                 inventory[i] = itemIdx
                 break
             }
