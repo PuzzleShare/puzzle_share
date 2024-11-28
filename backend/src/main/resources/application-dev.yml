@@ -14,5 +14,5 @@ spring:
   flyway:
     enabled: true
 login:
-  base-url: https://container-service-1.9sjrmz3hsgdvw.ap-northeast-2.cs.amazonlightsail.com
+  base-url: https://puzzleshare.site
   redirect-url: https://puzzle-frontend-five.vercel.app/login/redirect
