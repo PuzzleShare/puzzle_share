@@ -146,7 +146,7 @@ class GameService(
                     val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
                     ourPuzzle.addPiece(pieces)
                     pieces.forEach {
-                        if(ourPuzzle.itemPiece.contains(it) && !ourPuzzle.itemPiece[it]!!){
+                        if (ourPuzzle.itemPiece.contains(it) && !ourPuzzle.itemPiece[it]!!) {
                             val attackItem = listOf(1, 2, 3, 4)
                             ourPuzzle.addItem(attackItem[(Math.random() * attackItem.size).toInt()])
                             ourPuzzle.itemPiece[it] = true
@@ -221,7 +221,7 @@ class GameService(
                 val slotNum = targets.toIntOrNull()
                 if (slotNum != null && slotNum >= 0 && slotNum < ourPuzzle.inventory.size) {
                     val itemIdx = ourPuzzle.inventory[slotNum]
-                    if (itemIdx > 0 && itemIdx <= GameItem.values().size){
+                    if (itemIdx > 0 && itemIdx <= GameItem.values().size) {
                         val gameItem = GameItem.values()[itemIdx]
                         gameItem.use(game, ourColor, res)
                         ourPuzzle.inventory[slotNum] = 0
@@ -238,11 +238,40 @@ class GameService(
         }
 
         // 게임 끝났는지 마지막에 확인
-        if (ourPuzzle.isCompleted || yourPuzzle.isCompleted) {
-            game.isFinished = true
-            game.finishTime = Date()
-            res.isFinished = true
-            deleteGame(game.gameId)
+        if ((ourPuzzle.isCompleted || yourPuzzle.isCompleted) && (game.isStarted &&!game.isFinished)) {
+
+            lock.lock()
+            try {
+                game.isFinished = true
+                game.finishTime = Date()
+                res.isFinished = game.isFinished
+                res.game = game
+                res.message="SAVE_RECORD"
+            } finally {
+                lock.unlock()
+            }
+
+            res.redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+            res.blueProgressPercent = if (game.gameType == "BATTLE") {
+                game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+            } else {
+                -1.0
+            }
+            res.redBundles = game.redPuzzle
+                ?.bundles
+                ?.values
+                ?.map { it.toSet() } ?: emptyList()
+            res.blueBundles = if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                game.bluePuzzle
+                    ?.bundles
+                    ?.values
+                    ?.map { it.toSet() } ?: emptyList()
+            } else {
+                emptyList()
+            }
+
+            sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+            game.isStarted = false
         }
 
         // 진행도 추가
@@ -373,7 +402,8 @@ class GameService(
 
         class MapStringAnyTypeReference : TypeReference<Map<String, Any>>()
         // Retrieve and parse metadata
-        val metaDataJson: String = redisTemplate.opsForValue().get("$basicKey:meta")as? String ?: throw Exception("Game not found")
+        val metaDataJson: String =
+            redisTemplate.opsForValue().get("$basicKey:meta") as? String ?: throw Exception("Game not found")
         val metaData: Map<String, String> =
             objectMapper.readValue<Map<String, String>>(
                 metaDataJson,
