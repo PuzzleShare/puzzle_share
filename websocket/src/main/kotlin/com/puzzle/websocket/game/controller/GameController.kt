@@ -23,7 +23,7 @@ class GameController(
     private val gameService: GameService,
     private val sendingOperations: SimpMessageSendingOperations,
 ) {
-    private val battleTimer = 10
+    private val battleTimer = 300
     private var sessionId: String? = null
     private val waitingList: Queue<User> = ConcurrentLinkedQueue()
 
