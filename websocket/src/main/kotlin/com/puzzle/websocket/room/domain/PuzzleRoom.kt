@@ -20,8 +20,8 @@ class PuzzleRoom(
     var masterName: String,
 ) {
     fun updateMaster(newMaster: PlayerRequest) {
-        this.master = newMaster.playerId
-        this.masterImage = newMaster.playerImage
-        this.masterName = newMaster.playerName
+        this.master = newMaster.playerId!!
+        this.masterImage = newMaster.playerImage.toString()
+        this.masterName = newMaster.playerName.toString()
     }
 }

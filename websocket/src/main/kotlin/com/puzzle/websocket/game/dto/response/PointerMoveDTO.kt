@@ -20,7 +20,7 @@ class PointerMoveDTO (
                 x = 0,
                 y = 0,
                 color = color,
-                playerId = playerRequest.playerId
+                playerId = playerRequest.playerId!!
             )
         }
     }
