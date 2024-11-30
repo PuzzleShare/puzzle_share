@@ -213,13 +213,13 @@ class PuzzleBoard : Serializable {
 //            } else {
 //                bundles[piece2.bundleNum]!! to bundles[piece1.bundleNum]!!
 //            }
-//        val (largeIdx, smallIdx) = (bundleLarge.first().bundleNum to bundleSmall.first().bundleNum)
-        val (bundle1, bundle2) = bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
+        val (bundleLarge, bundleSmall) = bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
+        val (largeIdx, smallIdx) = (bundleLarge.first().bundleNum to bundleSmall.first().bundleNum)
 
-        updateConnectedEdgeCount(bundle1, bundle2)
-        bundle2.forEach { it.bundleNum = piece1.bundleNum }
-        bundles[piece1.bundleNum]!!.addAll(bundle2)
-        bundles.remove(piece2.bundleNum)
+        updateConnectedEdgeCount(bundleLarge, bundleSmall)
+        bundleSmall.forEach { it.bundleNum = largeIdx }
+        bundles[largeIdx]!!.addAll(bundleSmall)
+        bundles.remove(smallIdx)
 
         isCompleted = bundles.size == 1 // && connectedEdges == totalEdges
     }
