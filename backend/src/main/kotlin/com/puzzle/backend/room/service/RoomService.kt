@@ -25,6 +25,11 @@ private const val MAX_HEIGHT = 2000
 class RoomService(
     private val roomRepository: RoomRepository,
 ) {
+    init {
+        // WebP 플러그인 등록 (필요한 경우)
+        ImageIO.scanForPlugins()
+    }
+
     fun createRoom(request: CreateRoomRequest): RoomIdResponse {
         val room = request.toRoom()
         val player = PlayerRequest(request.playerId, request.playerImage, request.playerName)
@@ -69,7 +74,6 @@ class RoomService(
 
     fun isPuzzleImageValid(imageUrl: String): Boolean {
         // 1. URL 형식 및 이미지 확장자 검사
-        println(imageUrl)
         if (!isValidImageUrl(imageUrl)) {
             return false
         }
