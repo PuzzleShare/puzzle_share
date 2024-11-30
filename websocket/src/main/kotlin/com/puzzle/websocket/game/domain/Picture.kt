@@ -23,7 +23,6 @@ data class Picture(
     var encodedString: String? = null,
 ) : Serializable {
     init {
-
         // 초기 퍼즐 조각 수 계산 (내림)
         var initialWidthPieces: Int = width / pieceSize
         var initialLengthPieces: Int = length / pieceSize
@@ -36,7 +35,6 @@ data class Picture(
         var initialNewWidth = initialWidthPieces * pieceSize
         var initialNewLength = initialLengthPieces * pieceSize
 
-        // 최대 크기 제한이 필요한지 확인
         var scaleFactor = 1.0
         if (initialNewWidth > 500 || initialNewLength > 500) {
             // 너비와 높이 중 큰 비율을 찾아 스케일 팩터 계산
@@ -57,22 +55,18 @@ data class Picture(
             lengthPieceCnt = max(initialLengthPieces.toDouble(), 1.0).toInt()
 
             // 최종 새로운 너비와 높이 계산
-            imgWidth = initialWidthPieces * pieceSize
-            imgHeight = initialLengthPieces * pieceSize
+            imgWidth = widthPieceCnt * pieceSize
+            imgHeight = lengthPieceCnt * pieceSize
+        } else {
+            // 스케일링이 필요 없을 경우
+            widthPieceCnt = initialWidthPieces
+            lengthPieceCnt = initialLengthPieces
+            imgWidth = initialNewWidth
+            imgHeight = initialNewLength
         }
-
-//        if (length >= width) {
-//            imgWidth = ((levelOneSize * width) / length / 100) * 100
-//            imgHeight = levelOneSize
-//        } else {
-//            imgWidth = levelOneSize
-//            imgHeight = ((levelOneSize * length) / width / 100) * 100
-//        }
 
         println("length : $length 이고 width : $width")
         println("imgHeight : $imgHeight 이고 imgWidth : $imgWidth")
-//        widthPieceCnt = ceil(imgWidth / pieceSize.toDouble()).toInt()
-//        lengthPieceCnt = ceil(imgHeight / pieceSize.toDouble()).toInt()
         println("widthPieceCnt : $widthPieceCnt 이고 lengthPieceCnt : $lengthPieceCnt")
     }
 
@@ -96,6 +90,7 @@ data class Picture(
                     encodedString = encodedString,
                 )
             } catch (e: Exception) {
+                // 기본 이미지 설정 또는 예외 처리
                 return Picture(
                     name = "짱구.jpg",
                     width = 1000,
