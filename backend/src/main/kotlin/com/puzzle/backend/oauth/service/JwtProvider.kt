@@ -31,7 +31,7 @@ class JwtProvider(
     private val frontDomain = if (active == "local") {
         "localhost"
     } else {
-        ".vercel.app"
+        "puzzleshare.site"
     }
 
     fun createToken(
