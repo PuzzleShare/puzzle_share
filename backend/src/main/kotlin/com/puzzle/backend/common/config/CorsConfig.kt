@@ -6,14 +6,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 const val LOCAL_FRONT = "http://localhost:3000"
 const val LOCAL_BACK = "http://localhost:8080"
-const val FRONT = "https://puzzle-frontend-five.vercel.app"
+const val FRONT = "https://puzzleshare.site"
+const val WWW_FRONT = "https://www.puzzleshare.site"
 
 @Configuration
 class CorsConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
             .addMapping("/**")
-            .allowedOrigins(LOCAL_FRONT, LOCAL_BACK, FRONT)
+            .allowedOrigins(LOCAL_FRONT, LOCAL_BACK, FRONT, WWW_FRONT)
             .allowedMethods("GET", "POST", "PUT", "DELETE")
             .allowedHeaders("*")
             .allowCredentials(true)

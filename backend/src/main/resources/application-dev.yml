@@ -14,5 +14,5 @@ spring:
   flyway:
     enabled: true
 login:
-  base-url: https://puzzleshare.site
-  redirect-url: https://puzzle-frontend-five.vercel.app/login/redirect
+  base-url: https://api.puzzleshare.site
+  redirect-url: https://puzzleshare.site/login/redirect
