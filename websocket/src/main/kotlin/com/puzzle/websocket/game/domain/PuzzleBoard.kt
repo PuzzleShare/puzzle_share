@@ -207,12 +207,13 @@ class PuzzleBoard : Serializable {
             return
         }
 
-        val (bundleLarge, bundleSmall) =
-            if (bundles[piece1.bundleNum]!!.size >= bundles[piece2.bundleNum]!!.size) {
-                bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
-            } else {
-                bundles[piece2.bundleNum]!! to bundles[piece1.bundleNum]!!
-            }
+//        val (bundleLarge, bundleSmall) =
+//            if (bundles[piece1.bundleNum]!!.size >= bundles[piece2.bundleNum]!!.size) {
+//                bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
+//            } else {
+//                bundles[piece2.bundleNum]!! to bundles[piece1.bundleNum]!!
+//            }
+        val (bundleLarge, bundleSmall) = bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
         val (largeIdx, smallIdx) = (bundleLarge.first().bundleNum to bundleSmall.first().bundleNum)
 
         updateConnectedEdgeCount(bundleLarge, bundleSmall)
