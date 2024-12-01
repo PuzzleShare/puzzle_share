@@ -18,9 +18,9 @@ data class GameDataDto(
     // 협동 모드: 참가자
     var players: List<PlayerRequest>? = null,
     // 배틀 모드: 레드 팀 퍼즐 진행률 (%)
-    var redProgressPercent: Int? = null,
+    var redProgressPercent: Double? = null,
     // 배틀 모드: 블루 팀 퍼즐 진행률 (%)
-    var blueProgressPercent: Int? = null,
+    var blueProgressPercent: Double? = null,
     // 퍼즐 이미지 URL
     var puzzleImage: String,
     // 퍼즐 조각 수
@@ -38,6 +38,7 @@ data class GameDataDto(
         gameStatus: String?,
         withTeam: List<String>,
         vsTeam: List<String>,
+        myPercent: Double,
     ): GameRecordDto {
         val durationInMinutes = (this.finishTime.second - this.startTime.second)
 
@@ -53,6 +54,7 @@ data class GameDataDto(
             teamMates = ObjectMapper().writeValueAsString(withTeam),
             opponents = ObjectMapper().writeValueAsString(vsTeam),
             myTeam = myTeam,
+            myPercent = myPercent,
             gameStatus = gameStatus,
         )
     }

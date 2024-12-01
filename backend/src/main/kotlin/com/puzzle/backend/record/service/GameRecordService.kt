@@ -4,6 +4,7 @@ import com.puzzle.backend.oauth.domain.Users
 import com.puzzle.backend.oauth.repository.UsersRepository
 import com.puzzle.backend.record.dto.GameDataDto
 import com.puzzle.backend.record.dto.GameRecordDto
+import com.puzzle.backend.record.dto.UserGalleryResponse
 import com.puzzle.backend.record.repository.GameRecordRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,6 +16,14 @@ class GameRecordService(
     private val usersRepository: UsersRepository,
     private val gameRecordRepository: GameRecordRepository,
 ) {
+    fun findGameRecordsForGallery(userId: Long): List<UserGalleryResponse> {
+        val user = usersRepository.findById(userId)
+            .orElseThrow { IllegalArgumentException("User not found with ID: $userId") }
+
+        return gameRecordRepository.findGameRecordsByMyPercentAndUserOrderByPlayedAtDesc(user = user, myPercent = 100.0)
+            .map { UserGalleryResponse.of(it) }
+    }
+
     @Transactional
     fun handleGameEnd(
         gameDataDto: GameDataDto,
@@ -26,7 +35,7 @@ class GameRecordService(
 
         when (gameDataDto.gameType) {
             "BATTLE" -> handleBattleMode(gameDataDto, user)
-            "COOPERATION" -> handleCooperationMode(gameDataDto, user)
+//            "COOPERATION" -> handleCooperationMode(gameDataDto, user)
             else -> throw IllegalArgumentException("Invalid game type: ${gameDataDto.gameType}")
         }
     }
@@ -36,8 +45,8 @@ class GameRecordService(
         user: Users,
     ) {
         val winnerTeam = determineWinner(
-            gameDataDto.redProgressPercent ?: 0,
-            gameDataDto.blueProgressPercent ?: 0,
+            gameDataDto.redProgressPercent ?: 0.0,
+            gameDataDto.blueProgressPercent ?: 0.0,
         )
 
         if (winnerTeam == "DRAW") {
@@ -48,8 +57,8 @@ class GameRecordService(
     }
 
     private fun determineWinner(
-        redProgress: Int,
-        blueProgress: Int,
+        redProgress: Double,
+        blueProgress: Double,
     ): String {
         return when {
             redProgress > blueProgress -> "RED"
@@ -68,12 +77,19 @@ class GameRecordService(
 
         val (withTeam, vsTeam) = determineBattleTeams(gameDataDto, user, myTeam)
 
+        val myPercent: Double? = when (myTeam) {
+            "RED" -> gameDataDto.redProgressPercent
+            "BLUE" -> gameDataDto.blueProgressPercent
+            else -> throw IllegalArgumentException("Unknown team: $myTeam")
+        }
+
         val gameRecordDto = gameDataDto.toGameRecordDto(
             userId = user.userId,
             myTeam = myTeam,
             gameStatus = if (isWinningTeam) "WIN" else "LOSS",
             withTeam = withTeam,
             vsTeam = vsTeam,
+            myPercent = myPercent!!,
         )
 
         val gameRecord = gameRecordDto.toEntity(user)
@@ -89,12 +105,19 @@ class GameRecordService(
         val myTeam = determineUserTeam(gameDataDto, user)
         val (withTeam, vsTeam) = determineBattleTeams(gameDataDto, user, myTeam)
 
+        val myPercent: Double? = when (myTeam) {
+            "RED" -> gameDataDto.redProgressPercent
+            "BLUE" -> gameDataDto.blueProgressPercent
+            else -> throw IllegalArgumentException("Unknown team: $myTeam")
+        }
+
         val gameRecordDto = gameDataDto.toGameRecordDto(
             userId = user.userId,
             myTeam = myTeam,
             gameStatus = "DRAW",
             withTeam = withTeam,
             vsTeam = vsTeam,
+            myPercent = myPercent!!,
         )
 
         val gameRecord = gameRecordDto.toEntity(user)
@@ -179,28 +202,28 @@ class GameRecordService(
         usersRepository.save(user)
     }
 
-    private fun handleCooperationMode(
-        gameDataDto: GameDataDto,
-        user: Users,
-    ) {
-        val isPuzzleCompleted = gameDataDto.redProgressPercent == 100 // Assuming progress for cooperative mode
-        val gameStatus = if (isPuzzleCompleted) "COMPLETED" else "FAILED"
-        // 자기 자신을 제외한 팀원 리스트
-        val withTeam = gameDataDto.players
-            ?.filter { it.playerName != user.userName }
-            ?.map { it.playerName } ?: emptyList()
-
-        val gameRecordDto = gameDataDto.toGameRecordDto(
-            userId = user.userId,
-            myTeam = "COOPERATION",
-            gameStatus = gameStatus,
-            withTeam = withTeam,
-            vsTeam = emptyList(),
-        )
-
-        val gameRecord = gameRecordDto.toEntity(user)
-        gameRecordRepository.save(gameRecord)
-
-        updateUserStats(user, if (isPuzzleCompleted) "WIN" else "LOSS")
-    }
+//    private fun handleCooperationMode(
+//        gameDataDto: GameDataDto,
+//        user: Users,
+//    ) {
+//        val isPuzzleCompleted = gameDataDto.redProgressPercent == 100.0 // Assuming progress for cooperative mode
+//        val gameStatus = if (isPuzzleCompleted) "COMPLETED" else "FAILED"
+//        // 자기 자신을 제외한 팀원 리스트
+//        val withTeam = gameDataDto.players
+//            ?.filter { it.playerName != user.userName }
+//            ?.map { it.playerName } ?: emptyList()
+//
+//        val gameRecordDto = gameDataDto.toGameRecordDto(
+//            userId = user.userId,
+//            myTeam = "COOPERATION",
+//            gameStatus = gameStatus,
+//            withTeam = withTeam,
+//            vsTeam = emptyList(),
+//        )
+//
+//        val gameRecord = gameRecordDto.toEntity(user)
+//        gameRecordRepository.save(gameRecord)
+//
+//        updateUserStats(user, if (isPuzzleCompleted) "WIN" else "LOSS")
+//    }
 }
