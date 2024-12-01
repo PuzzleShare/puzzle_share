@@ -98,35 +98,33 @@ class GameController(
                         ?.values
                         ?.map { it.toSet() } ?: emptyList()
 
-                    if (Math.abs(redProgressPercent - blueProgressPercent) >= 25)
-                        {
-                            val targetTeam =
-                                if (redProgressPercent > blueProgressPercent) {
-                                    "BLUE"
-                                } else {
-                                    "RED"
-                                }
-                            val targetPuzzle =
-                                if (redProgressPercent > blueProgressPercent) {
-                                    game.bluePuzzle
-                                } else {
-                                    game.redPuzzle
-                                }!!
-                            // item frame add
-                            if (!targetPuzzle.addedFrame)
-                                {
-                                    targetPuzzle.addedFrame = true
-                                    targetPuzzle.addItem(5)
-                                    sendingOperations.convertAndSend(
-                                        "/topic/game/room/${game.gameId}/help",
-                                        InventoryResponse(
-                                            team = targetTeam,
-                                            inventory = targetPuzzle.inventory,
-                                            fitPieceIndex = -1,
-                                        ),
-                                    )
-                                }
+                    if (Math.abs(redProgressPercent - blueProgressPercent) >= 25) {
+                        val targetTeam =
+                            if (redProgressPercent > blueProgressPercent) {
+                                "BLUE"
+                            } else {
+                                "RED"
+                            }
+                        val targetPuzzle =
+                            if (redProgressPercent > blueProgressPercent) {
+                                game.bluePuzzle
+                            } else {
+                                game.redPuzzle
+                            }!!
+                        // item frame add
+                        if (!targetPuzzle.addedFrame) {
+                            targetPuzzle.addedFrame = true
+                            targetPuzzle.addItem(5)
+                            sendingOperations.convertAndSend(
+                                "/topic/game/room/${game.gameId}/help",
+                                InventoryResponse(
+                                    team = targetTeam,
+                                    inventory = targetPuzzle.inventory,
+                                    fitPieceIndex = -1,
+                                ),
+                            )
                         }
+                    }
                 }
             }
 
@@ -139,7 +137,7 @@ class GameController(
         @DestinationVariable
         gameId: String,
         pointerMoveDTO: PointerMoveDTO,
-    )  {
+    ) {
         sendingOperations.convertAndSend("/topic/game/$gameId/mouse", pointerMoveDTO)
     }
 
@@ -152,7 +150,7 @@ class GameController(
             if (game.isStarted && !game.isFinished) {
                 var time = game.getTime()
                 if (game.gameType == "BATTLE") {
-                    time = battleTimer - time
+                    time = game.battleTimer - time
                 }
                 if (time >= 0) {
                     val timer = mapOf("time" to time)

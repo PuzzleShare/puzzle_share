@@ -18,6 +18,7 @@ class PuzzleRoom(
     var master: Long,
     var masterImage: String,
     var masterName: String,
+    var battleTimer: Int? = null,
 ) {
     fun updateMaster(newMaster: PlayerRequest) {
         this.master = newMaster.playerId!!

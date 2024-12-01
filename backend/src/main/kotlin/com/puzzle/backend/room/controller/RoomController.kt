@@ -24,6 +24,14 @@ class RoomController(
     override fun createRoom(
         @RequestBody request: CreateRoomRequest,
     ): ResponseEntity<RoomIdResponse> {
+        if (request.gameMode.equals("battle", ignoreCase = true)) {
+            // 1, 3, 5, 8, 10분
+            val validTimers = listOf(60, 180, 300, 480, 600)
+            if (request.battleTimer == null || request.battleTimer !in validTimers) {
+                return ResponseEntity.badRequest().body(RoomIdResponse("Invalid battle timer"))
+            }
+        }
+
         val newRoom = roomService.createRoom(request)
         return ResponseEntity.ok(newRoom)
     }
@@ -46,7 +54,7 @@ class RoomController(
     @PostMapping("/image/dimensions")
     fun getImageDimensions(
         @RequestParam imageUrl: String,
-    ): ResponseEntity<Boolean> {
+    ): ResponseEntity<Int> {
         val response = roomService.isPuzzleImageValid(imageUrl)
         return ResponseEntity.ok(response)
     }

@@ -19,6 +19,8 @@ data class Room(
     var master: Long,
     var masterImage: String,
     var masterName: String,
+    // 배틀 타이머 추가 (초 단위)
+    var battleTimer: Int? = null,
 ) {
     fun updateMaster(newMaster: PlayerRequest) {
         this.master = newMaster.playerId

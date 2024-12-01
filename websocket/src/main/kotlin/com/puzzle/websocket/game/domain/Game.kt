@@ -10,6 +10,7 @@ data class Game(
     var gameName: String = "",
     var roomSize: Int = 0,
     var gameType: String = "",
+    var battleTimer: Int = 180,
     var admin: User? = null,
     var picture: Picture? = null,
     var redTeam: MutableList<PlayerRequest> = mutableListOf(),
@@ -38,9 +39,10 @@ data class Game(
         isStarted = true
     }
 
-    fun getTime(): Long {
-        val nowTime = Date()
-        return (nowTime.time - (startTime?.time ?: 0)) / 1000
+    fun getTime(): Int {
+        val currentTime = System.currentTimeMillis()
+        val elapsedTime = (currentTime - this.startTime!!.time) / 1000
+        return elapsedTime.toInt()
     }
 
     companion object {
@@ -68,6 +70,7 @@ data class Game(
                     gameType = gameType,
                     sessionToUser = mutableMapOf(),
                     picture = picture, // 생성한 Picture 객체를 설정
+                    battleTimer = room.battleTimer!!,
                 )
 
             if (gameType == "BATTLE") {
