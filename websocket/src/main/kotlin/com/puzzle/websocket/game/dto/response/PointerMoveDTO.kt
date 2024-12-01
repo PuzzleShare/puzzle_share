@@ -4,6 +4,7 @@ import com.puzzle.websocket.room.dto.request.PlayerRequest
 
 class PointerMoveDTO (
     val playerId: Long,
+    val playerName: String,
     val x: Int,
     val y: Int,
     val team: String,
@@ -20,7 +21,8 @@ class PointerMoveDTO (
                 x = 0,
                 y = 0,
                 color = color,
-                playerId = playerRequest.playerId!!
+                playerId = playerRequest.playerId!!,
+                playerName = playerRequest.playerName!!,
             )
         }
     }
