@@ -18,15 +18,16 @@ data class GameRecordDto(
     val puzzleImage: String,
     // 퍼즐 조각 수
     val totalPieceCount: Int,
+    val myPercent: Double,
     // 게임 시간 (분)
     val durationInMinutes: Int,
     // 게임 종료 시간
     val playedAt: LocalDateTime,
     // JSON 형태의 동료 팀원 ID 리스트
-    val teamMates: String? = null,
+    val teamMates: String?=null,
     // JSON 형태의 상대 팀원 ID 리스트 (협동 모드의 경우 NULL)
-    val opponents: String? = null,
-    val myTeam: String? = null,
+    val opponents: String?=null,
+    val myTeam: String?=null,
     val gameStatus: String? = null,
 ) {
     fun toEntity(user: Users): GameRecord {
@@ -42,6 +43,7 @@ data class GameRecordDto(
             teamMates = this.teamMates,
             opponents = this.opponents,
             myTeam = this.myTeam,
+            myPercent = this.myPercent,
             gameStatus = this.gameStatus,
         )
     }

@@ -43,6 +43,8 @@ data class GameRecord(
     @Column(nullable = true)
     val gameStatus: String?,
     @Column(nullable = false)
+    val myPercent: Double,
+    @Column(nullable = false)
     val puzzleImage: String,
     @Column(nullable = false)
     val totalPieceCount: Int,
@@ -67,6 +69,7 @@ data class GameRecord(
             playedAt = this.playedAt,
             // 이미 JSON 문자열이므로 그대로 전달
             teamMates = this.teamMates,
+            myPercent = this.myPercent,
             // 이미 JSON 문자열이므로 그대로 전달
             opponents = this.opponents,
             myTeam = this.myTeam,

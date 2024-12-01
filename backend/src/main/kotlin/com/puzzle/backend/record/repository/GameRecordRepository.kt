@@ -28,4 +28,10 @@ interface GameRecordRepository : JpaRepository<GameRecord, Long> {
         gameType: String,
         pageable: Pageable,
     ): Page<GameRecord>
+
+    fun findGameRecordsByMyPercentAndUserOrderByPlayedAtDesc(
+        myPercent: Double = 100.0,
+        user: Users,
+
+    ): List<GameRecord>
 }

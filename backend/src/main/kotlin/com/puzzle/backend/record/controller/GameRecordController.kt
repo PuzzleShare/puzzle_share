@@ -3,6 +3,7 @@ package com.puzzle.backend.record.controller
 import com.puzzle.backend.oauth.repository.UsersRepository
 import com.puzzle.backend.record.dto.GameDataDto
 import com.puzzle.backend.record.dto.GameRecordDto
+import com.puzzle.backend.record.dto.UserGalleryResponse
 import com.puzzle.backend.record.dto.UserGameRecordsResponse
 import com.puzzle.backend.record.service.GameRecordService
 import org.springframework.data.domain.Page
@@ -74,5 +75,14 @@ class GameRecordController(
             currentPage = pagedGameRecords.number,
         )
         return ResponseEntity.ok(response)
+    }
+
+    // 특정 유저의 게임 전적 조회
+    @GetMapping("/{userId}/records/gallery")
+    fun getUserGameRecordsGallery(
+        @PathVariable
+        userId: Long,
+    ): ResponseEntity<List<UserGalleryResponse>> {
+        return ResponseEntity.ok(gameRecordService.findGameRecordsForGallery(userId))
     }
 }
