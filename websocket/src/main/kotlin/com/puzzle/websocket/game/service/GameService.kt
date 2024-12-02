@@ -143,32 +143,27 @@ class GameService(
 
         when (message) {
             "ADD_PIECE" -> {
-                lock.lock() // 락 획득
-                try {
-                    val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
-                    ourPuzzle.addPiece(pieces)
-                    pieces.forEach {
-                        if (ourPuzzle.itemPiece.contains(it) && !ourPuzzle.itemPiece[it]!!) {
-                            val attackItem = listOf(1, 2, 3, 4)
-                            ourPuzzle.addItem(attackItem[(Math.random() * attackItem.size).toInt()])
-                            ourPuzzle.itemPiece[it] = true
-                            sendingOperations.convertAndSend(
-                                "/topic/game/room/$roomId/useItem",
-                                InventoryResponse(
-                                    team = ourColor,
-                                    inventory = ourPuzzle.inventory,
-                                    fitPieceIndex = it,
-                                )
+                val pieces = targets.split(",").mapNotNull { it.toIntOrNull() }
+                ourPuzzle.addPiece(pieces)
+                pieces.forEach {
+                    if (ourPuzzle.itemPiece.contains(it) && !ourPuzzle.itemPiece[it]!!) {
+                        val attackItem = listOf(1, 2, 3, 4)
+                        ourPuzzle.addItem(attackItem[(Math.random() * attackItem.size).toInt()])
+                        ourPuzzle.itemPiece[it] = true
+                        sendingOperations.convertAndSend(
+                            "/topic/game/room/$roomId/useItem",
+                            InventoryResponse(
+                                team = ourColor,
+                                inventory = ourPuzzle.inventory,
+                                fitPieceIndex = it,
                             )
-                        }
+                        )
                     }
-
-                    res.team = ourColor
-                    res.message = "ADD_PIECE"
-                    res.targets = targets
-                } finally {
-                    lock.unlock() // 반드시 락 해제
                 }
+
+                res.team = ourColor
+                res.message = "ADD_PIECE"
+                res.targets = targets
 
                 savePuzzle(game)
             }
@@ -240,18 +235,14 @@ class GameService(
         }
 
         // 게임 끝났는지 마지막에 확인
-        if ((ourPuzzle.isCompleted || yourPuzzle.isCompleted) && (game.isStarted &&!game.isFinished)) {
+        if ((ourPuzzle.isCompleted || yourPuzzle.isCompleted) && (game.isStarted && !game.isFinished)) {
 
-            lock.lock()
-            try {
-                game.isFinished = true
-                game.finishTime = Date()
-                res.isFinished = game.isFinished
-                res.game = game
-                res.message="SAVE_RECORD"
-            } finally {
-                lock.unlock()
-            }
+            game.isFinished = true
+            game.finishTime = Date()
+            res.isFinished = game.isFinished
+            res.game = game
+            res.message = "SAVE_RECORD"
+
 
             res.redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
             res.blueProgressPercent = if (game.gameType == "BATTLE") {
@@ -274,6 +265,7 @@ class GameService(
 
             sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
             game.isStarted = false
+            res.isStarted = false
             val waitingRoomId = game.roomId
             val room = puzzleRoomRepository.findById(waitingRoomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId") }
             room.roomStatus = "WAITING"

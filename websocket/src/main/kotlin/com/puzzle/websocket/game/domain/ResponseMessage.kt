@@ -10,6 +10,7 @@ data class ResponseMessage(
     var positionY: Int = 0,
     var targets: String? = null,
     var isFinished: Boolean = false,
+    var isStarted: Boolean = true,
     var redProgressPercent: Double = -1.0,
     var blueProgressPercent: Double = -1.0,
     var deleted: Map<Int, DoubleArray>? = null,
