@@ -85,8 +85,10 @@ enum class GameItem(
         val (x, y) = targetPuzzle.getCanvasCenter()
         targets.forEach {
             it.forEach {
-                it.position_x = x
-                it.position_y = y
+                val randomX = (Math.random() * 20).toInt()
+                it.position_x = x + randomX * if (randomX % 2 == 0) { 1 } else { -1 }
+                val randomY = (Math.random() * 20).toInt()
+                it.position_y = y + randomY * if (randomY % 2 == 0) { 1 } else { -1 }
             }
         }
 
