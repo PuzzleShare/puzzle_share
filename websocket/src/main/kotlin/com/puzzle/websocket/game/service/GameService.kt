@@ -32,6 +32,7 @@ import java.util.concurrent.locks.ReentrantLock
 class GameService(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val sendingOperations: SimpMessageSendingOperations,
+    private val puzzleRoomRepository: PuzzleRoomRepository
 ) {
     val gameRooms: MutableMap<String, Game> = mutableMapOf()
     val gson: Gson = Gson()
@@ -110,7 +111,7 @@ class GameService(
     }
 
     @Throws(Exception::class)
-    fun playGame(sharePuzzle: SharePuzzle, puzzleRoomRepository: PuzzleRoomRepository): ResponseMessage {
+    fun playGame(sharePuzzle: SharePuzzle): ResponseMessage {
         val roomId = sharePuzzle.roomId
         val sender = sharePuzzle.sender
         var message = sharePuzzle.message

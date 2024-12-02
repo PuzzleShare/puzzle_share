@@ -72,7 +72,7 @@ class GameController(
 
     @MessageMapping("/game/puzzle")
     @Throws(Exception::class)
-    fun puzzle(sharePuzzle: SharePuzzle, puzzleRoomRepository: PuzzleRoomRepository) {
+    fun puzzle(sharePuzzle: SharePuzzle) {
         val game = gameService.findById(sharePuzzle.roomId) ?: return
 
         if (!game.isStarted) {
@@ -80,7 +80,7 @@ class GameController(
         }
 
         val res =
-            gameService.playGame(sharePuzzle, puzzleRoomRepository).apply {
+            gameService.playGame(sharePuzzle).apply {
                 // 혼합 방식 진행률 계산 반영
                 redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
                 blueProgressPercent =
