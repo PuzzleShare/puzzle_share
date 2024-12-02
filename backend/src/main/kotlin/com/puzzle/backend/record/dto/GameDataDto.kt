@@ -8,6 +8,7 @@ import java.time.ZoneId
 import java.util.Date
 
 data class GameDataDto(
+    var gameId: String,
     var gameName: String,
     // 게임 유형 (BATTLE, COOPERATION)
     var gameType: String,
@@ -56,6 +57,7 @@ data class GameDataDto(
             myTeam = myTeam,
             myPercent = myPercent,
             gameStatus = gameStatus,
+            gameId = this.gameId,
         )
     }
 

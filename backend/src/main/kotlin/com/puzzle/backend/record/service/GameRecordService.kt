@@ -33,6 +33,10 @@ class GameRecordService(
             IllegalArgumentException("User not found with ID: $userId")
         }
 
+        if (gameRecordRepository.existsGameRecordByUserAndGameId(user, gameId = gameDataDto.gameId)){
+            throw IllegalArgumentException("Exists GameRecord ${gameDataDto.gameId} $userId")
+        }
+
         when (gameDataDto.gameType) {
             "BATTLE" -> handleBattleMode(gameDataDto, user)
 //            "COOPERATION" -> handleCooperationMode(gameDataDto, user)
@@ -48,7 +52,6 @@ class GameRecordService(
             gameDataDto.redProgressPercent ?: 0.0,
             gameDataDto.blueProgressPercent ?: 0.0,
         )
-
         if (winnerTeam == "DRAW") {
             saveDrawRecords(gameDataDto, user)
         } else {
@@ -94,7 +97,6 @@ class GameRecordService(
 
         val gameRecord = gameRecordDto.toEntity(user)
         gameRecordRepository.save(gameRecord)
-
         updateUserStats(user, if (isWinningTeam) "WIN" else "LOSS")
     }
 
