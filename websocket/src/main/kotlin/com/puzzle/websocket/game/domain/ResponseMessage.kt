@@ -16,4 +16,5 @@ data class ResponseMessage(
     var deleted: Map<Int, DoubleArray>? = null,
     var redBundles: List<Set<Piece>>? = null,
     var blueBundles: List<Set<Piece>>? = null,
+    var battleTimer: Int? = null,
 )
