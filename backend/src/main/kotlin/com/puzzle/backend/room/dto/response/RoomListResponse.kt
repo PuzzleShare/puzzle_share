@@ -8,7 +8,7 @@ data class RoomListResponse(
     // 방 이름
     val roomName: String,
     val gameMode: String,
-    val roomStatus: String, // 방 상태
+    var roomStatus: String,
     val puzzleImage: String,
     val puzzlePiece: Int,
     // 최대 참가자 수
