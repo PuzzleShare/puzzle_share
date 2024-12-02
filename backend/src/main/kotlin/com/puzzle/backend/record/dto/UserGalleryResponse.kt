@@ -9,14 +9,14 @@ data class UserGalleryResponse(
     val puzzleImage: String,
     val totalPieceCount: Int,
     val durationInMinutes: Int,
-    val playedAt: LocalDateTime, // 게임 종료 시간
+    val playedAt: LocalDateTime,
     val teamMates: String?,
     val opponents: String?,
-    val myTeam: String?
+    val myTeam: String?,
 ) {
     companion object {
-        fun of(gameRecord: GameRecord): UserGalleryResponse {
-            return UserGalleryResponse(
+        fun of(gameRecord: GameRecord): UserGalleryResponse =
+            UserGalleryResponse(
                 recordId = gameRecord.recordId,
                 gameName = gameRecord.gameName,
                 puzzleImage = gameRecord.puzzleImage,
@@ -25,8 +25,7 @@ data class UserGalleryResponse(
                 playedAt = gameRecord.playedAt,
                 teamMates = gameRecord.teamMates,
                 opponents = gameRecord.opponents,
-                myTeam = gameRecord.myTeam
+                myTeam = gameRecord.myTeam,
             )
-        }
     }
 }

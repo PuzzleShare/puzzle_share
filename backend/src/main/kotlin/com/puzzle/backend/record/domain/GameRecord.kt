@@ -43,7 +43,7 @@ data class GameRecord(
     @Column(nullable = true)
     val gameStatus: String?,
     @Column(nullable = false)
-    val myPercent: Double,
+    val myPercent: Double?,
     @Column(nullable = false)
     val puzzleImage: String,
     @Column(nullable = false)

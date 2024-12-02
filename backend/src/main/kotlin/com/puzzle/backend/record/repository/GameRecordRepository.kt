@@ -32,6 +32,5 @@ interface GameRecordRepository : JpaRepository<GameRecord, Long> {
     fun findGameRecordsByMyPercentAndUserOrderByPlayedAtDesc(
         myPercent: Double = 100.0,
         user: Users,
-
     ): List<GameRecord>
 }
