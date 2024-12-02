@@ -181,12 +181,13 @@ class GameController(
                                 } else {
                                     emptyList()
                                 }
+                            message="SAVE_RECORD"
                         }
                     game.isFinished = true
-                    res.isFinished = game.isFinished
+                    res.isFinished = true
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-
                     game.isStarted = false
+                    res.isStarted = false
 
                     // room 상태 변경
                     val roomId = game.roomId

@@ -270,6 +270,7 @@ class GameService(
             val room = puzzleRoomRepository.findById(waitingRoomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId") }
             room.roomStatus = "WAITING"
             puzzleRoomRepository.save(room)
+            deleteGame(game.gameId)
 
         }
 
