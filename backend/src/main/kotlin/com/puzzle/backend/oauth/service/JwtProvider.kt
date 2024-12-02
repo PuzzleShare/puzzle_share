@@ -92,18 +92,14 @@ class JwtProvider(
         refreshToken: String,
         response: HttpServletResponse,
     ) {
-        val hour = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1)
-        val hourFormatted = hour.format(DateTimeFormatter.RFC_1123_DATE_TIME)
         response.addHeader(
             "Set-Cookie",
-            "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Expires=$hourFormatted",
+            "jwt=$accessToken; Domain=$frontDomain; Path=/; Secure; SameSite=None; Max-Age=$HOUR",
         )
 
-        val day = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusDays(1)
-        val dayFormatted = day.format(DateTimeFormatter.RFC_1123_DATE_TIME)
         response.addHeader(
             "Set-Cookie",
-            "refresh=$refreshToken; Path=/; HttpOnly; Secure; SameSite=None; Expires=$dayFormatted",
+            "refresh=$refreshToken; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=$DAY",
         )
     }
 }
