@@ -11,6 +11,7 @@ data class Room(
     val roomId: String,
     val roomName: String,
     val gameMode: String,
+    var roomStatus: String,
     val puzzleImage: String,
     val puzzlePiece: Int,
     val maxPlayers: Int,

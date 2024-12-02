@@ -20,6 +20,7 @@ data class CreateRoomRequest(
             roomId = UUID.randomUUID().toString(),
             roomName = roomName,
             gameMode = gameMode,
+            roomStatus = "WAITING",
             puzzleImage = puzzleImage,
             puzzlePiece = puzzlePiece,
             maxPlayers = maxPlayers,

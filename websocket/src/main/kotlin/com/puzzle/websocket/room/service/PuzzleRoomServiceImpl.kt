@@ -1,6 +1,7 @@
 package com.puzzle.websocket.room.service
 
 import com.puzzle.backend.common.exception.custom.RoomFullException
+import com.puzzle.websocket.common.exception.custom.NoneMasterException
 import com.puzzle.websocket.game.service.GameService
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import com.puzzle.websocket.room.dto.request.InviteRequest
@@ -25,6 +26,9 @@ class PuzzleRoomServiceImpl(
         playerRequest: PlayerRequest,
     ) {
         val room = findById(roomId)
+        if (room.roomStatus=="PLAYING"){
+            return
+        }
         if (room.bluePlayers.contains(playerRequest) || room.redPlayers.contains(playerRequest)) {
             return
         }
@@ -98,10 +102,14 @@ class PuzzleRoomServiceImpl(
     ) {
         val room = findById(roomId)
         if (room.master != playerRequest.playerId) {
-            return
+            throw NoneMasterException("방장이 아닙니다.")
         }
         var game = gameService.createGame(room)
         game = gameService.startGame(game.gameId)!!
+
+        // 방 상태 게임중으로 변경
+        room.roomStatus = "PLAYING"
+        puzzleRoomRepository.save(room)
         messagingTemplate.convertAndSend(
             "/topic/room/$roomId/game",
             game,
