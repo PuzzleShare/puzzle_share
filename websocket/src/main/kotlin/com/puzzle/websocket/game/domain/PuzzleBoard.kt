@@ -89,6 +89,7 @@ class PuzzleBoard : Serializable {
         val firstItenPieceIndex = (Math.random() * cnt).toInt()
         itemPiece[firstItenPieceIndex] = false
         itemPiece[(firstItenPieceIndex + cnt / 3) % cnt] = false
+        itemPiece[(firstItenPieceIndex + cnt / 3) * 2 % cnt] = false
 
         return board
     }
