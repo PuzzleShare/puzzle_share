@@ -3,6 +3,7 @@ package com.puzzle.backend.room.dto.response
 import com.puzzle.backend.room.domain.Room
 import com.puzzle.backend.room.dto.request.PlayerRequest
 import java.io.Serializable
+import java.time.LocalDateTime
 
 data class WaitingRoomResponse(
     val roomId: String,
@@ -20,6 +21,7 @@ data class WaitingRoomResponse(
     // 현재 참가자 목록
     val bluePlayers: List<PlayerRequest> = listOf(),
     val master: Long,
+    val createdAt: LocalDateTime,
 ) : Serializable {
     companion object {
         fun toResponse(
@@ -37,6 +39,7 @@ data class WaitingRoomResponse(
                 room.redPlayers,
                 room.bluePlayers,
                 room.master,
+                room.createdAt,
             )
     }
 }
