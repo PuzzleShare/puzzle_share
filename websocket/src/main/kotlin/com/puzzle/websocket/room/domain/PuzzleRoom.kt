@@ -10,6 +10,7 @@ class PuzzleRoom(
     val roomId: String, // 방 ID
     val roomName: String, // 방 이름
     val gameMode: String,
+    var roomStatus: String,
     val puzzleImage: String,
     val puzzlePiece: Int,
     val maxPlayers: Int, // 최대 참가자 수
