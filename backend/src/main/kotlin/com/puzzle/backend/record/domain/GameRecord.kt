@@ -54,6 +54,8 @@ data class GameRecord(
     val durationInMinutes: Int,
     @Column(nullable = false)
     val playedAt: LocalDateTime,
+    @Column(nullable = false)
+    val battleTimer: Int,
 ) {
     fun toDto(): GameRecordDto {
         val objectMapper = jacksonObjectMapper()
@@ -77,6 +79,7 @@ data class GameRecord(
             opponents = this.opponents,
             myTeam = this.myTeam,
             gameStatus = this.gameStatus,
+            battleTimer = this.battleTimer,
         )
     }
 }

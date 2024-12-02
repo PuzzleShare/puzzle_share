@@ -30,6 +30,7 @@ data class GameRecordDto(
     val opponents: String? = null,
     val myTeam: String? = null,
     val gameStatus: String? = null,
+    val battleTimer: Int? = null,
 ) {
     fun toEntity(user: Users): GameRecord =
         GameRecord(
@@ -47,5 +48,6 @@ data class GameRecordDto(
             myTeam = this.myTeam,
             myPercent = this.myPercent,
             gameStatus = this.gameStatus,
+            battleTimer = this.battleTimer!!,
         )
 }

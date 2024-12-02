@@ -185,6 +185,7 @@ class GameController(
                         }
                     game.isFinished = true
                     res.isFinished = true
+                    res.battleTimer = game.battleTimer
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
                     game.isStarted = false
                     res.isStarted = false

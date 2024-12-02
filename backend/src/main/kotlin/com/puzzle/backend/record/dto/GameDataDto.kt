@@ -26,6 +26,7 @@ data class GameDataDto(
     var puzzleImage: String,
     // 퍼즐 조각 수
     var totalPieceCount: Int,
+    var battleTimer: Int,
     // 퍼즐 시작 시간
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
     var startTime: LocalDateTime,
@@ -58,6 +59,7 @@ data class GameDataDto(
             myPercent = myPercent,
             gameStatus = gameStatus,
             gameId = this.gameId,
+            battleTimer = this.battleTimer,
         )
     }
 
