@@ -21,6 +21,7 @@ import com.puzzle.websocket.game.dto.response.InventoryResponse
 import com.puzzle.websocket.game.enums.GameItem
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import com.puzzle.websocket.room.dto.request.PlayerRequest
+import com.puzzle.websocket.room.repository.PuzzleRoomRepository
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Service
@@ -109,7 +110,7 @@ class GameService(
     }
 
     @Throws(Exception::class)
-    fun playGame(sharePuzzle: SharePuzzle): ResponseMessage {
+    fun playGame(sharePuzzle: SharePuzzle, puzzleRoomRepository: PuzzleRoomRepository): ResponseMessage {
         val roomId = sharePuzzle.roomId
         val sender = sharePuzzle.sender
         var message = sharePuzzle.message
@@ -272,6 +273,11 @@ class GameService(
 
             sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
             game.isStarted = false
+            val waitingRoomId = game.roomId
+            val room = puzzleRoomRepository.findById(waitingRoomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId") }
+            room.roomStatus = "WAITING"
+            puzzleRoomRepository.save(room)
+
         }
 
         // 진행도 추가

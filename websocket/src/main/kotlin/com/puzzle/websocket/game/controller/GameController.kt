@@ -6,6 +6,7 @@ import com.puzzle.websocket.game.domain.User
 import com.puzzle.websocket.game.dto.response.InventoryResponse
 import com.puzzle.websocket.game.dto.response.PointerMoveDTO
 import com.puzzle.websocket.game.service.GameService
+import com.puzzle.websocket.room.repository.PuzzleRoomRepository
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -21,6 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 @EnableScheduling
 class GameController(
     private val gameService: GameService,
+    private val puzzleRoomRepository: PuzzleRoomRepository,
     private val sendingOperations: SimpMessageSendingOperations,
 ) {
     private val battleTimer = 300
@@ -70,7 +72,7 @@ class GameController(
 
     @MessageMapping("/game/puzzle")
     @Throws(Exception::class)
-    fun puzzle(sharePuzzle: SharePuzzle) {
+    fun puzzle(sharePuzzle: SharePuzzle, puzzleRoomRepository: PuzzleRoomRepository) {
         val game = gameService.findById(sharePuzzle.roomId) ?: return
 
         if (!game.isStarted) {
@@ -78,7 +80,7 @@ class GameController(
         }
 
         val res =
-            gameService.playGame(sharePuzzle).apply {
+            gameService.playGame(sharePuzzle, puzzleRoomRepository).apply {
                 // 혼합 방식 진행률 계산 반영
                 redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
                 blueProgressPercent =
@@ -187,6 +189,13 @@ class GameController(
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
 
                     game.isStarted = false
+
+                    // room 상태 변경
+                    val roomId = game.roomId
+                    val room = puzzleRoomRepository.findById(roomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
+                    room.roomStatus = "WAITING"
+                    puzzleRoomRepository.save(room)
+
                     Thread.sleep(20)
                     gameService.deleteGame(game.gameId)
                 }

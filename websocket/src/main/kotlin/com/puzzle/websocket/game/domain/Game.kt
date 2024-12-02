@@ -8,6 +8,7 @@ import java.util.UUID
 data class Game(
     var gameId: String = "",
     var gameName: String = "",
+    var roomId : String = "",
     var roomSize: Int = 0,
     var gameType: String = "",
     var admin: User? = null,
@@ -46,6 +47,7 @@ data class Game(
     companion object {
         fun create(room: PuzzleRoom): Game {
             val name = room.roomName
+            val roomId = room.roomId
             val roomSize = room.maxPlayers
             val gameType = "BATTLE"
             val puzzleImage = room.puzzleImage
@@ -64,6 +66,7 @@ data class Game(
                 Game(
                     gameId = uuid,
                     gameName = name,
+                    roomId = roomId,
                     roomSize = roomSize,
                     gameType = gameType,
                     sessionToUser = mutableMapOf(),
