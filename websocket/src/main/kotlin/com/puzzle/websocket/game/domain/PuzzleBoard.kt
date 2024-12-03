@@ -87,11 +87,6 @@ class PuzzleBoard : Serializable {
         inventory[0] = (Math.random() * 4).toInt() + 1
         inventory[1] = (Math.random() * 4).toInt() + 1
         inventory[2] = (Math.random() * 4).toInt() + 1
-        inventory[3] = (Math.random() * 4).toInt() + 1
-        inventory[4] = (Math.random() * 4).toInt() + 1
-        inventory[5] = (Math.random() * 4).toInt() + 1
-        inventory[6] = (Math.random() * 4).toInt() + 1
-        inventory[7] = (Math.random() * 4).toInt() + 1
         val firstItenPieceIndex = (Math.random() * cnt).toInt()
         itemPiece[firstItenPieceIndex] = false
         itemPiece[(firstItenPieceIndex + cnt / 3) % cnt] = false
