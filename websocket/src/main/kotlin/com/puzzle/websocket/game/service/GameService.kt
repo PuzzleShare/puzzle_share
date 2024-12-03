@@ -222,9 +222,11 @@ class GameService(
                 piece.position_y = arr[0].y
 
                 ourPuzzle.bundles[piece.bundleNum]!!.forEach {
-                    val (x, y) = getNewPoint(ourPuzzle, piece, it)
-                    it.position_x = x
-                    it.position_y = y
+                    if (it != piece){
+                        val (x, y) = getNewPoint(ourPuzzle, piece, it)
+                        it.position_x = x
+                        it.position_y = y
+                    }
                 }
             }
 
@@ -308,10 +310,14 @@ class GameService(
         puzzle: PuzzleBoard,
         std: Piece,
         target: Piece,
-    ): Pair<Double, Double> = Pair(
-        (target.position_x - std.position_x) * puzzle.pieceSize,
-        (target.position_y - std.position_y) * puzzle.pieceSize,
-    )
+    ): Pair<Double, Double> {
+        val (targetY, targetX) = puzzle.idxToCoordinate[target.index]!!
+        val (stdY, stdX) = puzzle.idxToCoordinate[std.index]!!
+        return Pair(
+            std.position_x + (targetX - stdX) * puzzle.pieceSize,
+            std.position_y + (targetY - stdY) * puzzle.pieceSize,
+        )
+    }
 
     private fun calculateProgress(puzzle: PuzzleBoard): Double {
         return puzzle.calculateMixedProgress() // PuzzleBoard의 혼합 진행률 계산 호출

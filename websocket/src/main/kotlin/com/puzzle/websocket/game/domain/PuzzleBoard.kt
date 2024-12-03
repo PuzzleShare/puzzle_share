@@ -86,6 +86,12 @@ class PuzzleBoard : Serializable {
 
         inventory[0] = (Math.random() * 4).toInt() + 1
         inventory[1] = (Math.random() * 4).toInt() + 1
+        inventory[2] = (Math.random() * 4).toInt() + 1
+        inventory[3] = (Math.random() * 4).toInt() + 1
+        inventory[4] = (Math.random() * 4).toInt() + 1
+        inventory[5] = (Math.random() * 4).toInt() + 1
+        inventory[6] = (Math.random() * 4).toInt() + 1
+        inventory[7] = (Math.random() * 4).toInt() + 1
         val firstItenPieceIndex = (Math.random() * cnt).toInt()
         itemPiece[firstItenPieceIndex] = false
         itemPiece[(firstItenPieceIndex + cnt / 3) % cnt] = false
@@ -208,19 +214,14 @@ class PuzzleBoard : Serializable {
             return
         }
 
-//        val (bundleLarge, bundleSmall) =
-//            if (bundles[piece1.bundleNum]!!.size >= bundles[piece2.bundleNum]!!.size) {
-//                bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
-//            } else {
-//                bundles[piece2.bundleNum]!! to bundles[piece1.bundleNum]!!
-//            }
-        val (bundleLarge, bundleSmall) = bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
-        val (largeIdx, smallIdx) = (bundleLarge.first().bundleNum to bundleSmall.first().bundleNum)
+        val (fromBundle, toBundle) = bundles[piece1.bundleNum]!! to bundles[piece2.bundleNum]!!
+        val fromBundleNum = piece1.bundleNum
+        val toBundleNum = piece2.bundleNum
 
-        updateConnectedEdgeCount(bundleLarge, bundleSmall)
-        bundleSmall.forEach { it.bundleNum = largeIdx }
-        bundles[largeIdx]!!.addAll(bundleSmall)
-        bundles.remove(smallIdx)
+        updateConnectedEdgeCount(fromBundle, toBundle)
+        fromBundle.forEach { it.bundleNum = toBundleNum }
+        toBundle.addAll(fromBundle)
+        bundles.remove(fromBundleNum)
 
         isCompleted = bundles.size == 1 // && connectedEdges == totalEdges
     }
