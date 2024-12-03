@@ -63,7 +63,7 @@ data class Game(
                     imageName = puzzleImage,
                     encodedString = puzzleImage,
                     width = room.imgWidth,
-                    length = room.imgHeight,
+                    length = room.imgLength,
                 )
 
             val game =
