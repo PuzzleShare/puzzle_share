@@ -22,6 +22,8 @@ data class GameRecord(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val recordId: Long = 0L,
+    @Column(nullable = false, name =  "game_id")
+    val gameId: String? = null,
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     val user: Users,
@@ -52,12 +54,15 @@ data class GameRecord(
     val durationInMinutes: Int,
     @Column(nullable = false)
     val playedAt: LocalDateTime,
+    @Column(nullable = false)
+    val battleTimer: Int,
 ) {
     fun toDto(): GameRecordDto {
         val objectMapper = jacksonObjectMapper()
 
         return GameRecordDto(
             recordId = this.recordId,
+            gameId = this.gameId.toString(),
             userId = this.user.userId,
             gameName = this.gameName,
             gameType = this.gameType,
@@ -74,6 +79,7 @@ data class GameRecord(
             opponents = this.opponents,
             myTeam = this.myTeam,
             gameStatus = this.gameStatus,
+            battleTimer = this.battleTimer,
         )
     }
 }

@@ -9,6 +9,7 @@ data class GameRecordDto(
     val recordId: Long = 0,
     // 사용자 ID
     val userId: Long,
+    val gameId:String,
     val gameName: String? = null,
     // 게임 유형 (BATTLE, COOPERATION)
     val gameType: String,
@@ -29,10 +30,12 @@ data class GameRecordDto(
     val opponents: String? = null,
     val myTeam: String? = null,
     val gameStatus: String? = null,
+    val battleTimer: Int? = null,
 ) {
     fun toEntity(user: Users): GameRecord =
         GameRecord(
             user = user,
+            gameId = this.gameId,
             gameName = this.gameName!!,
             gameType = this.gameType,
             players = this.players.toString(),
@@ -45,5 +48,6 @@ data class GameRecordDto(
             myTeam = this.myTeam,
             myPercent = this.myPercent,
             gameStatus = this.gameStatus,
+            battleTimer = this.battleTimer!!,
         )
 }

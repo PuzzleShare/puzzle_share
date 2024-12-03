@@ -33,4 +33,9 @@ interface GameRecordRepository : JpaRepository<GameRecord, Long> {
         myPercent: Double = 100.0,
         user: Users,
     ): List<GameRecord>
+
+    fun existsGameRecordByUserAndGameId(
+        user:Users,
+        gameId:String
+    ) : Boolean
 }

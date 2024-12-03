@@ -251,16 +251,12 @@ class GameService(
         // 게임 끝났는지 마지막에 확인
         if ((ourPuzzle.isCompleted || yourPuzzle.isCompleted) && (game.isStarted && !game.isFinished)) {
 
-            lock.lock()
-            try {
-                game.isFinished = true
-                game.finishTime = Date()
-                res.isFinished = game.isFinished
-                res.game = game
-                res.message = "SAVE_RECORD"
-            } finally {
-                lock.unlock()
-            }
+            game.isFinished = true
+            game.finishTime = Date()
+            res.isFinished = game.isFinished
+            res.game = game
+            res.message = "SAVE_RECORD"
+
 
             res.redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
             res.blueProgressPercent = if (game.gameType == "BATTLE") {
@@ -283,11 +279,13 @@ class GameService(
 
             sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
             game.isStarted = false
+            res.isStarted = false
             val waitingRoomId = game.roomId
             val room = puzzleRoomRepository.findById(waitingRoomId)
                 .orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId") }
             room.roomStatus = "WAITING"
             puzzleRoomRepository.save(room)
+            deleteGame(game.gameId)
 
         }
 

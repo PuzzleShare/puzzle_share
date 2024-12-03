@@ -13,6 +13,7 @@ data class UserGalleryResponse(
     val teamMates: String?,
     val opponents: String?,
     val myTeam: String?,
+    val battleTimer: Int = 0,
 ) {
     companion object {
         fun of(gameRecord: GameRecord): UserGalleryResponse =
@@ -26,6 +27,7 @@ data class UserGalleryResponse(
                 teamMates = gameRecord.teamMates,
                 opponents = gameRecord.opponents,
                 myTeam = gameRecord.myTeam,
+                battleTimer = gameRecord.battleTimer,
             )
     }
 }

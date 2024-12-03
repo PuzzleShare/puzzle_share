@@ -3,6 +3,7 @@ package com.puzzle.backend.room.domain
 import com.puzzle.backend.room.dto.request.PlayerRequest
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
+import java.time.LocalDateTime
 
 @RedisHash(value = "Room", timeToLive = 86400)
 data class Room(
@@ -22,6 +23,7 @@ data class Room(
     var masterName: String,
     // 배틀 타이머 추가 (초 단위)
     var battleTimer: Int? = null,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 ) {
     fun updateMaster(newMaster: PlayerRequest) {
         this.master = newMaster.playerId
