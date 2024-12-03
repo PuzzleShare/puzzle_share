@@ -24,14 +24,12 @@ import com.puzzle.websocket.room.domain.PuzzleRoom
 import com.puzzle.websocket.room.dto.request.PlayerRequest
 import com.puzzle.websocket.room.repository.PuzzleRoomRepository
 import com.puzzle.websocket.room.service.PuzzleRoomService
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.Date
 import java.util.concurrent.locks.ReentrantLock
 
@@ -371,73 +369,30 @@ class GameService(
         runBlocking {
             val basicKey = "$gameKeyPrefix${game.gameId}"
             val jobList = mutableListOf<Deferred<Unit>>()
-            game.redPuzzle?.let { it ->
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString())
-                    },
-                )
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString())
-                    },
-                )
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString())
-                    },
-                )
-
-                val boardJson = objectMapper.writeValueAsString(it.board)
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:board", boardJson)
-                    },
-                )
-                val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCorrected", correctedJson)
-                    },
-                )
+            game.redPuzzle?.let {
+                jobList.add(redisSet("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString()))
+                jobList.add(redisSet("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString()))
+                jobList.add(redisSet("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString()))
+                jobList.add(redisSet("$basicKey:redPuzzle:board", objectMapper.writeValueAsString(it.board)))
+                // 2차원 배열 직렬화
+                jobList.add(redisSet("$basicKey:redPuzzle:isCorrected", objectMapper.writeValueAsString(it.isCorrected)))
             }
 
-            game.bluePuzzle?.let { it ->
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString())
-                    },
-                )
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString())
-                    },
-                )
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString())
-                    },
-                )
-
-                val boardJson = objectMapper.writeValueAsString(it.board)
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:board", boardJson)
-                    },
-                )
-                val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
-                jobList.add(
-                    async(Dispatchers.IO) {
-                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCorrected", correctedJson)
-                    },
-                )
+            game.bluePuzzle?.let {
+                jobList.add(redisSet("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString()))
+                jobList.add(redisSet("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString()))
+                jobList.add(redisSet("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString()))
+                jobList.add(redisSet("$basicKey:bluePuzzle:board", objectMapper.writeValueAsString(it.board)))
+                // 2차원 배열 직렬화
+                jobList.add(redisSet("$basicKey:bluePuzzle:isCorrected", objectMapper.writeValueAsString(it.isCorrected)))
             }
             jobList.forEach { it.await() }
         }
 
     private val gameKeyPrefix = "Game:"
 
-    private fun save(game: Game) {
+    private fun save(game: Game) = runBlocking {
+        val jobList = mutableListOf<Deferred<Unit>>()
         val basicKey = "$gameKeyPrefix${game.gameId}"
         val metaData =
             mapOf(
@@ -451,53 +406,64 @@ class GameService(
                 "isFinished" to game.isFinished,
                 "isSaved" to game.isSaved,
             )
-        redisTemplate.opsForValue().set("$basicKey:meta", objectMapper.writeValueAsString(metaData))
+        jobList.add(redisSet("$basicKey:meta", objectMapper.writeValueAsString(metaData)))
+        jobList.add(redisSet("$basicKey:redTeam", objectMapper.writeValueAsString(game.redTeam)))
+        jobList.add(redisSet("$basicKey:blueTeam", objectMapper.writeValueAsString(game.blueTeam)))
+        jobList.add(redisSet("$basicKey:players", objectMapper.writeValueAsString(game.players)))
 
-        redisTemplate.opsForValue().set("$basicKey:redTeam", objectMapper.writeValueAsString(game.redTeam))
-        redisTemplate.opsForValue().set("$basicKey:blueTeam", objectMapper.writeValueAsString(game.blueTeam))
-        redisTemplate.opsForValue().set("$basicKey:players", objectMapper.writeValueAsString(game.players))
-
-        game.picture?.let { redisTemplate.opsForValue().set("$basicKey:picture", objectMapper.writeValueAsString(it)) }
-
-        game.admin?.let { redisTemplate.opsForValue().set("$basicKey:admin", objectMapper.writeValueAsString(it)) }
+        game.picture?.let { jobList.add(redisSet("$basicKey:picture", objectMapper.writeValueAsString(it))) }
+        game.admin?.let { jobList.add(redisSet("$basicKey:admin", objectMapper.writeValueAsString(it))) }
 
         game.redPuzzle?.let { it ->
-            redisTemplate.opsForValue().set("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString())
-            redisTemplate.opsForValue().set("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString())
-            redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString())
+            jobList.add(redisSet("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString()))
+            jobList.add(redisSet("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString()))
+            jobList.add(redisSet("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString()))
             for (idxToCord in it.idxToCoordinate) {
-                redisTemplate.opsForHash<String, String>().put(
-                    "$basicKey:redPuzzle:idxToCoordinate",
-                    idxToCord.key.toString(),
-                    ListStringUtils.listToString(idxToCord.value),
+                jobList.add(
+                    redisPut(
+                        "$basicKey:redPuzzle:idxToCoordinate",
+                        idxToCord.key.toString(),
+                        ListStringUtils.listToString(idxToCord.value),
+                    )
                 )
             }
 
-            val boardJson = objectMapper.writeValueAsString(it.board)
-            redisTemplate.opsForValue().set("$basicKey:redPuzzle:board", boardJson)
-            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
-            redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCorrected", correctedJson)
+            jobList.add(redisSet("$basicKey:redPuzzle:board", objectMapper.writeValueAsString(it.board)))
+            // 2차원 배열 직렬화
+            jobList.add(redisSet("$basicKey:redPuzzle:isCorrected", objectMapper.writeValueAsString(it.isCorrected)))
         }
 
-        game.bluePuzzle?.let { it ->
-
-            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString())
-            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString())
-            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString())
-            for (idxToCord in it.idxToCoordinate) {
-                redisTemplate.opsForHash<String, String>().put(
-                    "$basicKey:bluePuzzle:idxToCoordinate",
-                    idxToCord.key.toString(),
-                    ListStringUtils.listToString(idxToCord.value),
+        game.bluePuzzle?.let {
+            jobList.add(redisSet("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString()))
+            jobList.add(redisSet("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString()))
+            jobList.add(redisSet("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString()))
+            it.idxToCoordinate.forEach {
+                jobList.add(
+                    redisPut(
+                        "$basicKey:bluePuzzle:idxToCoordinate",
+                        it.key.toString(),
+                        ListStringUtils.listToString(it.value),
+                    )
                 )
             }
 
-            val boardJson = objectMapper.writeValueAsString(it.board)
-            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:board", boardJson)
-            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
-            redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCorrected", correctedJson)
+            jobList.add(redisSet("$basicKey:bluePuzzle:board", objectMapper.writeValueAsString(it.board)))
+            // 2차원 배열 직렬화
+            jobList.add(redisSet("$basicKey:bluePuzzle:isCorrected", objectMapper.writeValueAsString(it.isCorrected)))
         }
+        jobList.forEach { it.await() }
     }
+
+    private suspend fun CoroutineScope.redisSet(
+        key: String,
+        data: String,
+    ):Deferred<Unit> = async(Dispatchers.IO) { redisTemplate.opsForValue().set(key, data) }
+
+    private suspend fun CoroutineScope.redisPut(
+        key: String,
+        hashKey: String,
+        data: String,
+    ):Deferred<Unit> = async(Dispatchers.IO) { redisTemplate.opsForHash<String, String>().put(key, hashKey, data) }
 
     private fun load(gameId: String): Game {
         val basicKey = "$gameKeyPrefix$gameId"

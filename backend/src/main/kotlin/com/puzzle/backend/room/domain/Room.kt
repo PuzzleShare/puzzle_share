@@ -15,7 +15,7 @@ data class Room(
     var roomStatus: String,
     var puzzleImage: String,
     var imgWidth: Int = 0,
-    var imgHeight: Int = 0,
+    var imgLength: Int = 0,
     val puzzlePiece: Int,
     val maxPlayers: Int,
     val redPlayers: MutableList<PlayerRequest> = mutableListOf(),
