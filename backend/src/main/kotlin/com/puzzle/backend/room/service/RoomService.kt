@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.net.URI
 import javax.imageio.ImageIO
+import kotlin.jvm.optionals.getOrNull
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -61,7 +62,9 @@ class RoomService(
                 compareBy<Room> { it.roomStatus != "WAITING" }
                     .thenByDescending { it.createdAt },
             ) // 방 이름으로 추가 정렬 필요시 사용
-        val response = roomList.map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
+        val response = roomList
+            .map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
+            .filter { it.nowPlayers != 0 }
         return response
     }
 
@@ -154,9 +157,8 @@ class RoomService(
     private fun findById(roomId: String): Room = roomRepository.findById(roomId).orElseThrow()
 
     private fun getParticipantCount(roomId: String): Int {
-        val room = findById(roomId)
+        val room = roomRepository.findById(roomId).getOrNull() ?: return 0
         val participantCount = room.redPlayers.size + room.bluePlayers.size
-        if (participantCount == 0) deleteRoom(roomId)
         return participantCount
     }
 }
