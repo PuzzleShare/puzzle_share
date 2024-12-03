@@ -15,7 +15,8 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import org.springframework.web.socket.messaging.SessionConnectEvent
-import java.util.*
+import java.util.Date
+import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
 
 @Controller
@@ -130,10 +131,12 @@ class GameController(
                 }
             }
 
-        if (!innerSandMessage.contains(sharePuzzle.message)){
-            sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
-        }
+        if (!innerSandMessage.contains(sharePuzzle.message))
+            {
+                sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
+            }
     }
+
     private val innerSandMessage = setOf("MOUSE_DRAG")
 
     @MessageMapping("/game/{gameId}/mouse")
@@ -150,7 +153,7 @@ class GameController(
     @Scheduled(fixedRate = 1000)
     @Throws(Exception::class)
     fun sendServerTime() {
-        val allRooms = gameService.findAllCooperationRoom() + gameService.findAllBattleRoom()
+        val allRooms = gameService.findAllBattleRoom()
         for (game in allRooms.reversed()) {
             if (game.isStarted && !game.isFinished) {
                 var time = game.getTime()
@@ -184,7 +187,7 @@ class GameController(
                                 } else {
                                     emptyList()
                                 }
-                            message="SAVE_RECORD"
+                            message = "SAVE_RECORD"
                         }
                     game.isFinished = true
                     res.isFinished = true
@@ -195,13 +198,28 @@ class GameController(
 
                     // room 상태 변경
                     val roomId = game.roomId
-                    val room = puzzleRoomRepository.findById(roomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
+                    val room =
+                        puzzleRoomRepository
+                            .findById(
+                                roomId,
+                            ).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
                     room.roomStatus = "WAITING"
                     puzzleRoomRepository.save(room)
 
                     Thread.sleep(20)
                     gameService.deleteGame(game.gameId)
                 }
+            }
+        }
+    }
+
+    // 60초에 한번씩 방 청소
+    @Scheduled(fixedRate = 60000)
+    fun deleteGame() {
+        val allRoom = gameService.findAllBattleRoom()
+        for (i in allRoom.indices.reversed()) {
+            if (allRoom[i].isFinished && !allRoom[i].isStarted) {
+                gameService.deleteGameRoom(allRoom[i].gameId)
             }
         }
     }
