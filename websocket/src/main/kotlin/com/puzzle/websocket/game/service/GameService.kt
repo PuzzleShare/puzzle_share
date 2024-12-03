@@ -8,6 +8,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.google.gson.Gson
+import com.puzzle.websocket.common.exception.custom.NoneMasterException
 import com.puzzle.websocket.game.domain.Game
 import com.puzzle.websocket.game.domain.ListStringUtils
 import com.puzzle.websocket.game.domain.Picture
@@ -22,9 +23,11 @@ import com.puzzle.websocket.game.enums.GameItem
 import com.puzzle.websocket.room.domain.PuzzleRoom
 import com.puzzle.websocket.room.dto.request.PlayerRequest
 import com.puzzle.websocket.room.repository.PuzzleRoomRepository
+import com.puzzle.websocket.room.service.PuzzleRoomService
 import kotlinx.coroutines.*
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.messaging.simp.SimpMessageSendingOperations
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.Date
@@ -35,6 +38,8 @@ class GameService(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val sendingOperations: SimpMessageSendingOperations,
     private val puzzleRoomRepository: PuzzleRoomRepository,
+    private val puzzleRoomService: PuzzleRoomService,
+    private val messagingTemplate: SimpMessagingTemplate,
 ) {
     val gameRooms: MutableMap<String, Game> = mutableMapOf()
     val gson: Gson = Gson()
@@ -91,6 +96,84 @@ class GameService(
             gameRooms[roomId] = game
         }
         return gameRooms[roomId]
+    }
+
+    fun gameStart(
+        roomId: String,
+        playerRequest: PlayerRequest,
+    ) {
+        val room =
+            puzzleRoomRepository
+                .findById(roomId)
+                .orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
+        if (room.master != playerRequest.playerId) {
+            throw NoneMasterException("방장이 아닙니다.")
+        }
+        var game = createGame(room)
+        game = startGame(game.gameId)!!
+
+        // 방 상태 게임중으로 변경
+        room.roomStatus = "PLAYING"
+        puzzleRoomRepository.save(room)
+        messagingTemplate.convertAndSend(
+            "/topic/room/$roomId/game",
+            game,
+        )
+    }
+    fun endGame(game:Game, res:ResponseMessage){
+        game.isFinished = true
+        game.finishTime = Date()
+        res.isFinished = game.isFinished
+        res.game = game
+        res.message = "SAVE_RECORD"
+
+        res.redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+        res.blueProgressPercent =
+            if (game.gameType == "BATTLE") {
+                game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+            } else {
+                -1.0
+            }
+        res.redBundles = game.redPuzzle
+            ?.bundles
+            ?.values
+            ?.map { it.toSet() } ?: emptyList()
+        res.blueBundles =
+            if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                game.bluePuzzle
+                    ?.bundles
+                    ?.values
+                    ?.map { it.toSet() } ?: emptyList()
+            } else {
+                emptyList()
+            }
+
+        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+        game.isStarted = false
+        res.isStarted = false
+        val waitingRoomId = game.roomId
+
+        val room =
+            puzzleRoomRepository.findById(waitingRoomId).orElseThrow {
+                IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId")
+            }
+
+        room.roomStatus = "WAITING"
+        puzzleRoomRepository.save(room)
+        deleteGame(game.gameId)
+    }
+
+    fun exitGame(gameId: String, playerRequest: PlayerRequest) {
+        val game = findById(gameId) ?: throw IllegalArgumentException("Game $gameId not found")
+        game.redTeam.remove(playerRequest)
+        game.blueTeam.remove(playerRequest)
+        val basicKey = "$gameKeyPrefix${gameId}"
+        redisTemplate.opsForValue().set("$basicKey:redTeam", objectMapper.writeValueAsString(game.redTeam))
+        redisTemplate.opsForValue().set("$basicKey:blueTeam", objectMapper.writeValueAsString(game.blueTeam))
+        if (game.redTeam.isEmpty() || game.blueTeam.isEmpty()){
+            endGame(game,ResponseMessage())
+        }
+        puzzleRoomService.leaveRoom(game.roomId,playerRequest)
     }
 
     fun createGame(room: PuzzleRoom): Game {
@@ -217,11 +300,11 @@ class GameService(
 
                 ourPuzzle.bundles[piece.bundleNum]!!.forEach {
                     if (it != piece)
-                        {
-                            val (x, y) = getNewPoint(ourPuzzle, piece, it)
-                            it.position_x = x
-                            it.position_y = y
-                        }
+                    {
+                        val (x, y) = getNewPoint(ourPuzzle, piece, it)
+                        it.position_x = x
+                        it.position_y = y
+                    }
                 }
             }
 
@@ -247,46 +330,7 @@ class GameService(
 
         // 게임 끝났는지 마지막에 확인
         if ((ourPuzzle.isCompleted || yourPuzzle.isCompleted) && (game.isStarted && !game.isFinished)) {
-            game.isFinished = true
-            game.finishTime = Date()
-            res.isFinished = game.isFinished
-            res.game = game
-            res.message = "SAVE_RECORD"
-
-            res.redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
-            res.blueProgressPercent =
-                if (game.gameType == "BATTLE") {
-                    game.bluePuzzle?.calculateMixedProgress() ?: 0.0
-                } else {
-                    -1.0
-                }
-            res.redBundles = game.redPuzzle
-                ?.bundles
-                ?.values
-                ?.map { it.toSet() } ?: emptyList()
-            res.blueBundles =
-                if (game.gameType.equals("BATTLE", ignoreCase = true)) {
-                    game.bluePuzzle
-                        ?.bundles
-                        ?.values
-                        ?.map { it.toSet() } ?: emptyList()
-                } else {
-                    emptyList()
-                }
-
-            sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-            game.isStarted = false
-            res.isStarted = false
-            val waitingRoomId = game.roomId
-
-            val room =
-                puzzleRoomRepository.findById(waitingRoomId).orElseThrow {
-                    IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId")
-                }
-
-            room.roomStatus = "WAITING"
-            puzzleRoomRepository.save(room)
-            deleteGame(game.gameId)
+            endGame(game,res)
         }
 
         // 진행도 추가

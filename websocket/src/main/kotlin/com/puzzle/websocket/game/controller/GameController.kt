@@ -6,6 +6,7 @@ import com.puzzle.websocket.game.domain.User
 import com.puzzle.websocket.game.dto.response.InventoryResponse
 import com.puzzle.websocket.game.dto.response.PointerMoveDTO
 import com.puzzle.websocket.game.service.GameService
+import com.puzzle.websocket.room.dto.request.PlayerRequest
 import com.puzzle.websocket.room.repository.PuzzleRoomRepository
 import org.springframework.context.event.EventListener
 import org.springframework.messaging.handler.annotation.DestinationVariable
@@ -34,6 +35,14 @@ class GameController(
     @EventListener
     fun handleWebSocketConnectListener(event: SessionConnectEvent) {
         sessionId = event.message.headers["simpSessionId"] as String?
+    }
+
+    @MessageMapping("/room/{roomId}/start")
+    fun startGame(
+        @DestinationVariable("roomId") roomId: String,
+        playerRequest: PlayerRequest,
+    ) {
+        gameService.gameStart(roomId, playerRequest)
     }
 
     @MessageMapping("/{roomId}/game/enter")
@@ -68,9 +77,19 @@ class GameController(
 
         val pointerMoveDTOS =
             game.redTeam.map { PointerMoveDTO.of(it, "red", "red") } +
-                game.blueTeam.map { PointerMoveDTO.of(it, "blue", "blue") }
+                    game.blueTeam.map { PointerMoveDTO.of(it, "blue", "blue") }
         sendingOperations.convertAndSend("/topic/game/${game.gameId}/pointer/init", pointerMoveDTOS)
     }
+
+    @MessageMapping("/game/{gameId}/exit")
+    @Throws(Exception::class)
+    fun exitGame(
+        @DestinationVariable gameId: String,
+        playerRequest: PlayerRequest,
+    ) {
+        gameService.exitGame(gameId, playerRequest)
+    }
+
 
     @MessageMapping("/game/puzzle")
     @Throws(Exception::class)
@@ -133,9 +152,9 @@ class GameController(
             }
 
         if (!innerSandMessage.contains(sharePuzzle.message))
-            {
-                sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
-            }
+        {
+            sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
+        }
     }
 
     private val innerSandMessage = setOf("MOUSE_DRAG")

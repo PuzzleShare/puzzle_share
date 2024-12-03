@@ -19,11 +19,6 @@ interface PuzzleRoomService {
         playerRequest: PlayerRequest,
     )
 
-    fun gameStart(
-        roomId: String,
-        playerRequest: PlayerRequest,
-    )
-
     fun invitePlayerToRoom(
         roomId: String,
         playerRequest: InviteRequest,
