@@ -58,9 +58,10 @@ class Users(
 
     private fun calculateWinRate() {
         winRate = if (totalGames > 0) {
-            (winCount.toDouble() / totalGames) * 100.0
+            ((winCount + drawCount * 0.5) / totalGames) * 100.0
         } else {
             0.0
         }
     }
+
 }
