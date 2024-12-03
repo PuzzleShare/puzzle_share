@@ -130,8 +130,11 @@ class GameController(
                 }
             }
 
-        sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
+        if (!innerSandMessage.contains(sharePuzzle.message)){
+            sendingOperations.convertAndSend("/topic/game/room/${sharePuzzle.roomId}", res)
+        }
     }
+    private val innerSandMessage = setOf("MOUSE_DRAG")
 
     @MessageMapping("/game/{gameId}/mouse")
     @Throws(Exception::class)

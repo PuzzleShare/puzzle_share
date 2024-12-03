@@ -29,6 +29,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.0")
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.8.0")
 }
 
 kotlin {
