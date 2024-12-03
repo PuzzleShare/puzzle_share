@@ -104,22 +104,9 @@ class RoomService(
             newWidth = floor(newWidth * scaleFactor / pieceSize).toInt() * pieceSize
             newHeight = floor(newHeight * scaleFactor / pieceSize).toInt() * pieceSize
         }
-
         val puzzlePiece = (newWidth / pieceSize) * (newHeight / pieceSize)
 
         return ImageResponse(width = newWidth, length = newHeight, puzzlePiece = puzzlePiece)
-    }
-
-    private fun scaleDimensions(
-        width: Int,
-        height: Int,
-    ): Pair<Int, Int> {
-        if (width <= MAX_IMAGE_DIMENSION && height <= MAX_IMAGE_DIMENSION) {
-            return width to height
-        }
-
-        val scaleFactor = min(MAX_IMAGE_DIMENSION / width.toDouble(), MAX_IMAGE_DIMENSION / height.toDouble())
-        return (width * scaleFactor).toInt() to (height * scaleFactor).toInt()
     }
 
     private fun downloadImage(imageUrl: String): BufferedImage {

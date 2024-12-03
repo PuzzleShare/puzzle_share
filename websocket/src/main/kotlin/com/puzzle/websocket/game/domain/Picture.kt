@@ -59,10 +59,6 @@ data class Picture(
             imgWidth = initialNewWidth
             imgHeight = initialNewLength
         }
-
-        println("length : $length 이고 width : $width")
-        println("imgHeight : $imgHeight 이고 imgWidth : $imgWidth")
-        println("widthPieceCnt : $widthPieceCnt 이고 lengthPieceCnt : $lengthPieceCnt")
     }
 
     companion object {

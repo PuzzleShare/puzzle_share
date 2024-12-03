@@ -29,7 +29,6 @@ import kotlinx.coroutines.runBlocking
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.messaging.simp.SimpMessageSendingOperations
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.Date
 import java.util.concurrent.locks.ReentrantLock
 
@@ -37,7 +36,7 @@ import java.util.concurrent.locks.ReentrantLock
 class GameService(
     private val redisTemplate: RedisTemplate<String, Any>,
     private val sendingOperations: SimpMessageSendingOperations,
-    private val puzzleRoomRepository: PuzzleRoomRepository
+    private val puzzleRoomRepository: PuzzleRoomRepository,
 ) {
     val gameRooms: MutableMap<String, Game> = mutableMapOf()
     val gson: Gson = Gson()
@@ -51,13 +50,6 @@ class GameService(
             .findAndRegisterModules()
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-
-    // 협동 게임방 불러오기
-    fun findAllCooperationRoom(): List<Game> {
-        val result = gameRooms.values.filter { it.gameType == "COOPERATION" }.toMutableList()
-        result.reverse()
-        return result
-    }
 
     fun deleteGame(gameId: String) {
         val basicKey = "$gameKeyPrefix$gameId"
@@ -82,6 +74,10 @@ class GameService(
                 "$basicKey:bluePuzzle:isCorrected",
             )
         redisTemplate.delete(keysToDelete)
+    }
+
+    fun deleteGameRoom(gameId: String) {
+        gameRooms.remove(gameId)
     }
 
     // 배틀 게임방 불러오기
@@ -163,7 +159,7 @@ class GameService(
                                     team = ourColor,
                                     inventory = ourPuzzle.inventory,
                                     fitPieceIndex = it,
-                                )
+                                ),
                             )
                         }
                     }
@@ -222,11 +218,12 @@ class GameService(
                 piece.position_y = arr[0].y
 
                 ourPuzzle.bundles[piece.bundleNum]!!.forEach {
-                    if (it != piece){
-                        val (x, y) = getNewPoint(ourPuzzle, piece, it)
-                        it.position_x = x
-                        it.position_y = y
-                    }
+                    if (it != piece)
+                        {
+                            val (x, y) = getNewPoint(ourPuzzle, piece, it)
+                            it.position_x = x
+                            it.position_y = y
+                        }
                 }
             }
 
@@ -252,43 +249,46 @@ class GameService(
 
         // 게임 끝났는지 마지막에 확인
         if ((ourPuzzle.isCompleted || yourPuzzle.isCompleted) && (game.isStarted && !game.isFinished)) {
-
             game.isFinished = true
             game.finishTime = Date()
             res.isFinished = game.isFinished
             res.game = game
             res.message = "SAVE_RECORD"
 
-
             res.redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
-            res.blueProgressPercent = if (game.gameType == "BATTLE") {
-                game.bluePuzzle?.calculateMixedProgress() ?: 0.0
-            } else {
-                -1.0
-            }
+            res.blueProgressPercent =
+                if (game.gameType == "BATTLE") {
+                    game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+                } else {
+                    -1.0
+                }
             res.redBundles = game.redPuzzle
                 ?.bundles
                 ?.values
                 ?.map { it.toSet() } ?: emptyList()
-            res.blueBundles = if (game.gameType.equals("BATTLE", ignoreCase = true)) {
-                game.bluePuzzle
-                    ?.bundles
-                    ?.values
-                    ?.map { it.toSet() } ?: emptyList()
-            } else {
-                emptyList()
-            }
+            res.blueBundles =
+                if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                    game.bluePuzzle
+                        ?.bundles
+                        ?.values
+                        ?.map { it.toSet() } ?: emptyList()
+                } else {
+                    emptyList()
+                }
 
             sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
             game.isStarted = false
             res.isStarted = false
             val waitingRoomId = game.roomId
-            val room = puzzleRoomRepository.findById(waitingRoomId)
-                .orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId") }
+
+            val room =
+                puzzleRoomRepository.findById(waitingRoomId).orElseThrow {
+                    IllegalArgumentException("PuzzleRoom not found for ID: $waitingRoomId")
+                }
+
             room.roomStatus = "WAITING"
             puzzleRoomRepository.save(room)
             deleteGame(game.gameId)
-
         }
 
         // 진행도 추가
@@ -323,72 +323,73 @@ class GameService(
         return puzzle.calculateMixedProgress() // PuzzleBoard의 혼합 진행률 계산 호출
     }
 
-    private fun savePuzzle(game: Game) = runBlocking {
-        val basicKey = "$gameKeyPrefix${game.gameId}"
-        val jobList = mutableListOf<Deferred<Unit>>()
-        game.redPuzzle?.let { it ->
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString())
-                }
-            )
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString())
-                }
-            )
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString())
-                }
-            )
+    private fun savePuzzle(game: Game) =
+        runBlocking {
+            val basicKey = "$gameKeyPrefix${game.gameId}"
+            val jobList = mutableListOf<Deferred<Unit>>()
+            game.redPuzzle?.let { it ->
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:correctedCount", it.correctedCount.toString())
+                    },
+                )
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:connectedEdges", it.connectedEdges.toString())
+                    },
+                )
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCompleted", it.isCompleted.toString())
+                    },
+                )
 
-            val boardJson = objectMapper.writeValueAsString(it.board)
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:redPuzzle:board", boardJson)
-                }
-            )
-            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCorrected", correctedJson)
-                }
-            )
+                val boardJson = objectMapper.writeValueAsString(it.board)
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:board", boardJson)
+                    },
+                )
+                val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:redPuzzle:isCorrected", correctedJson)
+                    },
+                )
+            }
+
+            game.bluePuzzle?.let { it ->
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString())
+                    },
+                )
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString())
+                    },
+                )
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString())
+                    },
+                )
+
+                val boardJson = objectMapper.writeValueAsString(it.board)
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:board", boardJson)
+                    },
+                )
+                val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
+                jobList.add(
+                    async(Dispatchers.IO) {
+                        redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCorrected", correctedJson)
+                    },
+                )
+            }
+            jobList.forEach { it.await() }
         }
-
-        game.bluePuzzle?.let { it ->
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:bluePuzzle:correctedCount", it.correctedCount.toString())
-                }
-            )
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:bluePuzzle:connectedEdges", it.connectedEdges.toString())
-                }
-            )
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCompleted", it.isCompleted.toString())
-                }
-            )
-
-            val boardJson = objectMapper.writeValueAsString(it.board)
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:bluePuzzle:board", boardJson)
-                }
-            )
-            val correctedJson = objectMapper.writeValueAsString(it.isCorrected) // 2차원 배열 직렬화
-            jobList.add(
-                async(Dispatchers.IO) {
-                    redisTemplate.opsForValue().set("$basicKey:bluePuzzle:isCorrected", correctedJson)
-                }
-            )
-        }
-        jobList.forEach { it.await() }
-    }
 
     private val gameKeyPrefix = "Game:"
 
