@@ -17,10 +17,12 @@ class GameRecordService(
     private val gameRecordRepository: GameRecordRepository,
 ) {
     fun findGameRecordsForGallery(userId: Long): List<UserGalleryResponse> {
-        val user = usersRepository.findById(userId)
+        val user = usersRepository
+            .findById(userId)
             .orElseThrow { IllegalArgumentException("User not found with ID: $userId") }
 
-        return gameRecordRepository.findGameRecordsByMyPercentAndUserOrderByPlayedAtDesc(user = user, myPercent = 100.0)
+        return gameRecordRepository
+            .findGameRecordsByMyPercentAndUserOrderByPlayedAtDesc(user = user, myPercent = 100.0)
             .map { UserGalleryResponse.of(it) }
     }
 
@@ -30,10 +32,10 @@ class GameRecordService(
         userId: Long,
     ) {
         val user = usersRepository.findById(userId).orElseThrow {
-            IllegalArgumentException("User not found with ID: $userId")
+            throw IllegalArgumentException("User not found with ID: $userId")
         }
 
-        if (gameRecordRepository.existsGameRecordByUserAndGameId(user, gameId = gameDataDto.gameId)){
+        if (gameRecordRepository.existsGameRecordByUserAndGameId(user, gameId = gameDataDto.gameId)) {
             throw IllegalArgumentException("Exists GameRecord ${gameDataDto.gameId} $userId")
         }
 
@@ -62,13 +64,12 @@ class GameRecordService(
     private fun determineWinner(
         redProgress: Double,
         blueProgress: Double,
-    ): String {
-        return when {
+    ): String =
+        when {
             redProgress > blueProgress -> "RED"
             redProgress < blueProgress -> "BLUE"
             else -> "DRAW"
         }
-    }
 
     private fun saveBattleRecords(
         gameDataDto: GameDataDto,
@@ -131,20 +132,19 @@ class GameRecordService(
     private fun determineUserTeam(
         gameDataDto: GameDataDto,
         user: Users,
-    ): String? {
-        return when {
+    ): String? =
+        when {
             gameDataDto.redTeam?.any { it.playerId == user.userId } == true -> "RED"
             gameDataDto.blueTeam?.any { it.playerId == user.userId } == true -> "BLUE"
             else -> null
         }
-    }
 
     private fun determineBattleTeams(
         gameDataDto: GameDataDto,
         user: Users,
         myTeam: String?,
-    ): Pair<List<String>, List<String>> {
-        return when (myTeam) {
+    ): Pair<List<String>, List<String>> =
+        when (myTeam) {
             "RED" -> Pair(
                 gameDataDto.redTeam!!.filter { it.playerName != user.userName }.map { it.playerName },
                 gameDataDto.blueTeam?.map { it.playerName } ?: emptyList(),
@@ -157,7 +157,6 @@ class GameRecordService(
 
             else -> Pair(emptyList(), emptyList())
         }
-    }
 
     fun getPagedGameRecords(
         userId: Long,

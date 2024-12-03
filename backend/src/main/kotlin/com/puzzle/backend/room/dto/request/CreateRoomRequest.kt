@@ -2,6 +2,7 @@ package com.puzzle.backend.room.dto.request
 
 import com.puzzle.backend.room.domain.Room
 import java.io.Serializable
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class CreateRoomRequest(
@@ -28,5 +29,6 @@ data class CreateRoomRequest(
             masterImage = playerImage,
             masterName = playerName,
             battleTimer = battleTimer,
+            createdAt = LocalDateTime.now(),
         )
 }
