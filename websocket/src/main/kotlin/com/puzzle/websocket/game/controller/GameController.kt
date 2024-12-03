@@ -1,5 +1,6 @@
 package com.puzzle.websocket.game.controller
 
+import com.puzzle.websocket.game.domain.Game
 import com.puzzle.websocket.game.domain.ResponseMessage
 import com.puzzle.websocket.game.domain.SharePuzzle
 import com.puzzle.websocket.game.domain.User
@@ -158,47 +159,60 @@ class GameController(
                     val timer = mapOf("time" to time)
                     sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", timer)
                 } else {
-                    game.finishTime = Date()
-                    val res =
-                        ResponseMessage(game = game).apply {
-                            redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
-                            blueProgressPercent =
-                                if (game.gameType == "BATTLE") {
-                                    game.bluePuzzle?.calculateMixedProgress() ?: 0.0
-                                } else {
-                                    -1.0
-                                }
-                            redBundles = game.redPuzzle
-                                ?.bundles
-                                ?.values
-                                ?.map { it.toSet() } ?: emptyList()
-                            blueBundles =
-                                if (game.gameType.equals("BATTLE", ignoreCase = true)) {
-                                    game.bluePuzzle
-                                        ?.bundles
-                                        ?.values
-                                        ?.map { it.toSet() } ?: emptyList()
-                                } else {
-                                    emptyList()
-                                }
-                            message="SAVE_RECORD"
-                        }
-                    game.isFinished = true
-                    res.isFinished = true
-                    sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
-                    game.isStarted = false
-                    res.isStarted = false
+                    endGame(game)
+                    continue
+                }
 
-                    // room 상태 변경
-                    val roomId = game.roomId
-                    val room = puzzleRoomRepository.findById(roomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
-                    room.roomStatus = "WAITING"
-                    puzzleRoomRepository.save(room)
-
-                    Thread.sleep(20)
-                    gameService.deleteGame(game.gameId)
+                // 팀 체크: 특정 팀이 모두 나갔을 경우
+                val roomId = game.roomId
+                val room = puzzleRoomRepository.findById(roomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
+                val isRedTeamEmpty = room.redPlayers.isEmpty()
+                val isBlueTeamEmpty = room.bluePlayers.isEmpty()
+                if (isRedTeamEmpty || isBlueTeamEmpty) {
+                    endGame(game) // 특정 팀이 모두 나간 경우 게임 종료 처리
                 }
             }
         }
+    }
+    fun endGame(game: Game) {
+        game.finishTime = Date()
+        val res =
+            ResponseMessage(game = game).apply {
+                redProgressPercent = game.redPuzzle?.calculateMixedProgress() ?: 0.0
+                blueProgressPercent =
+                    if (game.gameType == "BATTLE") {
+                        game.bluePuzzle?.calculateMixedProgress() ?: 0.0
+                    } else {
+                        -1.0
+                    }
+                redBundles = game.redPuzzle
+                    ?.bundles
+                    ?.values
+                    ?.map { it.toSet() } ?: emptyList()
+                blueBundles =
+                    if (game.gameType.equals("BATTLE", ignoreCase = true)) {
+                        game.bluePuzzle
+                            ?.bundles
+                            ?.values
+                            ?.map { it.toSet() } ?: emptyList()
+                    } else {
+                        emptyList()
+                    }
+                message = "SAVE_RECORD"
+            }
+        game.isFinished = true
+        res.isFinished = true
+        sendingOperations.convertAndSend("/topic/game/room/${game.gameId}", res)
+        game.isStarted = false
+        res.isStarted = false
+
+        // room 상태 변경
+        val roomId = game.roomId
+        val room = puzzleRoomRepository.findById(roomId).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
+        room.roomStatus = "WAITING"
+        puzzleRoomRepository.save(room)
+
+        Thread.sleep(20)
+        gameService.deleteGame(game.gameId)
     }
 }
