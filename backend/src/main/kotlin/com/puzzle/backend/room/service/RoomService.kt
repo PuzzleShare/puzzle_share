@@ -52,7 +52,8 @@ class RoomService(
 
         return RoomIdResponse(room.roomId)
     }
-fun getRoomList(): List<RoomListResponse> {
+
+    fun getRoomList(): List<RoomListResponse> {
         val roomList = roomRepository
             .findAll()
             .filterNotNull()
@@ -153,13 +154,6 @@ fun getRoomList(): List<RoomListResponse> {
         } catch (e: Exception) {
             false
         }
-
-    fun getRoomList(): List<RoomListResponse> =
-        roomRepository
-            .findAll()
-            .filterNotNull()
-            .sortedWith(compareBy<Room> { it.roomStatus != "WAITING" }.thenBy { it.createdAt })
-            .map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
 
     fun getRoom(roomId: String): WaitingRoomResponse {
         val room = findById(roomId)
