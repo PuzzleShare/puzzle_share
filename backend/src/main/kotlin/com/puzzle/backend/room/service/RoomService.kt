@@ -51,7 +51,7 @@ class RoomService(
             .filterNotNull()
             .sortedWith(
                 compareBy<Room> { it.roomStatus != "WAITING" }
-                    .thenBy { it.createdAt },
+                    .thenByDescending { it.createdAt },
             ) // 방 이름으로 추가 정렬 필요시 사용
         val response = roomList.map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
         return response

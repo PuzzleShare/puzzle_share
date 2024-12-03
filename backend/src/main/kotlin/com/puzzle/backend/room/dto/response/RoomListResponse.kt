@@ -2,6 +2,7 @@ package com.puzzle.backend.room.dto.response
 
 import com.puzzle.backend.room.domain.Room
 import java.io.Serializable
+import java.time.LocalDateTime
 
 data class RoomListResponse(
     val roomId: String,
@@ -17,6 +18,8 @@ data class RoomListResponse(
     val nowPlayers: Int,
     val masterImage: String,
     val masterName: String,
+    // 생성 시간
+    val createdAt: LocalDateTime,
 ) : Serializable {
     companion object {
         fun toResponse(
@@ -34,6 +37,7 @@ data class RoomListResponse(
                 nowPlayers,
                 room.masterImage,
                 room.masterName,
+                room.createdAt,
             )
     }
 }
