@@ -18,6 +18,7 @@ import org.springframework.web.socket.messaging.SessionConnectEvent
 import java.util.Date
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.jvm.optionals.getOrNull
 
 @Controller
 @EnableScheduling
@@ -197,14 +198,10 @@ class GameController(
                     res.isStarted = false
 
                     // room 상태 변경
-                    val roomId = game.roomId
-                    val room =
-                        puzzleRoomRepository
-                            .findById(
-                                roomId,
-                            ).orElseThrow { IllegalArgumentException("PuzzleRoom not found for ID: $roomId") }
-                    room.roomStatus = "WAITING"
-                    puzzleRoomRepository.save(room)
+                    puzzleRoomRepository.findById(game.roomId).getOrNull()?.let {
+                        it.roomStatus = "WAITING"
+                        puzzleRoomRepository.save(it)
+                    }
 
                     Thread.sleep(20)
                     gameService.deleteGame(game.gameId)
