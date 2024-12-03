@@ -3,6 +3,7 @@ package com.puzzle.websocket.room.domain
 import com.puzzle.websocket.room.dto.request.PlayerRequest
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
+import java.time.LocalDateTime
 
 @RedisHash(value = "Room", timeToLive = 86400)
 class PuzzleRoom(
@@ -22,6 +23,7 @@ class PuzzleRoom(
     var masterImage: String,
     var masterName: String,
     var battleTimer: Int? = null,
+    var createdAt: LocalDateTime,
 ) {
     fun updateMaster(newMaster: PlayerRequest) {
         this.master = newMaster.playerId!!
