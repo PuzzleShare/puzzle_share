@@ -63,5 +63,4 @@ class Users(
             0.0
         }
     }
-
 }

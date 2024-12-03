@@ -1,6 +1,7 @@
 package com.puzzle.backend.common.exception
 
 import com.puzzle.backend.common.BaseResponse
+import com.puzzle.backend.common.exception.custom.ImageValidationException
 import com.puzzle.backend.common.exception.custom.RoomFullException
 import com.puzzle.backend.common.status.ResultCode
 import org.springframework.http.HttpStatus
@@ -27,6 +28,13 @@ class CustomExceptionHandler {
     @ExceptionHandler(RoomFullException::class)
     protected fun roomFullException(ex: RoomFullException): ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf("빈 자리 없음" to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
+    }
+
+    // 나머지 예외 처리
+    @ExceptionHandler(ImageValidationException::class)
+    protected fun imageValidationException(ex: ImageValidationException): ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mapOf("message" to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ResultCode.ERROR.name, errors, ResultCode.ERROR.msg), HttpStatus.BAD_REQUEST)
     }
 

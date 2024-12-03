@@ -12,6 +12,8 @@ class PuzzleRoom(
     val gameMode: String,
     var roomStatus: String,
     val puzzleImage: String,
+    var imgWidth: Int = 0,
+    var imgHeight: Int = 0,
     val puzzlePiece: Int,
     val maxPlayers: Int, // 최대 참가자 수
     val redPlayers: MutableList<PlayerRequest> = mutableListOf(), // 현재 참가자 목록
