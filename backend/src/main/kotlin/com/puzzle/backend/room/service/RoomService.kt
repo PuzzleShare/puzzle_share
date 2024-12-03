@@ -153,7 +153,7 @@ class RoomService(
 
             val puzzlePiece = (widthPieceCnt * lengthPieceCnt)
 
-            return ImageResponse(width = imgWidth, length = imgHeight, puzzlePiece = puzzlePiece)
+            return ImageResponse(width = width, length = length, puzzlePiece = puzzlePiece)
         } catch (e: Exception) {
             // 로그를 남기고 false 반환 (선택 사항)
             println("printStackTrace")
