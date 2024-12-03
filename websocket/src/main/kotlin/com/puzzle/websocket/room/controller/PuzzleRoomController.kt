@@ -42,12 +42,4 @@ class PuzzleRoomController(
     ) {
         puzzleRoomService.moveTeam(roomId, playerRequest)
     }
-
-    @MessageMapping("/room/{roomId}/start")
-    fun startGame(
-        @DestinationVariable("roomId") roomId: String,
-        playerRequest: PlayerRequest,
-    ) {
-        puzzleRoomService.gameStart(roomId, playerRequest)
-    }
 }
