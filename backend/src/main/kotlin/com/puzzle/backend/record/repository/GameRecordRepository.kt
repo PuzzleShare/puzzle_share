@@ -35,7 +35,7 @@ interface GameRecordRepository : JpaRepository<GameRecord, Long> {
     ): List<GameRecord>
 
     fun existsGameRecordByUserAndGameId(
-        user:Users,
-        gameId:String
-    ) : Boolean
+        user: Users,
+        gameId: String,
+    ): Boolean
 }

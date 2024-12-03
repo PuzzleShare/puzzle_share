@@ -1,6 +1,7 @@
 package com.puzzle.backend.room.controller
 
 import com.puzzle.backend.room.dto.request.CreateRoomRequest
+import com.puzzle.backend.room.dto.response.ImageResponse
 import com.puzzle.backend.room.dto.response.RoomIdResponse
 import com.puzzle.backend.room.dto.response.RoomListResponse
 import com.puzzle.backend.room.dto.response.WaitingRoomResponse
@@ -54,8 +55,8 @@ class RoomController(
     @PostMapping("/image/dimensions")
     fun getImageDimensions(
         @RequestParam imageUrl: String,
-    ): ResponseEntity<Int> {
-        val response = roomService.isPuzzleImageValid(imageUrl)
+    ): ResponseEntity<ImageResponse> {
+        val response = roomService.validatePuzzleImage(imageUrl)
         return ResponseEntity.ok(response)
     }
 }

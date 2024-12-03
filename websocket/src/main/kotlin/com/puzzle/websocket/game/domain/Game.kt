@@ -8,7 +8,7 @@ import java.util.UUID
 data class Game(
     var gameId: String = "",
     var gameName: String = "",
-    var roomId : String = "",
+    var roomId: String = "",
     var roomSize: Int = 0,
     var gameType: String = "",
     var battleTimer: Int = 180,
@@ -62,6 +62,8 @@ data class Game(
                     pieceSize = 40, // 적절한 퍼즐 조각 크기를 설정하세요.
                     imageName = puzzleImage,
                     encodedString = puzzleImage,
+                    width = room.imgWidth,
+                    length = room.imgHeight,
                 )
 
             val game =

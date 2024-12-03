@@ -22,7 +22,7 @@ data class GameRecord(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val recordId: Long = 0L,
-    @Column(nullable = false, name =  "game_id")
+    @Column(nullable = false, name = "game_id")
     val gameId: String? = null,
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
