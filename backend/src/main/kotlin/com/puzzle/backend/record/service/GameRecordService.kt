@@ -32,7 +32,7 @@ class GameRecordService(
         userId: Long,
     ) {
         val user = usersRepository.findById(userId).orElseThrow {
-            IllegalArgumentException("User not found with ID: $userId")
+            throw IllegalArgumentException("User not found with ID: $userId")
         }
 
         if (gameRecordRepository.existsGameRecordByUserAndGameId(user, gameId = gameDataDto.gameId)) {

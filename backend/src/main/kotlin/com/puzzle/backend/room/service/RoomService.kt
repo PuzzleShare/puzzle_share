@@ -52,6 +52,17 @@ class RoomService(
 
         return RoomIdResponse(room.roomId)
     }
+fun getRoomList(): List<RoomListResponse> {
+        val roomList = roomRepository
+            .findAll()
+            .filterNotNull()
+            .sortedWith(
+                compareBy<Room> { it.roomStatus != "WAITING" }
+                    .thenByDescending { it.createdAt },
+            ) // 방 이름으로 추가 정렬 필요시 사용
+        val response = roomList.map { RoomListResponse.toResponse(it, getParticipantCount(it.roomId)) }
+        return response
+    }
 
     fun validatePuzzleImage(imageUrl: String): ImageResponse {
         if (!isValidImageUrl(imageUrl)) {
