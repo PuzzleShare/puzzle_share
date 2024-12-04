@@ -18,6 +18,8 @@ data class RoomListResponse(
     val nowPlayers: Int,
     val masterImage: String,
     val masterName: String,
+    // 배틀 시간
+    var battleTimer: Int? = null,
     // 생성 시간
     val createdAt: LocalDateTime,
 ) : Serializable {
@@ -37,6 +39,7 @@ data class RoomListResponse(
                 nowPlayers,
                 room.masterImage,
                 room.masterName,
+                room.battleTimer,
                 room.createdAt,
             )
     }
