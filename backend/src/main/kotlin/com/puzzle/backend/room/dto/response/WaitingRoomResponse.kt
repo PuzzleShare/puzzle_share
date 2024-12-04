@@ -21,6 +21,7 @@ data class WaitingRoomResponse(
     // 현재 참가자 목록
     val bluePlayers: List<PlayerRequest> = listOf(),
     val master: Long,
+    var battleTimer: Int? = null,
     val createdAt: LocalDateTime,
 ) : Serializable {
     companion object {
@@ -39,6 +40,7 @@ data class WaitingRoomResponse(
                 room.redPlayers,
                 room.bluePlayers,
                 room.master,
+                room.battleTimer,
                 room.createdAt,
             )
     }
