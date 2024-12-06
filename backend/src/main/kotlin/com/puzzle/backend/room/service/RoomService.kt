@@ -1,5 +1,7 @@
 package com.puzzle.backend.room.service
 
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.ObjectMetadata
 import com.puzzle.backend.common.exception.custom.ImageValidationException
 import com.puzzle.backend.room.domain.Room
 import com.puzzle.backend.room.dto.request.CreateRoomRequest
@@ -11,9 +13,15 @@ import com.puzzle.backend.room.dto.response.WaitingRoomResponse
 import com.puzzle.backend.room.repository.RoomRepository
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.multipart.MultipartFile
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.net.URI
+import java.net.URLConnection
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 import javax.imageio.ImageIO
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.floor
@@ -29,11 +37,15 @@ private const val MAX_HEIGHT = 2000
 private const val PIECE_SIZE = 40
 private const val MAX_IMAGE_DIMENSION = 500
 
+private val timeFormat = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")
+
 @Service
 class RoomService(
     private val roomRepository: RoomRepository,
+    private val amazonS3: AmazonS3,
 ) {
     private val restTemplate = RestTemplate()
+    private val bucketName = "puzzleshare-gallery" // 생성한 S3 버킷 이름
 
     init {
         ImageIO.scanForPlugins()
@@ -42,9 +54,6 @@ class RoomService(
     fun createRoom(request: CreateRoomRequest): RoomIdResponse {
         val room = request.toRoom()
         val player = PlayerRequest(request.playerId, request.playerImage, request.playerName)
-
-        room.imgWidth = request.width
-        room.imgLength = request.height
 
         room.bluePlayers.add(player)
         room.updateMaster(player)
@@ -76,19 +85,20 @@ class RoomService(
             // 2. 이미지 다운로드 시도
             val imageBytes: ByteArray? = restTemplate.getForObject(URI.create(imageUrl), ByteArray::class.java)
             if (imageBytes == null) {
-                throw ImageValidationException("이미지를 다운받을 수 없습니다.")
+                throw ImageValidationException("이미지를 처리할 수 없습니다.")
             }
 
             // 3. 이미지 파일 읽기
             val image: BufferedImage? = ImageIO.read(ByteArrayInputStream(imageBytes))
-            print(image.toString())
+            // print(image.toString())
             if (image == null) {
-                throw ImageValidationException("이미지를 다운받을 수 없습니다.")
+                throw ImageValidationException("이미지를 처리할 수 없습니다.")
             }
             val width = image.width
             val length = image.height
             val pieceSize = 40
-// 초기 퍼즐 조각 수 계산 (내림)
+
+            // 초기 퍼즐 조각 수 계산 (내림)
             var initialWidthPieces: Int = width / pieceSize
             var initialLengthPieces: Int = length / pieceSize
 
@@ -153,7 +163,7 @@ class RoomService(
 
             val puzzlePiece = (widthPieceCnt * lengthPieceCnt)
 
-            return ImageResponse(width = width, length = length, puzzlePiece = puzzlePiece)
+            return ImageResponse(width = width, length = length, puzzlePiece = puzzlePiece, imageUrl = imageUrl)
         } catch (e: Exception) {
             // 로그를 남기고 false 반환 (선택 사항)
             println("printStackTrace")
@@ -161,6 +171,52 @@ class RoomService(
             throw e
         }
     }
+
+    fun storeImageFromFile(file: MultipartFile): String =
+        try {
+            val extension = file.originalFilename?.substringAfterLast('.', "").orEmpty()
+            val currentDateTime = LocalDateTime
+                .now()
+                .format(timeFormat)
+            val fileName = "${currentDateTime}_${UUID.randomUUID()}.$extension"
+
+            amazonS3.putObject(bucketName, fileName, file.inputStream, null)
+
+            amazonS3.getUrl(bucketName, fileName).toString()
+        } catch (e: Exception) {
+            throw RuntimeException("이미지 업로드 실패: ${e.message}", e)
+        }
+
+    fun storeImageFromUrl(imageUrl: String): String {
+        try {
+            if (amazonS3.doesObjectExist(bucketName, imageUrl)) {
+                return amazonS3.getUrl(bucketName, imageUrl).toString()
+            }
+
+            val extension = imageUrl.substringAfterLast('.', "").substringBefore('?').orEmpty()
+            val currentDateTime = LocalDateTime
+                .now()
+                .format(timeFormat)
+            val fileName = "${currentDateTime}_${UUID.randomUUID()}.$extension"
+
+            val url = URI.create(imageUrl).toURL()
+            val inputStream: InputStream = url.openStream()
+
+            val metadata = ObjectMetadata().apply {
+                contentType = URLConnection.guessContentTypeFromStream(inputStream)
+            }
+
+            amazonS3.putObject(bucketName, fileName, inputStream, metadata)
+
+            return amazonS3.getUrl(bucketName, fileName).toString()
+        } catch (e: Exception) {
+            throw RuntimeException("이미지 업로드 실패: ${e.message}", e)
+        }
+    }
+
+    fun validatePuzzleImageFromUrl(imageUrl: String): ImageResponse = validatePuzzleImage(storeImageFromUrl(imageUrl))
+
+    fun validatePuzzleImageFromFile(file: MultipartFile): ImageResponse = validatePuzzleImage(storeImageFromFile(file))
 
     fun calculatePuzzlePieces(
         width: Int,
@@ -220,7 +276,7 @@ class RoomService(
         }
         val puzzlePiece = (widthPieceCnt * lengthPieceCnt)
 
-        return ImageResponse(width = imgWidth, length = imgHeight, puzzlePiece = puzzlePiece)
+        return ImageResponse(width = imgWidth, length = imgHeight, puzzlePiece = puzzlePiece, imageUrl = "")
     }
 
     private fun isValidImageSize(
@@ -244,10 +300,6 @@ class RoomService(
     fun getRoom(roomId: String): WaitingRoomResponse {
         val room = findById(roomId)
         return WaitingRoomResponse.toResponse(room, getParticipantCount(roomId))
-    }
-
-    fun deleteRoom(roomId: String) {
-        roomRepository.deleteById(roomId)
     }
 
     private fun findById(roomId: String): Room = roomRepository.findById(roomId).orElseThrow()

@@ -4,4 +4,5 @@ data class ImageResponse(
     val width: Int,
     val length: Int,
     val puzzlePiece: Int,
+    val imageUrl: String,
 )
