@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/api/rooms")
@@ -52,11 +53,19 @@ class RoomController(
         return ResponseEntity.ok(room)
     }
 
-    @PostMapping("/image/dimensions")
-    fun getImageDimensions(
-        @RequestParam imageUrl: String,
+    @PostMapping("/image-url/dimensions")
+    fun getImageUrlDimensions(
+        @RequestPart imageUrl: String,
     ): ResponseEntity<ImageResponse> {
-        val response = roomService.validatePuzzleImage(imageUrl)
+        val response = roomService.validatePuzzleImageFromUrl(imageUrl)
+        return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/image-file/dimensions")
+    fun getImageFileDimensions(
+        @RequestPart imageFile: MultipartFile,
+    ): ResponseEntity<ImageResponse> {
+        val response = roomService.validatePuzzleImageFromFile(imageFile)
         return ResponseEntity.ok(response)
     }
 }
