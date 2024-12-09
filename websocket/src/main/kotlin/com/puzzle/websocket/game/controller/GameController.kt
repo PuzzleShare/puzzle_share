@@ -31,6 +31,7 @@ class GameController(
     private val battleTimer = 300
     private var sessionId: String? = null
     private val waitingList: Queue<User> = ConcurrentLinkedQueue()
+    private val mouseData = mutableMapOf<String, MutableList<PointerMoveDTO>>()
 
     @EventListener
     fun handleWebSocketConnectListener(event: SessionConnectEvent) {
@@ -75,10 +76,15 @@ class GameController(
             }
         sendingOperations.convertAndSend("/topic/game/room/$roomId/init", res)
 
-        val pointerMoveDTOS =
-            game.redTeam.map { PointerMoveDTO.of(it, "red", "red") } +
-                    game.blueTeam.map { PointerMoveDTO.of(it, "blue", "blue") }
-        sendingOperations.convertAndSend("/topic/game/${game.gameId}/pointer/init", pointerMoveDTOS)
+        if (game.gameId in mouseData){
+            sendingOperations.convertAndSend("/topic/game/${game.gameId}/pointer/init", mouseData[game.gameId]!!)
+        }else{
+            val pointerMoveDTOS =
+                game.redTeam.map { PointerMoveDTO.of(it, "red", "red") } +
+                        game.blueTeam.map { PointerMoveDTO.of(it, "blue", "blue") }
+            mouseData[game.gameId] = pointerMoveDTOS.toMutableList()
+            sendingOperations.convertAndSend("/topic/game/${game.gameId}/pointer/init", pointerMoveDTOS)
+        }
     }
 
     @MessageMapping("/game/{gameId}/exit")
@@ -166,7 +172,15 @@ class GameController(
         gameId: String,
         pointerMoveDTO: PointerMoveDTO,
     ) {
-        sendingOperations.convertAndSend("/topic/game/$gameId/mouse", pointerMoveDTO)
+        mouseData[gameId]?.let {
+            for (p in it){
+                if (p.playerId == pointerMoveDTO.playerId){
+                    p.x = pointerMoveDTO.x
+                    p.y = pointerMoveDTO.y
+                    break
+                }
+            }
+        }
     }
 
     //  서버 타이머 제공
@@ -236,6 +250,17 @@ class GameController(
         for (i in allRoom.indices.reversed()) {
             if (allRoom[i].isFinished && !allRoom[i].isStarted) {
                 gameService.deleteGameRoom(allRoom[i].gameId)
+                mouseData.remove(allRoom[i].gameId)
+            }
+        }
+    }
+
+    @Scheduled(fixedRate = 100)
+    fun mouseMove() {
+        gameService.findAllBattleRoom()
+        .forEach {
+            if(!it.isFinished && it.gameId in mouseData){
+                sendingOperations.convertAndSend("/topic/game/${it.gameId}/mouse", mouseData[it.gameId]!!)
             }
         }
     }
