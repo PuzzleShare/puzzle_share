@@ -16,7 +16,7 @@
 |:------:|:------:|:------:|:------:|:------:|
 | <img src="https://github.com/user-attachments/assets/11dc94cb-6d73-47a8-9900-40292cd0d149" alt="문지언" width="150"> | <img src="https://github.com/user-attachments/assets/a7380cbb-c7e1-4be3-a977-11e9390e630d" alt="고병찬" width="150"> | <img src="https://github.com/user-attachments/assets/4b9d7b09-beb0-48d5-8ac3-44dec9ad1a65" alt="김진성" width="150"> | <img src="https://github.com/user-attachments/assets/357c88d1-7684-4e4c-93c6-ff29644d89d1" alt="정인우" width="150"> | <img src="https://github.com/user-attachments/assets/33ac0898-46b0-471c-be12-8650b3dfba93" alt="최민재" width="150"> |
 | BE/FE | BE/FE | BE/FE | BE/FE | BE/FE |
-| - 역할 추가 | - 역할 추가 | - 역할 추가 | - 게임 대기방 소켓 구성<br/>- 전체적인 화면 디자인 및 구현<br/>- 퍼즐 그룹화 및 진행률 로직 구현<br/>- 맞춰진 퍼즐 사이 균열 생기는 문제 해결<br/>- 퍼즐 데이터 패킷 최적화<br/>- 이미지 업로드(Amazon S3) | - 역할 추가 |
+| - 역할 추가 | - 역할 추가 | - 역할 추가 | - 게임 대기방 소켓 구성<br/>- 전체적인 화면 디자인 및 구현<br/>- 퍼즐 그룹화 및 진행률 로직 구현<br/>- 맞춰진 퍼즐 사이 균열 생기는 문제 해결<br/>- 퍼즐 데이터 패킷 최적화<br/>- 이미지 업로드(Amazon S3) | - OAuth2 <br/>- 맞춰진 퍼즐 사이 비틀어진 공간 생기는 문제 해결<br/>- 퍼즐 데이터 패킷 최적화<br/>- 아이템 구현<br/>- 캔버스 크기 변경에 따른 마우스이벤트 왜곡 문제 해결 |
 
 <br/>
 
