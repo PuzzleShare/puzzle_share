@@ -12,7 +12,7 @@
 ## 팀원/역할
 <img src="https://github.com/user-attachments/assets/c2d59d30-2fef-4d19-a222-5d5d79de9be3" alt="크래프톤 팀원 사진" width="700">
 
-| 문지언 [GitHub](https://github.com/jifrozen0110) | 고병찬 [GitHub](https://github.com/LDK1009) | 김진성 [GitHub](https://github.com/LDK1009) | 정인우 [GitHub](https://github.com/LDK1009) | 최민재 [GitHub](https://github.com/LDK1009) |
+| 문지언 [GitHub](https://github.com/jifrozen0110) | 고병찬 [GitHub](https://github.com/LDK1009) | 김진성 [GitHub](https://github.com/JINS-DE) | 정인우 [GitHub](https://github.com/LDK1009) | 최민재 [GitHub](https://github.com/LDK1009) |
 |:------:|:------:|:------:|:------:|:------:|
 | <img src="https://github.com/user-attachments/assets/11dc94cb-6d73-47a8-9900-40292cd0d149" alt="문지언" width="150"> | <img src="https://github.com/user-attachments/assets/a7380cbb-c7e1-4be3-a977-11e9390e630d" alt="고병찬" width="150"> | <img src="https://github.com/user-attachments/assets/4b9d7b09-beb0-48d5-8ac3-44dec9ad1a65" alt="김진성" width="150"> | <img src="https://github.com/user-attachments/assets/357c88d1-7684-4e4c-93c6-ff29644d89d1" alt="정인우" width="150"> | <img src="https://github.com/user-attachments/assets/33ac0898-46b0-471c-be12-8650b3dfba93" alt="최민재" width="150"> |
 | BE/FE | BE/FE | BE/FE | BE/FE | BE/FE |
