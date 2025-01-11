@@ -6,13 +6,18 @@
 
 ## Contents
 
+[팀원 / 역할](#팀원--역할)  
+[아키텍쳐](#아키텍쳐)  
+[기술 스택](#기술-스택)  
+[문제 해결 / 개선](#문제-해결--개선)  
+[주요 기능](#주요-기능)  
 
 <br/>
 
-## 팀원/역할
+## 팀원 / 역할
 <img src="https://github.com/user-attachments/assets/c2d59d30-2fef-4d19-a222-5d5d79de9be3" alt="크래프톤 팀원 사진" width="700">
 
-| 문지언 [GitHub](https://github.com/jifrozen0110) | 고병찬 [GitHub](https://github.com/LDK1009) | 김진성 [GitHub](https://github.com/JINS-DE) | 정인우 [GitHub](https://github.com/LDK1009) | 최민재 [GitHub](https://github.com/LDK1009) |
+| 문지언 [GitHub](https://github.com/jifrozen0110) | 고병찬 [GitHub](https://github.com/qudcks1940) | 김진성 [GitHub](https://github.com/JINS-DE) | 정인우 [GitHub](https://github.com/jeonginwoo) | 최민재 [GitHub](https://github.com/alswo1212) |
 |:------:|:------:|:------:|:------:|:------:|
 | <img src="https://github.com/user-attachments/assets/11dc94cb-6d73-47a8-9900-40292cd0d149" alt="문지언" width="150"> | <img src="https://github.com/user-attachments/assets/a7380cbb-c7e1-4be3-a977-11e9390e630d" alt="고병찬" width="150"> | <img src="https://github.com/user-attachments/assets/4b9d7b09-beb0-48d5-8ac3-44dec9ad1a65" alt="김진성" width="150"> | <img src="https://github.com/user-attachments/assets/357c88d1-7684-4e4c-93c6-ff29644d89d1" alt="정인우" width="150"> | <img src="https://github.com/user-attachments/assets/33ac0898-46b0-471c-be12-8650b3dfba93" alt="최민재" width="150"> |
 | BE/FE | BE/FE | BE/FE | BE/FE | BE/FE |
@@ -25,29 +30,25 @@
 
 <br/>
 
-## 주요 기능
-### 화면
-|||
-|:------:|:------:|
-| 홈(게임 리스트) | 마이페이지 |
-| <img src="https://github.com/user-attachments/assets/894d0b21-334b-4255-a9ad-d45bdd4d6399" alt="홈(게임 리스트)" width="380"> | <img src="https://github.com/user-attachments/assets/f45aa01f-6912-44b1-bdf3-59ecddfb3bcc" alt="마이페이지" width="380"> |
-| 갤러리 | 상세보기 |
-| <img src="https://github.com/user-attachments/assets/72653656-7f78-440b-994e-be2fc7fcf4be" alt="갤러리" width="380"> | <img src="https://github.com/user-attachments/assets/b56325df-7695-4d21-b1fb-66d906dac4dc" alt="상세보기" width="380"> |
-| 방만들기 | 게임 대기방 |
-| <img src="https://github.com/user-attachments/assets/f6e1ee65-e304-4102-9f41-e827c8c19140" alt="방만들기" width="380"> | <img src="https://github.com/user-attachments/assets/a8343ac3-8193-4841-ad9d-e57429ac86fc" alt="게임 대기방" width="380"> |
-| 게임 시작 | 완성한 퍼즐은 갤러리에 저장 |
-| <img src="https://github.com/user-attachments/assets/d1b5d850-26f5-43fe-a368-1f8db149c857" alt="게임 시작" width="380"> | <img src="https://github.com/user-attachments/assets/48ca7993-6803-46d9-8387-fb810ce3fd8b" alt="완성한 퍼즐은 갤러리에 저장" width="380"> |
+## 기술 스택
+### Backend
+<div style="margin: ; text-align: left;" "text-align: left;">
+    <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white">
+    <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white">
+    <img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=for-the-badge&logo=Amazon AWS&logoColor=white">
+    <img src="https://img.shields.io/badge/Amazon S3-569A31?style=for-the-badge&logo=Amazon S3&logoColor=white">
+    <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white">
+    <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">
+    <img src="https://img.shields.io/badge/Flyway-CC0200?style=for-the-badge&logo=Flyway&logoColor=white">
+</div>
 
-
-### 아이템
-|||
-|:------:|:------:|
-| 아이템 퍼즐 (공격 아이템 랜덤 획득) | 먹물 (상대팀 화면 가리기) |
-| <img src="https://github.com/user-attachments/assets/0af97df8-95b7-4d4c-847f-8c53809251d1" alt="아이템 퍼즐" width="380"> | <img src="https://github.com/user-attachments/assets/c3f17e6c-0fc9-43c2-a64f-0bff7d01f083" alt="먹물" width="380"> |
-| 폭탄 (상대팀 퍼즐 연결 끊기) | 블랙홀 (상대팀 퍼즐 모으기) |
-| <img src="https://github.com/user-attachments/assets/4e9a7ac5-3396-4eff-b036-d2050be3c9a3" alt="폭탄" width="380"> | <img src="https://github.com/user-attachments/assets/607c1a69-a2b1-40d3-b174-fb6d0b662360" alt="블랙홀" width="380"> |
-| 태풍 (상대팀 퍼즐 흩뿌리기) | 액자 (우리팀 퍼즐 테두리 맞추기, 지는 팀 지원 아이템) |
-| <img src="https://github.com/user-attachments/assets/f8a2bd62-6b75-4fb6-8894-ccfa810dbceb" alt="태풍" width="380"> | <img src="https://github.com/user-attachments/assets/2675c483-f923-49e9-89c1-18021081760e" alt="액자" width="380"> |
+### Frontend
+<div style="margin: ; text-align: left;" "text-align: left;">
+    <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
+    <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
+    <img src="https://img.shields.io/badge/Javascript-F7DF1E?style=for-the-badge&logo=Javascript&logoColor=white">
+    <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=Vercel&logoColor=white">
+</div>
 
 <br/>
 
@@ -79,25 +80,38 @@
 <br/>
 
 2. 마우스 이벤트 왜곡
+   - 배경 설명
+   - 엉뚱한 퍼즐이 움직임  
+     <img src="https://github.com/user-attachments/assets/ac46b8c3-8f2f-40d7-b6c2-e7c05b416ce3" alt="딱 맞는 퍼즐" width="380">
 3. 패킷 수 최적화
+   - 퍼즐 데이터 패킷
+   - 마우스 이벤트 패킷
+4. 장애 예방
+   - Redis 사용한 이유
 
 <br/>
 
-## 🛠️ Tech Stacks
-### Backend
-<div style="margin: ; text-align: left;" "text-align: left;">
-    <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&logo=Spring&logoColor=white">
-    <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=for-the-badge&logo=Spring Boot&logoColor=white">
-    <img src="https://img.shields.io/badge/Amazon AWS-232F3E?style=for-the-badge&logo=Amazon AWS&logoColor=white">
-    <img src="https://img.shields.io/badge/Amazon S3-569A31?style=for-the-badge&logo=Amazon S3&logoColor=white">
-    <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white">
-    <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">
-</div>
+## 주요 기능
+### 화면
+|||
+|:------:|:------:|
+| 홈(게임 리스트) | 마이페이지 |
+| <img src="https://github.com/user-attachments/assets/894d0b21-334b-4255-a9ad-d45bdd4d6399" alt="홈(게임 리스트)" width="380"> | <img src="https://github.com/user-attachments/assets/f45aa01f-6912-44b1-bdf3-59ecddfb3bcc" alt="마이페이지" width="380"> |
+| 갤러리 | 상세보기 |
+| <img src="https://github.com/user-attachments/assets/72653656-7f78-440b-994e-be2fc7fcf4be" alt="갤러리" width="380"> | <img src="https://github.com/user-attachments/assets/b56325df-7695-4d21-b1fb-66d906dac4dc" alt="상세보기" width="380"> |
+| 방만들기 | 게임 대기방 |
+| <img src="https://github.com/user-attachments/assets/f6e1ee65-e304-4102-9f41-e827c8c19140" alt="방만들기" width="380"> | <img src="https://github.com/user-attachments/assets/a8343ac3-8193-4841-ad9d-e57429ac86fc" alt="게임 대기방" width="380"> |
+| 게임 시작 | 완성한 퍼즐은 갤러리에 저장 |
+| <img src="https://github.com/user-attachments/assets/d1b5d850-26f5-43fe-a368-1f8db149c857" alt="게임 시작" width="380"> | <img src="https://github.com/user-attachments/assets/48ca7993-6803-46d9-8387-fb810ce3fd8b" alt="완성한 퍼즐은 갤러리에 저장" width="380"> |
 
-### Frontend
-<div style="margin: ; text-align: left;" "text-align: left;">
-    <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white">
-    <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=React&logoColor=white">
-    <img src="https://img.shields.io/badge/Javascript-F7DF1E?style=for-the-badge&logo=Javascript&logoColor=white">
-    <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=Vercel&logoColor=white">
-</div>
+
+### 아이템
+|||
+|:------:|:------:|
+| 아이템 퍼즐 (공격 아이템 랜덤 획득) | 먹물 (상대팀 화면 가리기) |
+| <img src="https://github.com/user-attachments/assets/0af97df8-95b7-4d4c-847f-8c53809251d1" alt="아이템 퍼즐" width="380"> | <img src="https://github.com/user-attachments/assets/c3f17e6c-0fc9-43c2-a64f-0bff7d01f083" alt="먹물" width="380"> |
+| 폭탄 (상대팀 퍼즐 연결 끊기) | 블랙홀 (상대팀 퍼즐 모으기) |
+| <img src="https://github.com/user-attachments/assets/4e9a7ac5-3396-4eff-b036-d2050be3c9a3" alt="폭탄" width="380"> | <img src="https://github.com/user-attachments/assets/607c1a69-a2b1-40d3-b174-fb6d0b662360" alt="블랙홀" width="380"> |
+| 태풍 (상대팀 퍼즐 흩뿌리기) | 액자 (우리팀 퍼즐 테두리 맞추기, 지는 팀 지원 아이템) |
+| <img src="https://github.com/user-attachments/assets/f8a2bd62-6b75-4fb6-8894-ccfa810dbceb" alt="태풍" width="380"> | <img src="https://github.com/user-attachments/assets/2675c483-f923-49e9-89c1-18021081760e" alt="액자" width="380"> |
+
